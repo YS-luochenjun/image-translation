@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "source": "../runs/burgerking-zh-20261029/source.png",
+  "source_sha256": "dd2ed34fd1c7d45d68bb9c33193e67ea92020d3fa07605142944ebb84e727ca9",
+  "background": {
+    "operations": [
+      {"type": "solid", "bbox": [14, 43, 220, 78], "color": "#ffffff"},
+      {"type": "solid", "bbox": [43, 118, 106, 16], "color": "#ffffff"},
+      {"type": "solid", "bbox": [31, 262, 108, 10], "color": "#ffffff"},
+      {"type": "sample_rows", "bbox": [66, 140, 28, 16], "donors": [[20, 139, 17, 91], [120, 139, 12, 91]], "row_radius": 1, "rgb_min": [231, 156, 0], "rgb_max": [255, 255, 94]},
+      {"type": "sample_rows", "bbox": [24, 155, 113, 22], "donors": [[20, 139, 17, 91], [120, 139, 12, 91]], "row_radius": 1, "rgb_min": [231, 156, 0], "rgb_max": [255, 255, 94]},
+      {"type": "sample_rows", "bbox": [42, 176, 78, 16], "donors": [[20, 139, 17, 91], [120, 139, 12, 91]], "row_radius": 1, "rgb_min": [231, 156, 0], "rgb_max": [255, 255, 94]},
+      {"type": "sample_rows", "bbox": [42, 190, 79, 16], "donors": [[20, 139, 17, 91], [120, 139, 12, 91]], "row_radius": 1, "rgb_min": [231, 156, 0], "rgb_max": [255, 255, 94]},
+      {"type": "sample_rows", "bbox": [38, 208, 82, 21], "donors": [[20, 139, 17, 91], [120, 139, 12, 91]], "row_radius": 1, "rgb_min": [231, 156, 0], "rgb_max": [255, 255, 94]},
+      {"type": "sample_rows", "bbox": [270, 13, 42, 42], "donors": [[268, 13, 4, 42], [311, 13, 3, 42]], "row_radius": 0, "rgb_min": [141, 0, 0], "rgb_max": [255, 64, 64]},
+      {"type": "sample_rows", "bbox": [35, 242, 102, 15], "donors": [[33, 242, 3, 15], [132, 242, 4, 15]], "row_radius": 0, "rgb_min": [141, 0, 0], "rgb_max": [255, 64, 64]},
+      {"type": "restore", "bbox": [41, 205, 81, 3]}
+    ]
+  },
+  "rows": [
+    {"id": "headline", "text": "免费领", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 50, "center": [101, 72], "color": "#d50700", "angle": 3.5, "stroke": 0.45},
+    {"id": "coupon", "text": "2026 优惠券", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 23, "center": [101, 108], "color": "#d50700", "angle": 3.5, "stroke": 0.2},
+    {"id": "tagline", "text": "今天就犒劳自己！", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 9.5, "center": [96, 125], "color": "#29130d", "angle": 0, "stroke": 0},
+    {"id": "limited", "text": "限时", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 14.5, "center": [291, 23.5], "color": "#ffffff", "angle": 0, "stroke": 0.15},
+    {"id": "offer", "text": "优惠", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 17, "center": [291, 43], "color": "#ffdf00", "angle": 0, "stroke": 0.15},
+    {"id": "enjoy", "text": "享用", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 12, "center": [80.5, 147.5], "color": "#29130d", "angle": 0, "stroke": 0.1},
+    {"id": "whopper", "text": "皇堡", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 25, "center": [79.5, 166], "color": "#ca0500", "angle": 0, "stroke": 0.2},
+    {"id": "registered-mark", "text": "®", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 7, "center": [108, 158.5], "color": "#ca0500", "angle": 0, "stroke": 0},
+    {"id": "fries", "text": "中份薯条", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 13, "center": [81, 184.5], "color": "#29130d", "angle": 0, "stroke": 0},
+    {"id": "drink", "text": "中杯饮料", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 13, "center": [81, 198.5], "color": "#29130d", "angle": 0, "stroke": 0},
+    {"id": "free", "text": "免费！", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 22, "center": [80, 219], "color": "#cf0700", "angle": 0, "stroke": 0.2},
+    {"id": "cta", "text": "领取免费套餐", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 13.5, "center": [86, 249.5], "color": "#ffffff", "angle": 0, "stroke": 0.1},
+    {"id": "conditions", "text": "需符合领取条件", "font_path": "C:/Windows/Fonts/msyhbd.ttc", "font_size": 8, "center": [85, 266.6], "color": "#666666", "angle": 0, "stroke": 0}
+  ],
+  "assets": [],
+  "protected_regions": [
+    {"id": "brand", "bbox": [16, 14, 175, 29]},
+    {"id": "burger_bun", "bbox": [151, 127, 128, 22]},
+    {"id": "burger_body", "bbox": [139, 149, 142, 94]},
+    {"id": "cola", "bbox": [240, 71, 80, 110]},
+    {"id": "fries", "bbox": [276, 128, 51, 108]},
+    {"id": "publisher", "bbox": [249, 256, 74, 14]},
+    {"id": "yellow_crown_left", "bbox": [47, 142, 15, 12]},
+    {"id": "yellow_crown_right", "bbox": [96, 142, 12, 12]},
+    {"id": "button_crown_left", "bbox": [22, 243, 11, 12]},
+    {"id": "button_crown_right", "bbox": [138, 243, 10, 12]},
+    {"id": "bottom_frame", "bbox": [10, 273, 317, 7]}
+  ],
+  "text_clear_boxes": [[47, 142, 15, 12], [96, 142, 12, 12]],
+  "working_scale": 6,
+  "view_scale": 3,
+  "notes": [
+    "复用 work/burgerking_prepare.py、work/burgerking_typeset.py 最终 B-action 与 work/burgerking_finalize.py 的制作参数。所有 bbox、donors 和清除框均为源画布 XYWH；center 为 XY。",
+    "sample_rows 逐行从原始 source 的 donor 列采样 y±row_radius，裁剪到 donor 的纵向范围，按 inclusive RGB 范围过滤后取各通道中位数并截为 uint8；操作按顺序执行。restore 从原始 source 恢复饮料与免费之间的分隔装饰。",
+    "文字先在 6 倍画布排版和旋转，再 LANCZOS 缩回源尺寸，之后按 text_clear_boxes 清空 RGBA 文字层，保护原始皇冠。",
+    "免费领搭配 2026 优惠券；享用、中份薯条、中杯饮料与领取条件忠实保留最终定稿。单独 ® 与皇堡同色排版。",
+    "protected_regions 来自旧 finalize 的全部 rois，重建结果应逐区与 source 原像素一致；此配置不赋予自动视觉审核结论。"
+  ]
+}

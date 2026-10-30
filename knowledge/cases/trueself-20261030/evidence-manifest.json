@@ -1,0 +1,33 @@
+{
+  "source_sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+  "files": {
+    "source.png": {
+      "source": "runs\\trueself-bilingual-20261030\\source.png",
+      "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861"
+    },
+    "chinese-before.png": {
+      "source": "runs\\trueself-bilingual-20261030\\zh-v1\\translated.png",
+      "sha256": "e58482db922d59df696b3813fc96fd72ac9e08789098d0df264ecca6616a684a"
+    },
+    "japanese-before.png": {
+      "source": "runs\\trueself-bilingual-20261030\\ja-v2\\translated.png",
+      "sha256": "59c5b75947eeb6cfcb9bf79ae661d59aec9dc9fd5ba484553b690cd80a2ba639"
+    },
+    "chinese-revised.png": {
+      "source": "runs\\trueself-bilingual-20261030\\zh-v2\\translated.png",
+      "sha256": "2ca376785dfc5cc73e410d15ae4b52df12453e7a10917c77539051268066ed6a"
+    },
+    "japanese-revised.png": {
+      "source": "runs\\trueself-bilingual-20261030\\ja-v3\\translated.png",
+      "sha256": "bfd97b9efe8abea469e0e8d194786709103785938af7256ed1c4e1656bb65d1f"
+    },
+    "clean-background.png": {
+      "source": "runs\\trueself-bilingual-20261030\\02-clean-wall.png",
+      "sha256": "bff7177452189b6b766262debc74e96944acc5a3707a6e37969156e926588b34"
+    },
+    "comparison.png": {
+      "source": "runs\\trueself-bilingual-20261030\\04-shadow-revision-comparison.png",
+      "sha256": "6277c5bef05db7481e7b31f63803e8e6edd3f46c95043f75fb2da1b37926bf33"
+    }
+  }
+}

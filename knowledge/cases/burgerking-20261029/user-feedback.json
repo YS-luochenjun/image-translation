@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-29",
+  "source": "direct user message in this session",
+  "user_quote": "目前很好，对于标签的理解也很好，没有翻译BURGER KING这样的商标，很好。\n\n此次效果也很好，帮我进行知识的积累与归纳",
+  "feedback": "positive",
+  "recognized_aspects": ["当前译图整体效果", "对标签语义角色的理解", "保留BURGER KING商标"],
+  "output_sha256": "928b9af773bdd34c3bfc3f68574c69a7133db87082f53dc2ba438df46a42a6de",
+  "evidence": "evidence/chinese-final.png",
+  "scope": "当前广告图片及保留品牌身份、翻译普通促销内容的判断方向",
+  "not_inferred": ["所有英文或注册名称一律保留", "所有产品名称一律翻译", "所有品牌的官方译名已核实", "促销活动真实性获得核实", "今后图像生成的常驻授权"],
+  "historical_reviews": "生成时审核保留原状，用户反馈独立追加"
+}

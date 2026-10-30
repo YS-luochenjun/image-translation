@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-29",
+  "source": "direct user message in this session",
+  "user_quote": "挺好的，请你进行知识沉淀与总结",
+  "feedback": "positive",
+  "scope": "认可本轮推荐图的视觉效果与设计方向",
+  "output_sha256": "65aafd3a5b69b4ccb558b2f31b5acc02f2a8302532c07cd836534619bd1dd7ac",
+  "evidence": "evidence/art-direction-candidate.png",
+  "case_status": "partial",
+  "case_status_reason": "保留单样例覆盖和已披露构图取舍；不再将旧版张力、弧形和行宽反馈描述为当前未处理问题",
+  "not_inferred": [
+    "所有图片都应该使用生图或相同版式",
+    "所有非文字像素保持不变",
+    "已恢复原始字体文件或取得可编辑纯文字层",
+    "获得后续付费生成的常驻授权"
+  ],
+  "historical_reviews": "不修改生成时的审核和not_recorded状态；本文件是后续反馈记录"
+}

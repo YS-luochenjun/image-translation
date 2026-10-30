@@ -1,0 +1,11 @@
+{
+  "methods": 5,
+  "cases": 3,
+  "archived_images_verified": 7,
+  "valid_local_links": 149,
+  "packet_includes_new_method": true,
+  "source_and_tag_relevance_verified": true,
+  "unrelated_case_not_loaded": true,
+  "automatic_visual_scoring_added": false,
+  "user_acceptance": "partial_improvement_only"
+}

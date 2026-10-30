@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "single-image-localizer"
+version = "0.1.0"
+description = "Agent-led, evidence-bound single image localization"
+requires-python = ">=3.11"
+dependencies = ["Pillow>=12.0,<13"]
+
+[project.scripts]
+image-localizer = "image_localizer.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "source": "../runs/desktop-1-zh-redo/source.png",
+  "source_sha256": "886f01336ce95e27e770eae25a6fab947a4e756e39f0cb7ca22dcc2faa8a7a70",
+  "background": {
+    "path": "../runs/desktop-1-zh-redo/02-clean-background.png",
+    "mask": "../runs/desktop-1-zh-redo/02-edit-mask.png"
+  },
+  "rows": [],
+  "assets": [
+    {
+      "id": "authorized-ribbon-panel",
+      "path": "../runs/desktop-1-zh-art-direction/generated-panel-clean-alpha.png",
+      "kind": "compound",
+      "position": [28, 180],
+      "size": [280, 94]
+    }
+  ],
+  "protected_regions": [
+    {"id": "upper-scene", "bbox": [0, 0, 336, 178]},
+    {"id": "rose", "bbox": [68, 125, 66, 56]}
+  ],
+  "text_clear_boxes": [],
+  "working_scale": 6,
+  "view_scale": 3,
+  "notes": [
+    "复用已清理的授权模型图形 generated-panel-clean-alpha.png；不重新调用生成。该资产包含缎带、文字与装饰，是复合栅格资产，并非独立纯文字层，因此 rows 为空且 kind 为 compound。",
+    "资产以 XY 位置 [28,180]、尺寸 WH [280,94] 合成；全部 bbox 为源画布 XYWH，非字体路径相对于本 JSON 所在 examples 目录。",
+    "保留上部人物、心形框主体及玫瑰；设计允许资产覆盖少量白衣下沿与心框底尖，保护范围以 protected_regions 为准。",
+    "底图和 L 模式编辑蒙版沿用现有 run；配置与复合资产的存在不赋予自动视觉审核结论。"
+  ]
+}

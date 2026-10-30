@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "layered-localization",
+      "path": "knowledge/methods/layered-localization.md",
+      "kind": "method",
+      "status": "active",
+      "tags": [
+        "workflow",
+        "layered",
+        "localization",
+        "review"
+      ],
+      "scope": "用户授权的单图五阶段分层流程；各阶段需真实观察，非自动实现声明"
+    },
+    {
+      "id": "content-routing",
+      "path": "knowledge/methods/content-routing.md",
+      "kind": "method",
+      "status": "provisional",
+      "tags": [
+        "routing",
+        "background",
+        "ui",
+        "ribbon",
+        "photography",
+        "artistic-type",
+        "document",
+        "chart",
+        "comic",
+        "vertical",
+        "rtl"
+      ],
+      "scope": "按图种与区域条件选择技术候选；少样例，不宣称所有分支已验证"
+    },
+    {
+      "id": "typography-composition",
+      "path": "knowledge/methods/typography-composition.md",
+      "kind": "method",
+      "status": "provisional",
+      "tags": [
+        "typography",
+        "composition",
+        "style",
+        "curved-text",
+        "perspective",
+        "review"
+      ],
+      "scope": "目标语言字形、容器和全图协调的逐图设计检查维度"
+    },
+    {
+      "id": "semantic-roles-and-brand-preservation",
+      "path": "knowledge/methods/semantic-roles-and-brand-preservation.md",
+      "kind": "method",
+      "status": "active",
+      "tags": [
+        "semantics",
+        "brand-preservation",
+        "product-name",
+        "conditions",
+        "food-ad"
+      ],
+      "scope": "先识别品牌/产品名/普通文案/规格条件/发布标识再决定动作；用户明确认可判断方向，技术仍逐图验证"
+    },
+    {
+      "id": "visual-fidelity-self-review",
+      "path": "knowledge/methods/visual-fidelity-self-review.md",
+      "kind": "method",
+      "status": "active",
+      "tags": [
+        "workflow",
+        "review",
+        "style",
+        "typography",
+        "self-review",
+        "iteration"
+      ],
+      "scope": "源图关键特征与候选同尺度反证比较；用户前主动返工、退化检查和停止条件，非自动审美或一律加影"
+    },
+    {
+      "id": "burgerking-20261029",
+      "source_sha256": "dd2ed34fd1c7d45d68bb9c33193e67ea92020d3fa07605142944ebb84e727ca9",
+      "path": "knowledge/cases/burgerking-20261029/README.md",
+      "kind": "case",
+      "status": "partial",
+      "tags": [
+        "food-ad",
+        "flat-color",
+        "brand-preservation",
+        "portion-size",
+        "zh-CN"
+      ],
+      "scope": "当前336x280广告整体效果与商标保留获用户认可；保留单案例覆盖和轻微纹理/小字限制",
+      "user_feedback": "positive",
+      "feedback_path": "knowledge/cases/burgerking-20261029/user-feedback.json"
+    },
+    {
+      "id": "ribbon-20261029",
+      "source_sha256": "886f01336ce95e27e770eae25a6fab947a4e756e39f0cb7ca22dcc2faa8a7a70",
+      "path": "knowledge/cases/ribbon-20261029/README.md",
+      "kind": "case",
+      "status": "partial",
+      "tags": [
+        "ribbon",
+        "gradient",
+        "curved-text",
+        "336x280",
+        "zh-CN",
+        "partial"
+      ],
+      "scope": "仅本例336x280缎带；生成式艺术字重设计已获用户正向反馈，保留单样例覆盖和构图取舍",
+      "user_feedback": "positive",
+      "feedback_path": "knowledge/cases/ribbon-20261029/user-feedback.json"
+    },
+    {
+      "id": "trueself-20261030",
+      "source_sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+      "path": "knowledge/cases/trueself-20261030/README.md",
+      "kind": "case",
+      "status": "partial",
+      "tags": [
+        "antique-poster",
+        "portrait",
+        "textured-background",
+        "serif-typography",
+        "shadow",
+        "zh-CN",
+        "ja",
+        "review-failure"
+      ],
+      "scope": "300x250双语古典海报；旧版阴影/字重漏检，修订获好一些的相对认可，保留字体/行距/墙面限制，不是完全验收",
+      "user_feedback": "partial",
+      "feedback_path": "knowledge/cases/trueself-20261030/user-feedback.json"
+    }
+  ]
+}
