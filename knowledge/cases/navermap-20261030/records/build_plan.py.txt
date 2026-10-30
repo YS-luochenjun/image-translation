@@ -1,0 +1,71 @@
+from pathlib import Path
+import json, hashlib
+import numpy as np
+from PIL import Image, ImageFilter, ImageFont
+ROOT=Path(__file__).resolve().parent
+src=Image.open(ROOT/'source.png').convert('RGB'); a=np.array(src).astype(float)
+mask=np.zeros(a.shape[:2],np.uint8)
+# Small labels: remove dark glyphs, their white outlines, and blue sea lettering.
+labels=[('seoul','서울','首尔',[351,123,41,25],[372,135]),('gangneung','강릉','江陵',[502,122,40,26],[521,135]),('daejeon','대전','大田',[396,225,39,26],[415,238]),('jeonju','전주','全州',[336,294,41,26],[356,307]),('daegu','대구','大邱',[474,280,41,27],[494,294]),('gwangju','광주','光州',[312,371,40,26],[332,384]),('busan','부산','釜山',[503,362,41,26],[523,375]),('jeju','제주','济州',[305,539,46,28],[327,553]),('westsea','서해','西海',[155,256,60,32],[185,271]),('eastsea','동해','东海',[580,206,53,31],[606,221]),('southsea','남해','南海',[435,479,58,31],[464,495])]
+for ident,ko,zh,(x,y,w,h),center in labels:
+    p=a[y:y+h,x:x+w]
+    if 'sea' in ident:
+        m=(p[:,:,2]-p[:,:,0]>65)&(p[:,:,0]<80)&(p[:,:,1]<170)
+        radius=3
+    else:
+        m=(p.max(2)<155)
+        radius=3
+    local=Image.fromarray((m*255).astype('uint8')).filter(ImageFilter.MaxFilter(radius*2+1))
+    mask[y:y+h,x:x+w]=np.maximum(mask[y:y+h,x:x+w],np.array(local))
+# The call to action is on a softly painted sky. Rebuild from its immediate
+# top/bottom boundary, retaining the surrounding clouds and landscape.
+x,y,w,h=625,414,543,77
+mask[y:y+h,x:x+w]=255
+# Solve a local harmonic extension, only inside the recorded edit mask.
+unknown=mask>0
+b=a.copy(); known=~unknown
+# Propagate trustworthy boundary colors inward.
+filled=known.copy()
+for i in range(110):
+    count=np.zeros(filled.shape,float); total=np.zeros_like(b)
+    for dy,dx in ((-1,0),(1,0),(0,-1),(0,1)):
+        f=np.roll(filled,(dy,dx),(0,1)); count+=f
+        total+=np.roll(b,(dy,dx),(0,1))*f[:,:,None]
+    frontier=(~filled)&(count>0)
+    if not frontier.any():break
+    b[frontier]=total[frontier]/count[frontier,None];filled[frontier]=True
+for i in range(450):
+    mean=(np.roll(b,1,0)+np.roll(b,-1,0)+np.roll(b,1,1)+np.roll(b,-1,1))/4
+    b[unknown]=mean[unknown]
+Image.fromarray(np.clip(b,0,255).astype('uint8')).save(ROOT/'clean-background.png')
+Image.fromarray(mask).save(ROOT/'edit-mask.png')
+# Evidence crops of source and background, at native detail enlarged for reading.
+for name,box in [('map',(265,100,550,405)),('cta',(610,405,1180,495))]:
+    src.crop(box).resize(((box[2]-box[0])*2,(box[3]-box[1])*2)).save(ROOT/f'source-{name}-2x.png')
+font='C:/Windows/Fonts/msyhbd.ttc'
+style={'font_path':font,'min_font_size':18,'max_font_size':24,'color':'#222222','align':'center','padding':0,'line_spacing':0,'stroke_width':2,'stroke_fill':'#FFFFFF'}
+mfile=ROOT/'languages/zh-CN/manifest.json'; manifest=json.loads(mfile.read_text('utf-8'))
+regions=[];rows=[];mapping=[]
+for ident,ko,zh,box,center in labels:
+    sea='sea' in ident
+    regions.append({'id':ident,'action':'translate','source_text':ko,'target_text':zh,'bbox':box,'confidence':0.99,'notes':'实际看图核对韩文；地理标签忠实翻译，保留相邻图钉及地图轮廓。','style':dict(style,color='#087FBF' if sea else '#222222'),'repair':{'mode':'clean_plate','color':'#FFFFFF'}})
+    rows.append({'id':ident,'text':zh,'font_path':font,'font_size':23 if sea else 18,'center':center,'color':'#087FBF' if sea else '#222222','stroke':0 if sea else 2,'effects':{} if sea else None})
+    if rows[-1]['effects'] is None:del rows[-1]['effects']
+    mapping.append({'region_id':ident,'row_ids':[ident],'asset_texts':[]})
+regions.append({'id':'cta','action':'translate','source_text':'지금 다운로드 하세요','target_text':'现在就下载吧','bbox':[625,414,543,77],'confidence':0.99,'notes':'忠实译为现在就下载吧；立即黑色，下载红色，保持醒目白描边。','style':dict(style,min_font_size=58,max_font_size=64),'repair':{'mode':'clean_plate','color':'#FFFFFF'}})
+# Four large glyphs, naturally spaced to maintain the broad advertising line.
+for i,char in enumerate('现在就下载吧'):
+    rows.append({'id':f'cta-{i}','text':char,'font_path':font,'font_size':68,'center':[681+i*86,452],'color':'#F00000' if i in (3,4) else '#171717','stroke':6})
+mapping.append({'region_id':'cta','row_ids':[f'cta-{i}' for i in range(6)],'asset_texts':[]})
+for ident,text,box in [('brand','NAVER MAP',[609,318,580,90]),('year','-2026-',[755,492,274,68]),('icon-n','N',[29,47,128,134]),('large-n','N',[767,66,250,250])]:
+    regions.append({'id':ident,'action':'preserve','source_text':text,'target_text':text,'bbox':box,'confidence':1,'notes':'品牌字标、图标内N或年份保持原样。','style':style,'repair':{'mode':'clean_plate','color':'#FFFFFF'}})
+protected=[{'id':'brand-mark','bbox':[609,318,580,90]},{'id':'year-mark','bbox':[755,492,274,68]},{'id':'app-icon','bbox':[29,47,128,134]},{'id':'main-logo','bbox':[767,66,250,250]}]
+for i,box in enumerate([[327,112,24,35],[476,112,25,34],[371,213,24,34],[312,280,24,34],[450,268,24,34],[288,360,24,34],[478,349,24,34],[277,530,26,35]]):protected.append({'id':f'pin-{i}','bbox':box})
+manifest.update(regions=regions,protected_regions=protected,glossary=[{'source':x[1],'target':x[2]} for x in labels],analysis={'complete':True,'unresolved':[],'observations':['实际打开1200×628规范化图与局部。共11处韩文地理标签、1处下载宣传语，品牌与年份保留。','源图为水彩插画，城市黑字白边、海域蓝字，广告黑红粗体白边，无需立体挤出。','所有韩文均可辨；没有隐藏小字或脚注。']})
+mfile.write_text(json.dumps(manifest,ensure_ascii=False,indent=2),'utf-8')
+job=json.loads((ROOT/'job.json').read_text('utf-8'))
+job.update(background={'path':'clean-background.png','mask':'edit-mask.png'},protected_regions=protected,working_scale=2,view_scale=1,visual_targets=[{'id':'map-labels','bbox':[270,105,278,465],'source_observation':'城市标签为小号黑色粗字白边，位于红图钉右侧。','criterion':'全部中文地名清晰，仍位于对应图钉右侧，图钉和海岸不变，无明显残字或补丁。'},{'id':'sea-labels','bbox':[150,200,490,310],'source_observation':'三处海域名为中蓝色，轻量无白色粗描边。','criterion':'西海、东海、南海为蓝字，大小与原标签协调，蓝色天空无矩形补丁。'},{'id':'cta-weight','bbox':[620,412,550,80],'source_observation':'下载宣传横向大字，黑红强对比，厚白描边，平面无立体影。','criterion':'现在就下载吧为黑红粗体白边，单行居中，保留广告力度且不碰品牌或年份。'},{'id':'preservation','bbox':[0,0,1200,628],'source_observation':'右侧主标及NAVER MAP、左上图标、2026与海滨插画构成画面主体。','criterion':'品牌图标年份原像素保留；地图轮廓、红图钉、海岸、山与树叶不被修复改动。'}])
+job['targets'][0].update(rows=rows,region_map=mapping,notes=['中文定稿采用标准中文城市译名；海域保留原标注的直译。'])
+job['notes']=['本地源像素约束的局部调和重建；不宣称恢复被文字遮挡的未知水彩细节。','只翻译韩文，保留品牌NAVER MAP与年份。']
+(ROOT/'job.json').write_text(json.dumps(job,ensure_ascii=False,indent=2),'utf-8')
+print('Prepared semantic manifest, local background, mask, and native job.')

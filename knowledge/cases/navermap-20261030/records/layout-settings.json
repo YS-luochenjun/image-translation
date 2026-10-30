@@ -1,0 +1,732 @@
+{
+  "ja": {
+    "seoul": {
+      "text": "ソウル",
+      "size": 18,
+      "position": [
+        352,
+        126
+      ],
+      "dimensions": [
+        54,
+        18
+      ]
+    },
+    "gangneung": {
+      "text": "江陵",
+      "size": 18,
+      "position": [
+        502,
+        126
+      ],
+      "dimensions": [
+        38,
+        19
+      ]
+    },
+    "daejeon": {
+      "text": "大田",
+      "size": 18,
+      "position": [
+        397,
+        228
+      ],
+      "dimensions": [
+        36,
+        19
+      ]
+    },
+    "jeonju": {
+      "text": "全州",
+      "size": 18,
+      "position": [
+        337,
+        298
+      ],
+      "dimensions": [
+        37,
+        19
+      ]
+    },
+    "daegu": {
+      "text": "大邱",
+      "size": 18,
+      "position": [
+        475,
+        284
+      ],
+      "dimensions": [
+        37,
+        19
+      ]
+    },
+    "gwangju": {
+      "text": "光州",
+      "size": 18,
+      "position": [
+        313,
+        374
+      ],
+      "dimensions": [
+        36,
+        19
+      ]
+    },
+    "busan": {
+      "text": "釜山",
+      "size": 18,
+      "position": [
+        504,
+        366
+      ],
+      "dimensions": [
+        37,
+        19
+      ]
+    },
+    "jeju": {
+      "text": "済州",
+      "size": 18,
+      "position": [
+        307,
+        544
+      ],
+      "dimensions": [
+        36,
+        19
+      ]
+    },
+    "westsea": {
+      "text": "西海",
+      "size": 23,
+      "position": [
+        142,
+        260
+      ],
+      "dimensions": [
+        44,
+        21
+      ]
+    },
+    "eastsea": {
+      "text": "東海",
+      "size": 23,
+      "position": [
+        618,
+        210
+      ],
+      "dimensions": [
+        45,
+        21
+      ]
+    },
+    "southsea": {
+      "text": "南海",
+      "size": 23,
+      "position": [
+        442,
+        484
+      ],
+      "dimensions": [
+        44,
+        21
+      ]
+    },
+    "cta": {
+      "text": "今すぐダウンロード",
+      "size": 58,
+      "position": [
+        633,
+        420
+      ],
+      "dimensions": [
+        524,
+        65
+      ]
+    }
+  },
+  "en": {
+    "seoul": {
+      "text": "Seoul",
+      "size": 17,
+      "position": [
+        352,
+        127
+      ],
+      "dimensions": [
+        47,
+        16
+      ]
+    },
+    "gangneung": {
+      "text": "Gangneung",
+      "size": 17,
+      "position": [
+        502,
+        126
+      ],
+      "dimensions": [
+        95,
+        19
+      ]
+    },
+    "daejeon": {
+      "text": "Daejeon",
+      "size": 17,
+      "position": [
+        397,
+        229
+      ],
+      "dimensions": [
+        66,
+        18
+      ]
+    },
+    "jeonju": {
+      "text": "Jeonju",
+      "size": 17,
+      "position": [
+        337,
+        298
+      ],
+      "dimensions": [
+        56,
+        18
+      ]
+    },
+    "daegu": {
+      "text": "Daegu",
+      "size": 17,
+      "position": [
+        475,
+        285
+      ],
+      "dimensions": [
+        52,
+        18
+      ]
+    },
+    "gwangju": {
+      "text": "Gwangju",
+      "size": 17,
+      "position": [
+        313,
+        374
+      ],
+      "dimensions": [
+        73,
+        19
+      ]
+    },
+    "busan": {
+      "text": "Busan",
+      "size": 17,
+      "position": [
+        504,
+        368
+      ],
+      "dimensions": [
+        52,
+        15
+      ]
+    },
+    "jeju": {
+      "text": "Jeju",
+      "size": 17,
+      "position": [
+        307,
+        544
+      ],
+      "dimensions": [
+        35,
+        18
+      ]
+    },
+    "westsea": {
+      "text": "West Sea",
+      "size": 20,
+      "position": [
+        120,
+        264
+      ],
+      "dimensions": [
+        88,
+        15
+      ]
+    },
+    "eastsea": {
+      "text": "East Sea",
+      "size": 20,
+      "position": [
+        600,
+        214
+      ],
+      "dimensions": [
+        81,
+        15
+      ]
+    },
+    "southsea": {
+      "text": "South Sea",
+      "size": 20,
+      "position": [
+        416,
+        488
+      ],
+      "dimensions": [
+        97,
+        15
+      ]
+    },
+    "cta": {
+      "text": "Download now",
+      "size": 70,
+      "position": [
+        646,
+        422
+      ],
+      "dimensions": [
+        498,
+        61
+      ]
+    }
+  },
+  "es": {
+    "seoul": {
+      "text": "Seúl",
+      "size": 17,
+      "position": [
+        352,
+        127
+      ],
+      "dimensions": [
+        37,
+        16
+      ]
+    },
+    "gangneung": {
+      "text": "Gangneung",
+      "size": 17,
+      "position": [
+        502,
+        126
+      ],
+      "dimensions": [
+        95,
+        19
+      ]
+    },
+    "daejeon": {
+      "text": "Daejeon",
+      "size": 17,
+      "position": [
+        397,
+        229
+      ],
+      "dimensions": [
+        66,
+        18
+      ]
+    },
+    "jeonju": {
+      "text": "Jeonju",
+      "size": 17,
+      "position": [
+        337,
+        298
+      ],
+      "dimensions": [
+        56,
+        18
+      ]
+    },
+    "daegu": {
+      "text": "Daegu",
+      "size": 17,
+      "position": [
+        475,
+        285
+      ],
+      "dimensions": [
+        52,
+        18
+      ]
+    },
+    "gwangju": {
+      "text": "Gwangju",
+      "size": 17,
+      "position": [
+        313,
+        374
+      ],
+      "dimensions": [
+        73,
+        19
+      ]
+    },
+    "busan": {
+      "text": "Busan",
+      "size": 17,
+      "position": [
+        504,
+        368
+      ],
+      "dimensions": [
+        52,
+        15
+      ]
+    },
+    "jeju": {
+      "text": "Jeju",
+      "size": 17,
+      "position": [
+        307,
+        544
+      ],
+      "dimensions": [
+        35,
+        18
+      ]
+    },
+    "westsea": {
+      "text": "Mar del Oeste",
+      "size": 20,
+      "position": [
+        100,
+        264
+      ],
+      "dimensions": [
+        129,
+        15
+      ]
+    },
+    "eastsea": {
+      "text": "Mar del Este",
+      "size": 20,
+      "position": [
+        582,
+        214
+      ],
+      "dimensions": [
+        116,
+        15
+      ]
+    },
+    "southsea": {
+      "text": "Mar del Sur",
+      "size": 20,
+      "position": [
+        410,
+        488
+      ],
+      "dimensions": [
+        108,
+        15
+      ]
+    },
+    "cta": {
+      "text": "Descarga ahora",
+      "size": 64,
+      "position": [
+        653,
+        418
+      ],
+      "dimensions": [
+        484,
+        69
+      ]
+    }
+  },
+  "de": {
+    "seoul": {
+      "text": "Seoul",
+      "size": 17,
+      "position": [
+        352,
+        127
+      ],
+      "dimensions": [
+        47,
+        16
+      ]
+    },
+    "gangneung": {
+      "text": "Gangneung",
+      "size": 17,
+      "position": [
+        502,
+        126
+      ],
+      "dimensions": [
+        95,
+        19
+      ]
+    },
+    "daejeon": {
+      "text": "Daejeon",
+      "size": 17,
+      "position": [
+        397,
+        229
+      ],
+      "dimensions": [
+        66,
+        18
+      ]
+    },
+    "jeonju": {
+      "text": "Jeonju",
+      "size": 17,
+      "position": [
+        337,
+        298
+      ],
+      "dimensions": [
+        56,
+        18
+      ]
+    },
+    "daegu": {
+      "text": "Daegu",
+      "size": 17,
+      "position": [
+        475,
+        285
+      ],
+      "dimensions": [
+        52,
+        18
+      ]
+    },
+    "gwangju": {
+      "text": "Gwangju",
+      "size": 17,
+      "position": [
+        313,
+        374
+      ],
+      "dimensions": [
+        73,
+        19
+      ]
+    },
+    "busan": {
+      "text": "Busan",
+      "size": 17,
+      "position": [
+        504,
+        368
+      ],
+      "dimensions": [
+        52,
+        15
+      ]
+    },
+    "jeju": {
+      "text": "Jeju",
+      "size": 17,
+      "position": [
+        307,
+        544
+      ],
+      "dimensions": [
+        35,
+        18
+      ]
+    },
+    "westsea": {
+      "text": "Westmeer",
+      "size": 20,
+      "position": [
+        116,
+        264
+      ],
+      "dimensions": [
+        96,
+        15
+      ]
+    },
+    "eastsea": {
+      "text": "Ostmeer",
+      "size": 20,
+      "position": [
+        600,
+        214
+      ],
+      "dimensions": [
+        81,
+        15
+      ]
+    },
+    "southsea": {
+      "text": "Südmeer",
+      "size": 20,
+      "position": [
+        422,
+        488
+      ],
+      "dimensions": [
+        85,
+        15
+      ]
+    },
+    "cta": {
+      "text": "Jetzt herunterladen",
+      "size": 56,
+      "position": [
+        634,
+        426
+      ],
+      "dimensions": [
+        522,
+        51
+      ]
+    }
+  },
+  "ru": {
+    "seoul": {
+      "text": "Сеул",
+      "size": 17,
+      "position": [
+        352,
+        126
+      ],
+      "dimensions": [
+        43,
+        19
+      ]
+    },
+    "gangneung": {
+      "text": "Каннын",
+      "size": 17,
+      "position": [
+        502,
+        128
+      ],
+      "dimensions": [
+        66,
+        15
+      ]
+    },
+    "daejeon": {
+      "text": "Тэджон",
+      "size": 17,
+      "position": [
+        397,
+        230
+      ],
+      "dimensions": [
+        64,
+        17
+      ]
+    },
+    "jeonju": {
+      "text": "Чонджу",
+      "size": 17,
+      "position": [
+        337,
+        298
+      ],
+      "dimensions": [
+        66,
+        18
+      ]
+    },
+    "daegu": {
+      "text": "Тэгу",
+      "size": 17,
+      "position": [
+        475,
+        285
+      ],
+      "dimensions": [
+        38,
+        18
+      ]
+    },
+    "gwangju": {
+      "text": "Кванджу",
+      "size": 17,
+      "position": [
+        313,
+        375
+      ],
+      "dimensions": [
+        74,
+        18
+      ]
+    },
+    "busan": {
+      "text": "Пусан",
+      "size": 17,
+      "position": [
+        504,
+        366
+      ],
+      "dimensions": [
+        51,
+        18
+      ]
+    },
+    "jeju": {
+      "text": "Чеджу",
+      "size": 17,
+      "position": [
+        307,
+        544
+      ],
+      "dimensions": [
+        55,
+        18
+      ]
+    },
+    "westsea": {
+      "text": "Западное море",
+      "size": 20,
+      "position": [
+        89,
+        262
+      ],
+      "dimensions": [
+        150,
+        19
+      ]
+    },
+    "eastsea": {
+      "text": "Восточное море",
+      "size": 20,
+      "position": [
+        560,
+        212
+      ],
+      "dimensions": [
+        161,
+        18
+      ]
+    },
+    "southsea": {
+      "text": "Южное море",
+      "size": 20,
+      "position": [
+        402,
+        486
+      ],
+      "dimensions": [
+        124,
+        19
+      ]
+    },
+    "cta": {
+      "text": "Скачайте сейчас",
+      "size": 62,
+      "position": [
+        636,
+        424
+      ],
+      "dimensions": [
+        518,
+        56
+      ]
+    }
+  }
+}

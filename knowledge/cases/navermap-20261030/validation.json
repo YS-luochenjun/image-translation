@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-30",
+  "scope": "Knowledge/curated evidence changes only; unrelated uncommitted implementation and review-desk work excluded from intended commit.",
+  "test_command": "python -X utf8 -m unittest discover -s tests -p test_knowledge.py -q",
+  "test_result": {
+    "tests": 8,
+    "seconds": 0.071,
+    "exit_code": 0,
+    "status": "pass"
+  },
+  "source_and_tag_case_routing": "pass",
+  "unrelated_case_exclusion": "pass",
+  "conditional_method_pointer": "pass",
+  "stage_checks": {
+    "groups": 3,
+    "languages": 7,
+    "status": "pass"
+  },
+  "exact_png_protection_recount": {
+    "outputs": 7,
+    "regions_per_output": 12,
+    "all_changed_pixels": 0
+  },
+  "canonical_output_hashes_and_archived_review_bindings": "pass",
+  "original_historical_records_unchanged": "pass",
+  "jpeg_findings": "Five JPEG exports each differ from same-language canonical PNG at39,763 pixels in brand ROI; expected lossy export, not a visibility score.",
+  "case_status": "partial",
+  "user_feedback": "positive_group_feedback",
+  "native_language_certification": false,
+  "main_visual_scope": [
+    "source",
+    "zh-CN",
+    "zh-Hant",
+    "en",
+    "es",
+    "background",
+    "en-overlay"
+  ],
+  "independent_current_visual_scope": [
+    "source",
+    "ja",
+    "de",
+    "ru"
+  ],
+  "no_ocr_or_image_model_calls": true
+}

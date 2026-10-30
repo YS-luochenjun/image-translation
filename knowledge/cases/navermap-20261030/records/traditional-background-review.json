@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "source_sha256": "bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3",
+  "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b",
+  "receipt_sha256": "7283c6d37409f5e47b9b98a271d56d3cf578df98e8da895dc29d65e2bc41eb71",
+  "reviewer": "Codex",
+  "review_kind": "self",
+  "checks": {
+    "no_residual_text": true,
+    "seam_continuity": true,
+    "protected_content": true
+  },
+  "observations": "本次重新打开1200×628背景，哈希与简体版已审背景相同。韩文已去除，品牌和图钉完整，边缘连续；复用相同背景，无新增修复。原宣传语后方局部水彩纹理较平滑的限制保持。",
+  "issues": [
+    {
+      "severity": "minor",
+      "region_id": "cta",
+      "note": "宣传语后的天空重建较平滑，未恢复被原字遮住的水彩细节；不影响主体、译文或背景连续性。"
+    }
+  ]
+}

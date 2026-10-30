@@ -1,0 +1,77 @@
+[
+  {
+    "png_name": "1_俄语_ru.png",
+    "png_sha256": "5b1f59a839732f96833118d4c9a9825f1d9a8677d69754db8fe163ad29ecbdd8",
+    "jpeg_name": "1_俄语_ru.jpg",
+    "jpeg_sha256": "c53892ca5ec9203464649dbafc11f214574120a409141335439c83b58f749012",
+    "comparison": "JPEG versus canonical same-language PNG; exact RGBA difference, not a visible-damage score",
+    "changed_pixels": 395824,
+    "brand_roi_xywh": [
+      609,
+      318,
+      580,
+      90
+    ],
+    "brand_changed_pixels": 39763
+  },
+  {
+    "png_name": "1_德语_de.png",
+    "png_sha256": "0c90b72681c3dfc5f21f67eb37a0146258ca357a1a38a4b66041459c63a1856b",
+    "jpeg_name": "1_德语_de.jpg",
+    "jpeg_sha256": "cd0a7d9f6c11e99e8814fa62e82f2a4857193f1c1df9cd968901a159eccb2dd9",
+    "comparison": "JPEG versus canonical same-language PNG; exact RGBA difference, not a visible-damage score",
+    "changed_pixels": 394559,
+    "brand_roi_xywh": [
+      609,
+      318,
+      580,
+      90
+    ],
+    "brand_changed_pixels": 39763
+  },
+  {
+    "png_name": "1_日语_ja.png",
+    "png_sha256": "91072028230fdf93195b388c121556c41e3dca3c042d4e613983babf3242ddab",
+    "jpeg_name": "1_日语_ja.jpg",
+    "jpeg_sha256": "b0f350ab57ec409a0b67517507686b2adbf6c7667423d3db4096feb20247f239",
+    "comparison": "JPEG versus canonical same-language PNG; exact RGBA difference, not a visible-damage score",
+    "changed_pixels": 392433,
+    "brand_roi_xywh": [
+      609,
+      318,
+      580,
+      90
+    ],
+    "brand_changed_pixels": 39763
+  },
+  {
+    "png_name": "1_英语_en.png",
+    "png_sha256": "fb633da6fead9f23b42bb6904708efdfa50934c6d18ef44e892d482bb9c9b8db",
+    "jpeg_name": "1_英语_en.jpg",
+    "jpeg_sha256": "3df40863c6486d6abd397a1b52c931914f30a71c8c8862849b5776f128a36519",
+    "comparison": "JPEG versus canonical same-language PNG; exact RGBA difference, not a visible-damage score",
+    "changed_pixels": 394603,
+    "brand_roi_xywh": [
+      609,
+      318,
+      580,
+      90
+    ],
+    "brand_changed_pixels": 39763
+  },
+  {
+    "png_name": "1_西班牙语_es.png",
+    "png_sha256": "7e3f97f48b0cbafb54018dd2743ebf128eaf528346b9a30c8376e24ac567fc7a",
+    "jpeg_name": "1_西班牙语_es.jpg",
+    "jpeg_sha256": "b021b206cfade0ffbb01c4c0e74286bab0d670f7a3bc8348efa3df08d09967e7",
+    "comparison": "JPEG versus canonical same-language PNG; exact RGBA difference, not a visible-damage score",
+    "changed_pixels": 395187,
+    "brand_roi_xywh": [
+      609,
+      318,
+      580,
+      90
+    ],
+    "brand_changed_pixels": 39763
+  }
+]

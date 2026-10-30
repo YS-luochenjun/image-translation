@@ -1,0 +1,52 @@
+[
+  {
+    "language": "ja",
+    "cta": "今すぐダウンロード",
+    "png": "1_日语_ja.png",
+    "jpg": "1_日语_ja.jpg",
+    "source_output_sha256": "91072028230fdf93195b388c121556c41e3dca3c042d4e613983babf3242ddab",
+    "self_review": "pass_with_minor",
+    "user_acceptance": "not_recorded",
+    "notes": "日语假名比原韩文字面略轻，白边比例更显眼，属轻微风格差异。"
+  },
+  {
+    "language": "en",
+    "cta": "Download now",
+    "png": "1_英语_en.png",
+    "jpg": "1_英语_en.jpg",
+    "source_output_sha256": "fb633da6fead9f23b42bb6904708efdfa50934c6d18ef44e892d482bb9c9b8db",
+    "self_review": "pass_with_minor",
+    "user_acceptance": "not_recorded",
+    "notes": "长地名Gangneung比原标签更宽，伸至海面，仍完整清晰。"
+  },
+  {
+    "language": "es",
+    "cta": "Descarga ahora",
+    "png": "1_西班牙语_es.png",
+    "jpg": "1_西班牙语_es.jpg",
+    "source_output_sha256": "7e3f97f48b0cbafb54018dd2743ebf128eaf528346b9a30c8376e24ac567fc7a",
+    "self_review": "pass_with_minor",
+    "user_acceptance": "not_recorded",
+    "notes": "宣传语与年份间留白比源图略多，标题字高轻微下降。"
+  },
+  {
+    "language": "de",
+    "cta": "Jetzt herunterladen",
+    "png": "1_德语_de.png",
+    "jpg": "1_德语_de.jpg",
+    "source_output_sha256": "0c90b72681c3dfc5f21f67eb37a0146258ca357a1a38a4b66041459c63a1856b",
+    "self_review": "pass_with_minor",
+    "user_acceptance": "not_recorded",
+    "notes": "长宣传语为适应宽度采用较小字号，字高较原韩文低，仍清晰且保持黑红白边层级。"
+  },
+  {
+    "language": "ru",
+    "cta": "Скачайте сейчас",
+    "png": "1_俄语_ru.png",
+    "jpg": "1_俄语_ru.jpg",
+    "source_output_sha256": "5b1f59a839732f96833118d4c9a9825f1d9a8677d69754db8fe163ad29ecbdd8",
+    "self_review": "pass_with_minor",
+    "user_acceptance": "not_recorded",
+    "notes": "Восточное море较长、向品牌方向延伸更多，但与品牌保持清楚间隙。"
+  }
+]

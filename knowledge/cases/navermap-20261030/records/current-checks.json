@@ -1,0 +1,143 @@
+{
+  "navermap-render-v2": {
+    "status": "pass",
+    "languages": {
+      "zh-CN": {
+        "status": "pass",
+        "technical": "pass",
+        "user_acceptance": "not_recorded",
+        "reasons": [],
+        "review_kind": "self",
+        "issues": [
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "下载宣传语后方局部水彩天空比原图更平滑，重建未恢复未知纹理；当前成图无硬边补丁，不影响阅读或主体。"
+          }
+        ]
+      }
+    },
+    "user_acceptance": "not_recorded"
+  },
+  "navermap-traditional-render": {
+    "status": "pass",
+    "languages": {
+      "zh-Hant": {
+        "status": "pass",
+        "technical": "pass",
+        "user_acceptance": "not_recorded",
+        "reasons": [],
+        "review_kind": "self",
+        "issues": [
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "复用背景中宣传语后的天空纹理较原图平滑；繁體版无新增背景修复，不影响译文与主体。"
+          }
+        ]
+      }
+    },
+    "user_acceptance": "not_recorded"
+  },
+  "navermap-five-render": {
+    "status": "pass",
+    "languages": {
+      "ja": {
+        "status": "pass",
+        "technical": "pass",
+        "user_acceptance": "not_recorded",
+        "reasons": [],
+        "review_kind": "self",
+        "issues": [
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+          },
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "日语假名比原韩文字面略轻，白边比例更显眼，属轻微风格差异。"
+          }
+        ]
+      },
+      "en": {
+        "status": "pass",
+        "technical": "pass",
+        "user_acceptance": "not_recorded",
+        "reasons": [],
+        "review_kind": "self",
+        "issues": [
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+          },
+          {
+            "severity": "minor",
+            "region_id": "gangneung",
+            "note": "长地名Gangneung比原标签更宽，伸至海面，仍完整清晰。"
+          }
+        ]
+      },
+      "es": {
+        "status": "pass",
+        "technical": "pass",
+        "user_acceptance": "not_recorded",
+        "reasons": [],
+        "review_kind": "self",
+        "issues": [
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+          },
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "宣传语与年份间留白比源图略多，标题字高轻微下降。"
+          }
+        ]
+      },
+      "de": {
+        "status": "pass",
+        "technical": "pass",
+        "user_acceptance": "not_recorded",
+        "reasons": [],
+        "review_kind": "self",
+        "issues": [
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+          },
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "长宣传语为适应宽度采用较小字号，字高较原韩文低，仍清晰且保持黑红白边层级。"
+          }
+        ]
+      },
+      "ru": {
+        "status": "pass",
+        "technical": "pass",
+        "user_acceptance": "not_recorded",
+        "reasons": [],
+        "review_kind": "self",
+        "issues": [
+          {
+            "severity": "minor",
+            "region_id": "cta",
+            "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+          },
+          {
+            "severity": "minor",
+            "region_id": "eastsea",
+            "note": "Восточное море较长、向品牌方向延伸更多，但与品牌保持清楚间隙。"
+          }
+        ]
+      }
+    },
+    "user_acceptance": "not_recorded"
+  }
+}

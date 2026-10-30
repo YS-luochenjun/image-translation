@@ -132,6 +132,17 @@
       "scope": "300x250双语古典海报；旧版阴影/字重漏检，修订获好一些的相对认可，保留字体/行距/墙面限制，不是完全验收",
       "user_feedback": "partial",
       "feedback_path": "knowledge/cases/trueself-20261030/user-feedback.json"
+    },
+    {
+      "id": "navermap-20261030",
+      "source_sha256": "bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3",
+      "path": "knowledge/cases/navermap-20261030/README.md",
+      "kind": "case",
+      "status": "partial",
+      "tags": ["map", "map-ad", "multilingual", "outlined-text", "watercolor", "brand-preservation", "zh-CN", "zh-Hant", "ja", "en", "es", "de", "ru"],
+      "scope": "同一1200x628韩文地图的七语变体；用户认可多轮整体效果，保留背景平滑、字高/笔重/斜势等minor及PNG与JPEG证据边界，不是七种图种或母语认证",
+      "user_feedback": "positive",
+      "feedback_path": "knowledge/cases/navermap-20261030/user-feedback.json"
     }
   ]
 }

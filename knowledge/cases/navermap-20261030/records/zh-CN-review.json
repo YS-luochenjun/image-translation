@@ -1,0 +1,104 @@
+{
+  "output_sha256": "37b3cfc0b1d10a4886848081eec094dc751b14b99da237001b775e1290ecbf17",
+  "plan_sha256": "e530df897c64cef8065c85858cb24a7e25b4be5b667a2f6a7ec135959550e125",
+  "advisories": {},
+  "advisory_reviews": {},
+  "reviewer": "Codex",
+  "review_kind": "self",
+  "checks": {
+    "semantic": true,
+    "completeness": true,
+    "legibility": true,
+    "restoration": true,
+    "style": true,
+    "protected_content": true
+  },
+  "stage_notes": {
+    "source": "实际看1200×628源图及2倍地图/原韩文横排；共11个地理标签与下载宣传语；品牌与年份保留。",
+    "background": "v3背景哈希与已看v2一致；韩文清除，地图城市附近为小范围局部调和修复，宣传语后天空细纹更平滑，未声称未知底纹逐像素恢复。",
+    "lettering": "实际打开overlay-preview独立透明资产层，以及2倍地图和CTA。首尔、江陵、大田、全州、大邱、光州、釜山、济州均核对；西海东海南海无缺字。现在就下载吧六字黑红白边，字腔开放，没有初稿同色粗描边的粘连。",
+    "composite": "实际查看1200×628成图、600×314缩略及2倍局部。地图标签紧邻正确图钉，CTA单行平直，下载两字红色，NAVER MAP为首层品牌标题。中文大字轮廓比原韩文字形更方正，符合目标语言；品牌、年份和8个图钉保护像素变化均为0。"
+  },
+  "issues": [
+    {
+      "severity": "minor",
+      "region_id": "cta",
+      "note": "下载宣传语后方局部水彩天空比原图更平滑，重建未恢复未知纹理；当前成图无硬边补丁，不影响阅读或主体。"
+    }
+  ],
+  "user_acceptance": "not_recorded",
+  "style_comparisons": [
+    {
+      "id": "map-labels",
+      "bbox": [
+        270,
+        105,
+        278,
+        465
+      ],
+      "source_observation": "城市标签为小号黑色粗字白边，位于红图钉右侧。",
+      "criterion": "全部中文地名清晰，仍位于对应图钉右侧，图钉和海岸不变，无明显残字或补丁。",
+      "target_observation": "8处中文城市名黑字白边，所有字完整可读，未压住红图钉；尺寸接近原标签。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "sea-labels",
+      "bbox": [
+        150,
+        200,
+        490,
+        310
+      ],
+      "source_observation": "三处海域名为中蓝色，轻量无白色粗描边。",
+      "criterion": "西海、东海、南海为蓝字，大小与原标签协调，蓝色天空无矩形补丁。",
+      "target_observation": "西海、东海、南海蓝字清楚；相较原文不再有韩文分隔空格，符合中文，三个地理位置一致。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "cta-weight",
+      "bbox": [
+        620,
+        412,
+        550,
+        80
+      ],
+      "source_observation": "下载宣传横向大字，黑红强对比，厚白描边，平面无立体影。",
+      "criterion": "现在就下载吧为黑红粗体白边，单行居中，保留广告力度且不碰品牌或年份。",
+      "target_observation": "现在就下载吧采用粗黑/红字面与白色描边；下载两字红色，其他黑色，原尺寸白边明确，整行未碰上方品牌和下方年份，整体幅宽略短于原韩文。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "preservation",
+      "bbox": [
+        0,
+        0,
+        1200,
+        628
+      ],
+      "source_observation": "右侧主标及NAVER MAP、左上图标、2026与海滨插画构成画面主体。",
+      "criterion": "品牌图标年份原像素保留；地图轮廓、红图钉、海岸、山与树叶不被修复改动。",
+      "target_observation": "原品牌图标和年份视觉完整；技术报告保护区与范围外像素变化均0。海滨、山、树叶保持原画。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    }
+  ]
+}

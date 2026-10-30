@@ -1,0 +1,361 @@
+{
+  "source_sha256": "bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3",
+  "outputs": {
+    "zh-CN": {
+      "path": "evidence/zh-CN.png",
+      "sha256": "37b3cfc0b1d10a4886848081eec094dc751b14b99da237001b775e1290ecbf17",
+      "production_stage": "runs\\navermap-render-v2\\zh-CN",
+      "size": [
+        1200,
+        628
+      ],
+      "cta": "现在就下载吧",
+      "translations": {
+        "seoul": "首尔",
+        "gangneung": "江陵",
+        "daejeon": "大田",
+        "jeonju": "全州",
+        "daegu": "大邱",
+        "gwangju": "光州",
+        "busan": "釜山",
+        "jeju": "济州",
+        "westsea": "西海",
+        "eastsea": "东海",
+        "southsea": "南海",
+        "cta": "现在就下载吧"
+      },
+      "agent_review_kind": "self",
+      "protected_changed_pixels": {
+        "brand-mark": 0,
+        "year-mark": 0,
+        "app-icon": 0,
+        "main-logo": 0,
+        "pin-0": 0,
+        "pin-1": 0,
+        "pin-2": 0,
+        "pin-3": 0,
+        "pin-4": 0,
+        "pin-5": 0,
+        "pin-6": 0,
+        "pin-7": 0
+      },
+      "agent_issues": [
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "下载宣传语后方局部水彩天空比原图更平滑，重建未恢复未知纹理；当前成图无硬边补丁，不影响阅读或主体。"
+        }
+      ],
+      "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b"
+    },
+    "zh-Hant": {
+      "path": "evidence/zh-Hant.png",
+      "sha256": "b9b577d771dccc8d53603578915161123de1585dac68731e7379512bfc3333b2",
+      "production_stage": "runs\\navermap-traditional-render\\zh-Hant",
+      "size": [
+        1200,
+        628
+      ],
+      "cta": "現在就下載吧",
+      "translations": {
+        "seoul": "首爾",
+        "gangneung": "江陵",
+        "daejeon": "大田",
+        "jeonju": "全州",
+        "daegu": "大邱",
+        "gwangju": "光州",
+        "busan": "釜山",
+        "jeju": "濟州",
+        "westsea": "西海",
+        "eastsea": "東海",
+        "southsea": "南海",
+        "cta": "現在就下載吧"
+      },
+      "agent_review_kind": "self",
+      "protected_changed_pixels": {
+        "brand-mark": 0,
+        "year-mark": 0,
+        "app-icon": 0,
+        "main-logo": 0,
+        "pin-0": 0,
+        "pin-1": 0,
+        "pin-2": 0,
+        "pin-3": 0,
+        "pin-4": 0,
+        "pin-5": 0,
+        "pin-6": 0,
+        "pin-7": 0
+      },
+      "agent_issues": [
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "复用背景中宣传语后的天空纹理较原图平滑；繁體版无新增背景修复，不影响译文与主体。"
+        }
+      ],
+      "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b"
+    },
+    "ja": {
+      "path": "evidence/ja.png",
+      "sha256": "91072028230fdf93195b388c121556c41e3dca3c042d4e613983babf3242ddab",
+      "production_stage": "runs\\navermap-five-render\\ja",
+      "size": [
+        1200,
+        628
+      ],
+      "cta": "今すぐダウンロード",
+      "translations": {
+        "seoul": "ソウル",
+        "gangneung": "江陵",
+        "daejeon": "大田",
+        "jeonju": "全州",
+        "daegu": "大邱",
+        "gwangju": "光州",
+        "busan": "釜山",
+        "jeju": "済州",
+        "westsea": "西海",
+        "eastsea": "東海",
+        "southsea": "南海",
+        "cta": "今すぐダウンロード"
+      },
+      "agent_review_kind": "self",
+      "protected_changed_pixels": {
+        "brand-mark": 0,
+        "year-mark": 0,
+        "app-icon": 0,
+        "main-logo": 0,
+        "pin-0": 0,
+        "pin-1": 0,
+        "pin-2": 0,
+        "pin-3": 0,
+        "pin-4": 0,
+        "pin-5": 0,
+        "pin-6": 0,
+        "pin-7": 0
+      },
+      "agent_issues": [
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+        },
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "日语假名比原韩文字面略轻，白边比例更显眼，属轻微风格差异。"
+        }
+      ],
+      "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b"
+    },
+    "en": {
+      "path": "evidence/en.png",
+      "sha256": "fb633da6fead9f23b42bb6904708efdfa50934c6d18ef44e892d482bb9c9b8db",
+      "production_stage": "runs\\navermap-five-render\\en",
+      "size": [
+        1200,
+        628
+      ],
+      "cta": "Download now",
+      "translations": {
+        "seoul": "Seoul",
+        "gangneung": "Gangneung",
+        "daejeon": "Daejeon",
+        "jeonju": "Jeonju",
+        "daegu": "Daegu",
+        "gwangju": "Gwangju",
+        "busan": "Busan",
+        "jeju": "Jeju",
+        "westsea": "West Sea",
+        "eastsea": "East Sea",
+        "southsea": "South Sea",
+        "cta": "Download now"
+      },
+      "agent_review_kind": "self",
+      "protected_changed_pixels": {
+        "brand-mark": 0,
+        "year-mark": 0,
+        "app-icon": 0,
+        "main-logo": 0,
+        "pin-0": 0,
+        "pin-1": 0,
+        "pin-2": 0,
+        "pin-3": 0,
+        "pin-4": 0,
+        "pin-5": 0,
+        "pin-6": 0,
+        "pin-7": 0
+      },
+      "agent_issues": [
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+        },
+        {
+          "severity": "minor",
+          "region_id": "gangneung",
+          "note": "长地名Gangneung比原标签更宽，伸至海面，仍完整清晰。"
+        }
+      ],
+      "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b"
+    },
+    "es": {
+      "path": "evidence/es.png",
+      "sha256": "7e3f97f48b0cbafb54018dd2743ebf128eaf528346b9a30c8376e24ac567fc7a",
+      "production_stage": "runs\\navermap-five-render\\es",
+      "size": [
+        1200,
+        628
+      ],
+      "cta": "Descarga ahora",
+      "translations": {
+        "seoul": "Seúl",
+        "gangneung": "Gangneung",
+        "daejeon": "Daejeon",
+        "jeonju": "Jeonju",
+        "daegu": "Daegu",
+        "gwangju": "Gwangju",
+        "busan": "Busan",
+        "jeju": "Jeju",
+        "westsea": "Mar del Oeste",
+        "eastsea": "Mar del Este",
+        "southsea": "Mar del Sur",
+        "cta": "Descarga ahora"
+      },
+      "agent_review_kind": "self",
+      "protected_changed_pixels": {
+        "brand-mark": 0,
+        "year-mark": 0,
+        "app-icon": 0,
+        "main-logo": 0,
+        "pin-0": 0,
+        "pin-1": 0,
+        "pin-2": 0,
+        "pin-3": 0,
+        "pin-4": 0,
+        "pin-5": 0,
+        "pin-6": 0,
+        "pin-7": 0
+      },
+      "agent_issues": [
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+        },
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "宣传语与年份间留白比源图略多，标题字高轻微下降。"
+        }
+      ],
+      "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b"
+    },
+    "de": {
+      "path": "evidence/de.png",
+      "sha256": "0c90b72681c3dfc5f21f67eb37a0146258ca357a1a38a4b66041459c63a1856b",
+      "production_stage": "runs\\navermap-five-render\\de",
+      "size": [
+        1200,
+        628
+      ],
+      "cta": "Jetzt herunterladen",
+      "translations": {
+        "seoul": "Seoul",
+        "gangneung": "Gangneung",
+        "daejeon": "Daejeon",
+        "jeonju": "Jeonju",
+        "daegu": "Daegu",
+        "gwangju": "Gwangju",
+        "busan": "Busan",
+        "jeju": "Jeju",
+        "westsea": "Westmeer",
+        "eastsea": "Ostmeer",
+        "southsea": "Südmeer",
+        "cta": "Jetzt herunterladen"
+      },
+      "agent_review_kind": "self",
+      "protected_changed_pixels": {
+        "brand-mark": 0,
+        "year-mark": 0,
+        "app-icon": 0,
+        "main-logo": 0,
+        "pin-0": 0,
+        "pin-1": 0,
+        "pin-2": 0,
+        "pin-3": 0,
+        "pin-4": 0,
+        "pin-5": 0,
+        "pin-6": 0,
+        "pin-7": 0
+      },
+      "agent_issues": [
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+        },
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "长宣传语为适应宽度采用较小字号，字高较原韩文低，仍清晰且保持黑红白边层级。"
+        }
+      ],
+      "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b"
+    },
+    "ru": {
+      "path": "evidence/ru.png",
+      "sha256": "5b1f59a839732f96833118d4c9a9825f1d9a8677d69754db8fe163ad29ecbdd8",
+      "production_stage": "runs\\navermap-five-render\\ru",
+      "size": [
+        1200,
+        628
+      ],
+      "cta": "Скачайте сейчас",
+      "translations": {
+        "seoul": "Сеул",
+        "gangneung": "Каннын",
+        "daejeon": "Тэджон",
+        "jeonju": "Чонджу",
+        "daegu": "Тэгу",
+        "gwangju": "Кванджу",
+        "busan": "Пусан",
+        "jeju": "Чеджу",
+        "westsea": "Западное море",
+        "eastsea": "Восточное море",
+        "southsea": "Южное море",
+        "cta": "Скачайте сейчас"
+      },
+      "agent_review_kind": "self",
+      "protected_changed_pixels": {
+        "brand-mark": 0,
+        "year-mark": 0,
+        "app-icon": 0,
+        "main-logo": 0,
+        "pin-0": 0,
+        "pin-1": 0,
+        "pin-2": 0,
+        "pin-3": 0,
+        "pin-4": 0,
+        "pin-5": 0,
+        "pin-6": 0,
+        "pin-7": 0
+      },
+      "agent_issues": [
+        {
+          "severity": "minor",
+          "region_id": "cta",
+          "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+        },
+        {
+          "severity": "minor",
+          "region_id": "eastsea",
+          "note": "Восточное море较长、向品牌方向延伸更多，但与品牌保持清楚间隙。"
+        }
+      ],
+      "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b"
+    }
+  },
+  "backgrounds_independently_reconstructed": 1,
+  "scope": "Seven language variants of one source; not seven independent image types or native-language certifications."
+}

@@ -1,0 +1,109 @@
+{
+  "output_sha256": "0c90b72681c3dfc5f21f67eb37a0146258ca357a1a38a4b66041459c63a1856b",
+  "plan_sha256": "a36d8538ba36118962db7705d5ae63ce6f3c2a036be8a15872d6be2280b53ceb",
+  "advisories": {},
+  "advisory_reviews": {},
+  "reviewer": "Codex",
+  "review_kind": "self",
+  "checks": {
+    "semantic": true,
+    "completeness": true,
+    "legibility": true,
+    "restoration": true,
+    "style": true,
+    "protected_content": true
+  },
+  "stage_notes": {
+    "source": "本轮实际打开1200×628韩文原图，重新核对8城市、3海域和下载宣传语。五语译文另经独立文字审校。",
+    "background": "本轮实际查看共享背景，哈希与前版已审底图一致。文字去除、图钉和品牌完整；复用原底图，原广告后天空水彩细纹较平滑的限制保持。",
+    "lettering": "实际打开本语言overlay-preview独立透明层及2倍地图/宣传语detail-sheet。八个城市均完整可读；Daejeon、Gwangju等长标签未相互遮挡。Westmeer、Ostmeer、Südmeer清楚，ü两点存在，无缺字。Jetzt黑色、herunterladen红色；长词完整不拆断，真实字体等比排字，整行宽度与品牌匹配；因译文较长字号较小，视觉字高低于原韩文。",
+    "composite": "本轮逐语打开1200×628成图检查全局，查看局部反证。品牌与年份留白清楚，无互相覆盖。Jetzt黑色、herunterladen红色；长词完整不拆断，真实字体等比排字，整行宽度与品牌匹配；因译文较长字号较小，视觉字高低于原韩文。技术回执品牌、年份、全部8红图钉及编辑范围外变化均为0。"
+  },
+  "issues": [
+    {
+      "severity": "minor",
+      "region_id": "cta",
+      "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+    },
+    {
+      "severity": "minor",
+      "region_id": "cta",
+      "note": "长宣传语为适应宽度采用较小字号，字高较原韩文低，仍清晰且保持黑红白边层级。"
+    }
+  ],
+  "user_acceptance": "not_recorded",
+  "style_comparisons": [
+    {
+      "id": "map-labels",
+      "bbox": [
+        270,
+        105,
+        278,
+        465
+      ],
+      "source_observation": "城市标签为小号黑色粗字白边，位于红图钉右侧。",
+      "criterion": "全部目标语言城市名完整清晰，位于正确图钉右侧，不相互重叠，不改变图钉或海岸。",
+      "target_observation": "八个城市均完整可读；Daejeon、Gwangju等长标签未相互遮挡。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "sea-labels",
+      "bbox": [
+        150,
+        200,
+        490,
+        310
+      ],
+      "source_observation": "三处海域名为中蓝色，轻量无白色粗描边。",
+      "criterion": "三处海域译名为蓝字，保持对应地理位置；长译名不碰地图主体、商标或其他文字。",
+      "target_observation": "Westmeer、Ostmeer、Südmeer清楚，ü两点存在，无缺字。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "cta-weight",
+      "bbox": [
+        620,
+        412,
+        550,
+        80
+      ],
+      "source_observation": "下载宣传横向大字，黑红强对比，厚白描边，平面无立体影。",
+      "criterion": "忠实翻译现在下载，黑红粗体白描边，单行完整不压扁；宽度与品牌协调，不碰品牌或年份。",
+      "target_observation": "Jetzt黑色、herunterladen红色；长词完整不拆断，真实字体等比排字，整行宽度与品牌匹配；因译文较长字号较小，视觉字高低于原韩文。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "preservation",
+      "bbox": [
+        0,
+        0,
+        1200,
+        628
+      ],
+      "source_observation": "右侧主标及NAVER MAP、左上图标、2026与海滨插画构成画面主体。",
+      "criterion": "品牌图标年份原像素保留；地图轮廓、红图钉、海岸、山与树叶不被修复改动。",
+      "target_observation": "NAVER MAP、两个绿色品牌图标、-2026-及红图钉完整，沿海树叶、山、水面未改变；保护像素为0变化。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    }
+  ]
+}

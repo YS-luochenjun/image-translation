@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "stage": "background",
+  "input_sha256": {
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\navermap-prepared-v3\\inputs\\bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3.png": "bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\navermap-prepared-v3\\inputs\\780b1cbdbc0bf28c1ebd04054e86a689fc23db85b382e8e30bdbd0f48084e17b.png": "780b1cbdbc0bf28c1ebd04054e86a689fc23db85b382e8e30bdbd0f48084e17b",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\navermap-prepared-v3\\inputs\\7a26927ee67974920c0b8744102a2b6c56f4c67746325856295fb6c796edf0d6.png": "7a26927ee67974920c0b8744102a2b6c56f4c67746325856295fb6c796edf0d6"
+  },
+  "artifact_sha256": {
+    "background-plan.json": "ef140994b746c35fa2e6eebd4ccfeb45f72ad65484e15ce914299f1b4d67263c",
+    "background.png": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b",
+    "edit-mask.png": "7a26927ee67974920c0b8744102a2b6c56f4c67746325856295fb6c796edf0d6",
+    "repair-layout.json": "f43b8e915080532bf990281102eb488105a099b69caa5aee2f7d4c014d00d6f2",
+    "source.png": "799f770b9951a576be356348130e1fb4826697ca6e99b31c2d7084d0099a17c6"
+  },
+  "elapsed_seconds": 0.3087,
+  "status": "pending",
+  "background_key": "3f8122c281dc26e847443926aa75d4ef043027420163e79e5c4532c3c74a8ab3",
+  "protected_changed_pixels": {
+    "brand-mark": 0,
+    "year-mark": 0,
+    "app-icon": 0,
+    "main-logo": 0,
+    "pin-0": 0,
+    "pin-1": 0,
+    "pin-2": 0,
+    "pin-3": 0,
+    "pin-4": 0,
+    "pin-5": 0,
+    "pin-6": 0,
+    "pin-7": 0
+  },
+  "outside_mask_changed_pixels": 0,
+  "review_required": "Actually view background before lettering"
+}

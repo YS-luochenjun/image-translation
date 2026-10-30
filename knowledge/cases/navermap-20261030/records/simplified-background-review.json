@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "source_sha256": "bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3",
+  "background_sha256": "cc29e717ed84b413f96f4c58a7b526856c9a449135461b93d2b9f89ac0aca08b",
+  "receipt_sha256": "2b34b154e8d117ad2a367cb715011beeaf046b6b8d06e047836e93f7ccdbdf2a",
+  "reviewer": "Codex",
+  "review_kind": "self",
+  "checks": {
+    "no_residual_text": true,
+    "seam_continuity": true,
+    "protected_content": true
+  },
+  "observations": "实际打开v2背景1200×628，并对照源图及2倍城市局部。11处韩文标签和宣传语已清除，无可辨残字；红图钉、品牌白边、年份和海岸保留。地图标签局部颜色延续邻近绿/蓝底，v2避免将独立白色地图边界整段抹去。宣传语底面为邻边调和重建的柔和天空，边缘无硬色块，但原字后方不可知的细小水彩纹理没有逐像素复原，局部比源图更平滑。 v3背景字节哈希与已实际查看的v2相同，复用同一背景观察。",
+  "issues": [
+    {
+      "severity": "minor",
+      "region_id": "cta",
+      "note": "宣传语后的天空重建较平滑，未恢复被原字遮住的水彩细节；不影响主体、译文或背景连续性。"
+    }
+  ]
+}

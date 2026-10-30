@@ -1,0 +1,35 @@
+{
+  "reviewer": "Independent subagent 1a5be385-aea4-4757-adeb-3409f32d0523",
+  "review_kind": "independent",
+  "actual_images": [
+    {
+      "path": "evidence/source.png",
+      "sha256": "bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3"
+    },
+    {
+      "path": "evidence/ja.png",
+      "sha256": "91072028230fdf93195b388c121556c41e3dca3c042d4e613983babf3242ddab"
+    },
+    {
+      "path": "evidence/de.png",
+      "sha256": "0c90b72681c3dfc5f21f67eb37a0146258ca357a1a38a4b66041459c63a1856b"
+    },
+    {
+      "path": "evidence/ru.png",
+      "sha256": "5b1f59a839732f96833118d4c9a9825f1d9a8677d69754db8fe163ad29ecbdd8"
+    }
+  ],
+  "scope": "Actually opened full-size source and ja/de/ru composites; read corresponding reviews and necessary plan/layout fields. No native-language certification, no independent background-layer inspection, no pixel recount by this reviewer.",
+  "findings": [
+    "Emphasis color follows the translated download action despite word-order changes.",
+    "CTA assets have similar widths but Japanese weight and German height are weaker than source; no blocking crop/overlap seen.",
+    "City labels remain to the right of correct pins; long sea names require checking both map and brand gaps.",
+    "Shared approximate background retains inherited local watercolor smoothing.",
+    "Source sea-label slant was omitted from earlier visual criteria; upright target lettering is an additional minor style difference."
+  ],
+  "known_limits": [
+    "One source, not new independent image types",
+    "Language idiom and toponym standardization not certified in this visual audit"
+  ],
+  "historical_reviews_changed": false
+}

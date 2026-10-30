@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-30",
+  "source": "Direct user messages in this session; no other-session transcript read or invented",
+  "feedback": "positive",
+  "scope": "Group-level approval of the repeated translations in 韩文地图; current discoverable seven canonical outputs are the evidence set, not separate per-file native-language/zero-pixel certificates.",
+  "events": [
+    {
+      "user_quote": "在同一项目下，有一个会话：“韩文地图”；这里面的图片翻译，目前我认为效果很好。请你判断，是否是这样。和你上次0.2.0的版本修改是否有关。目前效果很好",
+      "scope": "Earlier simplified-map overall effect"
+    },
+    {
+      "user_quote": "目前“韩文地图”中，又进行了多轮翻译，效果很好。请你总结是否有新的知识等可以总结。完成后进行commit",
+      "scope": "Current repeated-translations overall feedback and knowledge/commit request"
+    }
+  ],
+  "current_output_sha256": {
+    "zh-CN": "37b3cfc0b1d10a4886848081eec094dc751b14b99da237001b775e1290ecbf17",
+    "zh-Hant": "b9b577d771dccc8d53603578915161123de1585dac68731e7379512bfc3333b2",
+    "ja": "91072028230fdf93195b388c121556c41e3dca3c042d4e613983babf3242ddab",
+    "en": "fb633da6fead9f23b42bb6904708efdfa50934c6d18ef44e892d482bb9c9b8db",
+    "es": "7e3f97f48b0cbafb54018dd2743ebf128eaf528346b9a30c8376e24ac567fc7a",
+    "de": "0c90b72681c3dfc5f21f67eb37a0146258ca357a1a38a4b66041459c63a1856b",
+    "ru": "5b1f59a839732f96833118d4c9a9825f1d9a8677d69754db8fe163ad29ecbdd8"
+  },
+  "case_status": "partial",
+  "case_status_reason": "One source with seven language variants; accepted overall effect retains disclosed minor texture/typography differences.",
+  "not_inferred": [
+    "Per-language native-speaker certification",
+    "All source styles or hidden texture recovered exactly",
+    "JPEG inherits PNG zero-pixel protection",
+    "Universal image-type capability or future paid authorization"
+  ],
+  "historical_reviews": "Original self/independent reviews and their not_recorded fields preserved verbatim; this is appended later feedback."
+}

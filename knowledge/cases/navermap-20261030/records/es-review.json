@@ -1,0 +1,109 @@
+{
+  "output_sha256": "7e3f97f48b0cbafb54018dd2743ebf128eaf528346b9a30c8376e24ac567fc7a",
+  "plan_sha256": "b09df16d51a2084d7ba697cefd770a4a5ff118db7b59a3913fc9484018d362b0",
+  "advisories": {},
+  "advisory_reviews": {},
+  "reviewer": "Codex",
+  "review_kind": "self",
+  "checks": {
+    "semantic": true,
+    "completeness": true,
+    "legibility": true,
+    "restoration": true,
+    "style": true,
+    "protected_content": true
+  },
+  "stage_notes": {
+    "source": "本轮实际打开1200×628韩文原图，重新核对8城市、3海域和下载宣传语。五语译文另经独立文字审校。",
+    "background": "本轮实际查看共享背景，哈希与前版已审底图一致。文字去除、图钉和品牌完整；复用原底图，原广告后天空水彩细纹较平滑的限制保持。",
+    "lettering": "实际打开本语言overlay-preview独立透明层及2倍地图/宣传语detail-sheet。Seúl重音完整；其余七城拼写与图钉对应，标签无漏字。Mar del Oeste、Mar del Este、Mar del Sur蓝字完整；三处位置保持源图地理关系。Descarga红色、ahora黑色，g下伸部完整，无白边裁切；相比原图字面高度略小，单行留白更大。",
+    "composite": "本轮逐语打开1200×628成图检查全局，查看局部反证。品牌与年份留白清楚，无互相覆盖。Descarga红色、ahora黑色，g下伸部完整，无白边裁切；相比原图字面高度略小，单行留白更大。技术回执品牌、年份、全部8红图钉及编辑范围外变化均为0。"
+  },
+  "issues": [
+    {
+      "severity": "minor",
+      "region_id": "cta",
+      "note": "复用背景中原宣传语后方的水彩纹理稍平滑，未恢复未知细节。"
+    },
+    {
+      "severity": "minor",
+      "region_id": "cta",
+      "note": "宣传语与年份间留白比源图略多，标题字高轻微下降。"
+    }
+  ],
+  "user_acceptance": "not_recorded",
+  "style_comparisons": [
+    {
+      "id": "map-labels",
+      "bbox": [
+        270,
+        105,
+        278,
+        465
+      ],
+      "source_observation": "城市标签为小号黑色粗字白边，位于红图钉右侧。",
+      "criterion": "全部目标语言城市名完整清晰，位于正确图钉右侧，不相互重叠，不改变图钉或海岸。",
+      "target_observation": "Seúl重音完整；其余七城拼写与图钉对应，标签无漏字。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "sea-labels",
+      "bbox": [
+        150,
+        200,
+        490,
+        310
+      ],
+      "source_observation": "三处海域名为中蓝色，轻量无白色粗描边。",
+      "criterion": "三处海域译名为蓝字，保持对应地理位置；长译名不碰地图主体、商标或其他文字。",
+      "target_observation": "Mar del Oeste、Mar del Este、Mar del Sur蓝字完整；三处位置保持源图地理关系。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "cta-weight",
+      "bbox": [
+        620,
+        412,
+        550,
+        80
+      ],
+      "source_observation": "下载宣传横向大字，黑红强对比，厚白描边，平面无立体影。",
+      "criterion": "忠实翻译现在下载，黑红粗体白描边，单行完整不压扁；宽度与品牌协调，不碰品牌或年份。",
+      "target_observation": "Descarga红色、ahora黑色，g下伸部完整，无白边裁切；相比原图字面高度略小，单行留白更大。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    },
+    {
+      "id": "preservation",
+      "bbox": [
+        0,
+        0,
+        1200,
+        628
+      ],
+      "source_observation": "右侧主标及NAVER MAP、左上图标、2026与海滨插画构成画面主体。",
+      "criterion": "品牌图标年份原像素保留；地图轮廓、红图钉、海岸、山与树叶不被修复改动。",
+      "target_observation": "NAVER MAP、两个绿色品牌图标、-2026-及红图钉完整，沿海树叶、山、水面未改变；保护像素为0变化。",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "overlay-preview.png"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,410 @@
+{
+  "schema_version": 1,
+  "source": "inputs/bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3.png",
+  "source_sha256": "bbb19d9643efcf3715a99663ca8868d49ef31763c2c145f50c75be06725981d3",
+  "background": {
+    "path": "inputs/780b1cbdbc0bf28c1ebd04054e86a689fc23db85b382e8e30bdbd0f48084e17b.png",
+    "mask": "inputs/7a26927ee67974920c0b8744102a2b6c56f4c67746325856295fb6c796edf0d6.png"
+  },
+  "rows": [],
+  "assets": [
+    {
+      "id": "seoul",
+      "path": "inputs/e6f503b42e9c1d83dda701507716ad2b8638eb77c3d28bc4c0968c51ec1deada.png",
+      "kind": "text",
+      "position": [
+        352,
+        127
+      ]
+    },
+    {
+      "id": "gangneung",
+      "path": "inputs/945a049f4305abb62584a7ad2d9c2a359fb77a20f5e05c3777ccfd154e19ff22.png",
+      "kind": "text",
+      "position": [
+        502,
+        126
+      ]
+    },
+    {
+      "id": "daejeon",
+      "path": "inputs/5ad637d61199a43bac0184058f3b5dc3017666acce095b030cc7dc796749441b.png",
+      "kind": "text",
+      "position": [
+        397,
+        229
+      ]
+    },
+    {
+      "id": "jeonju",
+      "path": "inputs/7cbad8e01ea3055404f7c1208259a08b111cf2717423fa70a2479751c3f73182.png",
+      "kind": "text",
+      "position": [
+        337,
+        298
+      ]
+    },
+    {
+      "id": "daegu",
+      "path": "inputs/0babfce49f46379e915c187ddadffeffafa2b3655074f1318c893a97f3edf256.png",
+      "kind": "text",
+      "position": [
+        475,
+        285
+      ]
+    },
+    {
+      "id": "gwangju",
+      "path": "inputs/7950ab70fdbfb65c7c6dc5c5708f143a956f0c76d3abf43a22169ec6699b9870.png",
+      "kind": "text",
+      "position": [
+        313,
+        374
+      ]
+    },
+    {
+      "id": "busan",
+      "path": "inputs/f39e0cfdddd54dd3e38a624d7455c7caa202577a11010d6acc77e0e067ff81bc.png",
+      "kind": "text",
+      "position": [
+        504,
+        368
+      ]
+    },
+    {
+      "id": "jeju",
+      "path": "inputs/83124439d5790a44d598b4028a6e3ed5d0d6baf765dddd1a5823aaef162403a6.png",
+      "kind": "text",
+      "position": [
+        307,
+        544
+      ]
+    },
+    {
+      "id": "westsea",
+      "path": "inputs/2d944cb26fe3758ae2361171a1c58acde42dc2d51359c04f07c579c5d47a930f.png",
+      "kind": "text",
+      "position": [
+        116,
+        264
+      ]
+    },
+    {
+      "id": "eastsea",
+      "path": "inputs/ddfd0ff4ca19e09631dee38c8a4178b88596dd64c88999a9dc811c60a44d107a.png",
+      "kind": "text",
+      "position": [
+        600,
+        214
+      ]
+    },
+    {
+      "id": "southsea",
+      "path": "inputs/c3fc8fbc6e1c2c63f8239b71da4de80706b2f238eb22e4a3108904082e068c56.png",
+      "kind": "text",
+      "position": [
+        422,
+        488
+      ]
+    },
+    {
+      "id": "cta",
+      "path": "inputs/f0de6eb313420bddd851fc86f74be875fbb441fcc1696587bb62fbc79215f550.png",
+      "kind": "text",
+      "position": [
+        634,
+        426
+      ]
+    }
+  ],
+  "protected_regions": [
+    {
+      "id": "brand-mark",
+      "bbox": [
+        609,
+        318,
+        580,
+        90
+      ]
+    },
+    {
+      "id": "year-mark",
+      "bbox": [
+        755,
+        492,
+        274,
+        68
+      ]
+    },
+    {
+      "id": "app-icon",
+      "bbox": [
+        29,
+        47,
+        128,
+        134
+      ]
+    },
+    {
+      "id": "main-logo",
+      "bbox": [
+        767,
+        66,
+        250,
+        250
+      ]
+    },
+    {
+      "id": "pin-0",
+      "bbox": [
+        327,
+        112,
+        24,
+        35
+      ]
+    },
+    {
+      "id": "pin-1",
+      "bbox": [
+        476,
+        112,
+        25,
+        34
+      ]
+    },
+    {
+      "id": "pin-2",
+      "bbox": [
+        371,
+        213,
+        24,
+        34
+      ]
+    },
+    {
+      "id": "pin-3",
+      "bbox": [
+        312,
+        280,
+        24,
+        34
+      ]
+    },
+    {
+      "id": "pin-4",
+      "bbox": [
+        450,
+        268,
+        24,
+        34
+      ]
+    },
+    {
+      "id": "pin-5",
+      "bbox": [
+        288,
+        360,
+        24,
+        34
+      ]
+    },
+    {
+      "id": "pin-6",
+      "bbox": [
+        478,
+        349,
+        24,
+        34
+      ]
+    },
+    {
+      "id": "pin-7",
+      "bbox": [
+        277,
+        530,
+        26,
+        35
+      ]
+    }
+  ],
+  "working_scale": 2,
+  "view_scale": 1,
+  "visual_targets": [
+    {
+      "id": "map-labels",
+      "bbox": [
+        270,
+        105,
+        278,
+        465
+      ],
+      "source_observation": "城市标签为小号黑色粗字白边，位于红图钉右侧。",
+      "criterion": "全部目标语言城市名完整清晰，位于正确图钉右侧，不相互重叠，不改变图钉或海岸。"
+    },
+    {
+      "id": "sea-labels",
+      "bbox": [
+        150,
+        200,
+        490,
+        310
+      ],
+      "source_observation": "三处海域名为中蓝色，轻量无白色粗描边。",
+      "criterion": "三处海域译名为蓝字，保持对应地理位置；长译名不碰地图主体、商标或其他文字。"
+    },
+    {
+      "id": "cta-weight",
+      "bbox": [
+        620,
+        412,
+        550,
+        80
+      ],
+      "source_observation": "下载宣传横向大字，黑红强对比，厚白描边，平面无立体影。",
+      "criterion": "忠实翻译现在下载，黑红粗体白描边，单行完整不压扁；宽度与品牌协调，不碰品牌或年份。"
+    },
+    {
+      "id": "preservation",
+      "bbox": [
+        0,
+        0,
+        1200,
+        628
+      ],
+      "source_observation": "右侧主标及NAVER MAP、左上图标、2026与海滨插画构成画面主体。",
+      "criterion": "品牌图标年份原像素保留；地图轮廓、红图钉、海岸、山与树叶不被修复改动。"
+    }
+  ],
+  "semantic_manifest": "semantics/de.json",
+  "region_map": [
+    {
+      "region_id": "seoul",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "seoul",
+          "text": "Seoul"
+        }
+      ]
+    },
+    {
+      "region_id": "gangneung",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "gangneung",
+          "text": "Gangneung"
+        }
+      ]
+    },
+    {
+      "region_id": "daejeon",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "daejeon",
+          "text": "Daejeon"
+        }
+      ]
+    },
+    {
+      "region_id": "jeonju",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "jeonju",
+          "text": "Jeonju"
+        }
+      ]
+    },
+    {
+      "region_id": "daegu",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "daegu",
+          "text": "Daegu"
+        }
+      ]
+    },
+    {
+      "region_id": "gwangju",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "gwangju",
+          "text": "Gwangju"
+        }
+      ]
+    },
+    {
+      "region_id": "busan",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "busan",
+          "text": "Busan"
+        }
+      ]
+    },
+    {
+      "region_id": "jeju",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "jeju",
+          "text": "Jeju"
+        }
+      ]
+    },
+    {
+      "region_id": "westsea",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "westsea",
+          "text": "Westmeer"
+        }
+      ]
+    },
+    {
+      "region_id": "eastsea",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "eastsea",
+          "text": "Ostmeer"
+        }
+      ]
+    },
+    {
+      "region_id": "southsea",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "southsea",
+          "text": "Südmeer"
+        }
+      ]
+    },
+    {
+      "region_id": "cta",
+      "row_ids": [],
+      "asset_texts": [
+        {
+          "asset_id": "cta",
+          "text": "Jetzt herunterladen"
+        }
+      ]
+    }
+  ],
+  "target_language": "de",
+  "background_review": "background-review.json",
+  "text_clear_boxes": [],
+  "notes": [
+    "本地源像素约束的局部调和重建；不宣称恢复被文字遮挡的未知水彩细节。",
+    "只翻译韩文，保留品牌NAVER MAP与年份。",
+    "五语共享同一已审去字背景；日语使用游ゴシック粗体，其余使用Arial Bold；所有文字资产逐项语义绑定。",
+    "保留源图海域称呼；文字按语言长度自然排版，不横向压缩。"
+  ]
+}

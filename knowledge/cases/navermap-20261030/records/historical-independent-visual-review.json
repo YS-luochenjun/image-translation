@@ -1,0 +1,14 @@
+{
+  "reviewer": "subagent a2c91e6f-5d4e-4f4d-81c0-00f8f0032439",
+  "review_kind": "independent",
+  "scope": "Actual source and each of five 1200x628 translated.png composites opened; independent reviewer did not inspect transparent layers or technical files.",
+  "finding": "No blocking semantic, missing glyph, clipping, or overlap defect found. Japanese CTA weight and German CTA height slightly weaker than source; remaining long labels readable.",
+  "current_outputs": {
+    "ja": "91072028230fdf93195b388c121556c41e3dca3c042d4e613983babf3242ddab",
+    "en": "fb633da6fead9f23b42bb6904708efdfa50934c6d18ef44e892d482bb9c9b8db",
+    "es": "7e3f97f48b0cbafb54018dd2743ebf128eaf528346b9a30c8376e24ac567fc7a",
+    "de": "0c90b72681c3dfc5f21f67eb37a0146258ca357a1a38a4b66041459c63a1856b",
+    "ru": "5b1f59a839732f96833118d4c9a9825f1d9a8677d69754db8fe163ad29ecbdd8"
+  },
+  "user_acceptance": "not_recorded"
+}
