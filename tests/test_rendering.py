@@ -177,6 +177,10 @@ class RenderingTests(unittest.TestCase):
         self.manifest["regions"][0]["style"]["font_path"] = str(self.root / "missing.ttf")
         self.assert_fails_without_output("missing font")
 
+    def test_missing_unicode_glyph_is_rejected_before_output(self):
+        self.manifest['regions'][0]['target_text'] = 'Hello中'
+        self.assert_fails_without_output('missing Unicode glyphs')
+
     def test_clean_plate_requires_clean_background(self):
         self.manifest["regions"][0]["repair"] = {"mode": "clean_plate"}
         self.assert_fails_without_output("requires clean_background")

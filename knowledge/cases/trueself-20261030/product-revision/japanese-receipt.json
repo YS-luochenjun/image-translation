@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "stage": "render",
+  "input_sha256": {
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\plan-ja.json": "41af17fd36ca4076f62618da54bdcaa4bd8921b1209a90ba66d4cb6ffcc8c1f5",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\inputs\\f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861.png": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\semantics\\ja.json": "40e78a2489cd5b9181d1efd24c7f0bf94588ba9a881db8147b00ea59f85a4d72",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\inputs\\96cd14ae8e7495a493a410c77a08d438297fe061ddc75c3323f462f7a0ed8c0f.png": "96cd14ae8e7495a493a410c77a08d438297fe061ddc75c3323f462f7a0ed8c0f",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\inputs\\63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804.png": "63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\background\\receipt.json": "2c847af9d2f697c1aadecb7cca4932ba84716a35405fb5245b244fb08244181b",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\background-review.json": "8a2dca181b75aa625a1a3d43e6f55e72dce3d803e6a7c1f226700dd16f741f19",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\inputs\\07727a339b462a76d3f5502e7261deb2ff9b2741ed5e308a360e8dfa31e6d4a0.otf": "07727a339b462a76d3f5502e7261deb2ff9b2741ed5e308a360e8dfa31e6d4a0",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\bundle.json": "d60643acb38dd4708a43b399ea56fd194df8a3cda7071d807cb960b5ef3ac33b"
+  },
+  "artifact_sha256": {
+    "allowed-edit-mask.png": "244f5f65d229d7bd2c775f85d7ee2d0325d47f78a69165b2fe30a9b4447ddbde",
+    "asset-layer.png": "7c1921690768899c078fe97b2e2e621edf08edd8359d07846be22bcc337786f4",
+    "background.png": "f799c90e532e935900f4b19672e7e3a2e014d892484deff121730830ff80e99c",
+    "comparison.png": "24dcaf95a50565089a97c45021b4eb7febc33118e946e588239e284c94de5458",
+    "effects-contact.png": "2eabcdf3e153f212c41abe271dab59a43c046a9ce738d02f529c7cf4abfcc88e",
+    "effects-depth.png": "218a55714a7bfa2c68911462fe5a8040ad16d5932fb96a452d063bf03b5ab734",
+    "effects-face.png": "79574dd18ba1a96f123df52a8dcae2661a0c3a4f789331d740532b8b243f2b74",
+    "effects-glyph-mask.png": "4f801011511a07a4b04c03b3b157daee5d398781d2fa1d90e1530cf5b8e70c0c",
+    "effects-highlight.png": "c2612f530cf213019521753919b9abdc16ebcb35799ff6b70479e1ecf658f0d4",
+    "effects-shadow.png": "cf1d66b6898d2d0f36276f37016287279f7ac0b5349b35fd814a1e4a69fadfd3",
+    "layout.json": "3c6b04b4de82b533197b09866fd32f9622581686e1e6573bb972613560aa99d8",
+    "overlay-preview.png": "5f58d6bf80e1afdd82798a1611fb60965e32256eb26089b423ba11a1ed78b675",
+    "overlay.png": "94526113bd67821c55024cd96d942e8c9a39869af7b9bb70bc345508d6ac9930",
+    "plan.json": "41af17fd36ca4076f62618da54bdcaa4bd8921b1209a90ba66d4cb6ffcc8c1f5",
+    "review-template.json": "5fd484eb569e7b1bb0838f209825ee8a04d7bff4749140f233545797d6b64baa",
+    "source.png": "d186ca1d6824952e08cbcd012334d80c66204838838cec58e7bf655473ac9068",
+    "text-layer.png": "94526113bd67821c55024cd96d942e8c9a39869af7b9bb70bc345508d6ac9930",
+    "translated.png": "60ad7a987f111740f4124c6c6cef4489b5ab6769f4d41e462a308a3491eda3f5",
+    "view.png": "1acb35a946642309a0b69a1b8f99ee4cdd260d20b31e21edd92281d8d0b0afe1"
+  },
+  "elapsed_seconds": 0.5435,
+  "status": "pending",
+  "technical": "pass",
+  "protected_changed_pixels": {
+    "portrait-frame-street": 0,
+    "top-wall": 0,
+    "bottom-wall": 0
+  },
+  "outside_mask_changed_pixels": 0,
+  "background_elapsed_seconds": 0.0641,
+  "notice": "Elapsed time measures tool execution only, not Agent analysis or visual review. No model calls."
+}

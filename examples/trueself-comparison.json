@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "source": "../knowledge/cases/trueself-20261030/evidence/source.png",
+  "candidates": [
+    {
+      "id": "zh-CN",
+      "path": "../knowledge/cases/trueself-20261030/product-revision/chinese.png"
+    },
+    {
+      "id": "ja",
+      "path": "../knowledge/cases/trueself-20261030/product-revision/japanese.png"
+    }
+  ],
+  "regions": [
+    {
+      "id": "lettering-wall",
+      "bbox": [
+        182,
+        31,
+        118,
+        174
+      ]
+    }
+  ],
+  "protected_regions": [
+    {
+      "id": "portrait-frame-street",
+      "bbox": [
+        0,
+        0,
+        182,
+        250
+      ]
+    },
+    {
+      "id": "top-wall",
+      "bbox": [
+        182,
+        0,
+        118,
+        31
+      ]
+    },
+    {
+      "id": "bottom-wall",
+      "bbox": [
+        182,
+        205,
+        118,
+        45
+      ]
+    }
+  ],
+  "notes": [
+    "Current Agent-reviewed candidates; comparison generation itself performs no visual approval. User acceptance not recorded."
+  ]
+}

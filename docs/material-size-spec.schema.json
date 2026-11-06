@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Production material size plan and output validation",
+  "type": "object", "additionalProperties": false,
+  "properties": {
+    "asset_type": {"enum": ["button","image","tk_carousel","fb_image","video"]},
+    "delivery_mode": {"enum": ["provided_source_set", "reference_seven_set", "explicit_sizes"]},
+    "scope_basis": {"type": "string", "minLength": 1},
+    "reference_evidence_path": {"type": "string", "minLength": 1},
+    "reference_members": {"$ref": "#/$defs/reference_members"},
+    "explicit_sizes": {"$ref": "#/$defs/sizes"},
+    "explicit_specification": {"type": "string", "minLength": 1},
+    "historical_reference": {"$ref": "#/$defs/reference"},
+    "sources": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "properties": {
+      "id": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1},
+      "languages": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+      "delivery_mode": {"enum": ["provided_source_set", "reference_seven_set", "explicit_sizes"]},
+    "scope_basis": {"type": "string", "minLength": 1},
+    "reference_evidence_path": {"type": "string", "minLength": 1},
+    "reference_members": {"$ref": "#/$defs/reference_members"},
+    "explicit_sizes": {"$ref": "#/$defs/sizes"}, "explicit_specification": {"type": "string", "minLength": 1},
+      "historical_reference": {"$ref": "#/$defs/reference"}
+    }, "required": ["id","path","languages"]}},
+    "outputs": {"type": "array", "items": {"type": "object", "additionalProperties": false, "properties": {
+      "member_id": {"type": "string", "minLength": 1},
+      "source_id": {"type": "string", "minLength": 1}, "language": {"type": "string", "minLength": 1},
+      "path": {"type": "string", "minLength": 1}, "adaptation": {"enum": ["contain","recompose","same_ratio"]}
+    }, "required": ["source_id","language","path","adaptation"]}}
+  },
+  "required": ["asset_type","sources"],
+  "$defs": {
+    "reference_members": {"type": "array", "minItems": 7, "maxItems": 7, "items": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"member_id": {"type": "string", "minLength": 1}, "resource_id": {"type": "string", "minLength": 1},
+                     "width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}},
+      "required": ["member_id", "resource_id", "width", "height"]}},
+    "sizes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1}}},
+    "reference": {"type": "object", "additionalProperties": false, "properties": {
+      "requirement_id": {"type": "string", "minLength": 1}, "material_id": {"type": "string", "minLength": 1},
+      "evidence_path": {"type": "string", "minLength": 1}, "sizes": {"$ref": "#/$defs/sizes"},
+      "same_group_same_type": {"const": true}
+    }, "required": ["requirement_id","material_id","evidence_path","sizes","same_group_same_type"]}
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "old-flat-zh",
+      "source": "../knowledge/cases/trueself-20261030/evidence/source.png",
+      "candidate": "../knowledge/cases/trueself-20261030/evidence/chinese-before.png",
+      "protected_regions": [
+        {
+          "id": "portrait-frame-street",
+          "bbox": [
+            0,
+            0,
+            182,
+            250
+          ]
+        }
+      ],
+      "expected_technical": "pass",
+      "known_visual_defects": [
+        "User historical feedback: flat type and insufficient soft shadow. A technical pass cannot approve this image."
+      ]
+    },
+    {
+      "id": "old-flat-ja",
+      "source": "../knowledge/cases/trueself-20261030/evidence/source.png",
+      "candidate": "../knowledge/cases/trueself-20261030/evidence/japanese-before.png",
+      "protected_regions": [
+        {
+          "id": "portrait-frame-street",
+          "bbox": [
+            0,
+            0,
+            182,
+            250
+          ]
+        }
+      ],
+      "expected_technical": "pass",
+      "known_visual_defects": [
+        "User historical feedback: flat type and insufficient soft shadow; source/candidate actual visual comparison required."
+      ]
+    },
+    {
+      "id": "native-zh",
+      "source": "../knowledge/cases/trueself-20261030/evidence/source.png",
+      "candidate": "../knowledge/cases/trueself-20261030/product-revision/chinese.png",
+      "protected_regions": [
+        {
+          "id": "portrait-frame-street",
+          "bbox": [
+            0,
+            0,
+            182,
+            250
+          ]
+        }
+      ],
+      "expected_technical": "pass",
+      "known_visual_defects": [
+        "Independent minor: upper/lower Chinese block density differs; plaster is approximate."
+      ]
+    },
+    {
+      "id": "native-ja",
+      "source": "../knowledge/cases/trueself-20261030/evidence/source.png",
+      "candidate": "../knowledge/cases/trueself-20261030/product-revision/japanese.png",
+      "protected_regions": [
+        {
+          "id": "portrait-frame-street",
+          "bbox": [
+            0,
+            0,
+            182,
+            250
+          ]
+        }
+      ],
+      "expected_technical": "pass",
+      "known_visual_defects": [
+        "Independent minor: complex first-line kanji somewhat dense; plaster is approximate."
+      ]
+    },
+    {
+      "id": "actual-protection-damage",
+      "source": "../knowledge/cases/trueself-20261030/evidence/source.png",
+      "candidate": "assets/protection-damage.png",
+      "protected_regions": [
+        {
+          "id": "portrait-frame-street",
+          "bbox": [
+            0,
+            0,
+            182,
+            250
+          ]
+        }
+      ],
+      "expected_technical": "fail",
+      "known_visual_defects": [
+        "Authored regression failure: green pixel at25,60 damages protected scene."
+      ]
+    }
+  ],
+  "notes": [
+    "Known visual labels come from historical user feedback or current independent review, not automatic visual detection. Expected technical results are4pass/1fail; all generated benchmark visual reviews remainpending."
+  ]
+}

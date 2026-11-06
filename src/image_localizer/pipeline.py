@@ -9,6 +9,7 @@ from uuid import uuid4
 
 from PIL import Image, ImageOps
 
+from .production_timing import bind_timing_output, timed_production
 from .contracts import ContractError, advisory_checks, require, validate_manifest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -97,6 +98,7 @@ def packet(run: Path) -> dict:
     return result
 
 
+@timed_production(input_name='run')
 def render(run: Path, clean_background: Path | None = None) -> dict:
     from .rendering import render_image
     manifest = load_run(run)
@@ -107,6 +109,7 @@ def render(run: Path, clean_background: Path | None = None) -> dict:
             require(font.is_absolute(), "font_path must be absolute (use doctor to locate fonts)")
     version = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "-" + uuid4().hex[:8]
     output = run / "renders" / version
+    bind_timing_output(output)
     manifest_hash = sha256(run / "manifest.json")
     source_hash = sha256(run / "source.png")
     background_hash = sha256(clean_background) if clean_background else None

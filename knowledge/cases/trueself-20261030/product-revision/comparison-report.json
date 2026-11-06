@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "binding": {
+    "spec": {
+      "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\trueself-comparison.json",
+      "sha256": "20204a525eafbb5e212f8912bca1b8f554d7c7f0f22f2de1ea6a34944101b1ab"
+    },
+    "source": {
+      "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\source.png",
+      "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+      "rgba_sha256": "31410fb3fc1c37f028cc75745e774e4c7278f0569b5be57b4b852142825c3972",
+      "size": [
+        300,
+        250
+      ]
+    },
+    "candidates": [
+      {
+        "id": "zh-CN",
+        "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\product-revision\\chinese.png",
+        "sha256": "d9dc13e7035bfa2cf4bd514d79529175ac175b006a5089e8e0d72449c23c9628",
+        "rgba_sha256": "db152888cdbb2affefeb45e7d995e4b3b137ef6e1ecb6ef7c2e4d9ffedadf856",
+        "size": [
+          300,
+          250
+        ]
+      },
+      {
+        "id": "ja",
+        "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\product-revision\\japanese.png",
+        "sha256": "60ad7a987f111740f4124c6c6cef4489b5ab6769f4d41e462a308a3491eda3f5",
+        "rgba_sha256": "5bee37caa5f527947194f63cff9d3e98dfbc59dab3bbdf0191543ab33140f0a4",
+        "size": [
+          300,
+          250
+        ]
+      }
+    ]
+  },
+  "canvas": [
+    300,
+    250
+  ],
+  "technical": "pass",
+  "visual_review": "pending",
+  "status": "pending",
+  "pixel_difference_semantics": "Exact RGBA changed-pixel mask; changes outside protected regions are descriptive and do not imply failure or visual quality.",
+  "board": "board.png",
+  "regions": [
+    {
+      "id": "lettering-wall",
+      "bbox": [
+        182,
+        31,
+        118,
+        174
+      ],
+      "artifact": "regions/000.png"
+    }
+  ],
+  "protected_regions": [
+    {
+      "id": "portrait-frame-street",
+      "bbox": [
+        0,
+        0,
+        182,
+        250
+      ]
+    },
+    {
+      "id": "top-wall",
+      "bbox": [
+        182,
+        0,
+        118,
+        31
+      ]
+    },
+    {
+      "id": "bottom-wall",
+      "bbox": [
+        182,
+        205,
+        118,
+        45
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "id": "zh-CN",
+      "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\product-revision\\chinese.png",
+      "sha256": "d9dc13e7035bfa2cf4bd514d79529175ac175b006a5089e8e0d72449c23c9628",
+      "rgba_sha256": "db152888cdbb2affefeb45e7d995e4b3b137ef6e1ecb6ef7c2e4d9ffedadf856",
+      "size": [
+        300,
+        250
+      ],
+      "difference": "differences/000.png",
+      "changed_pixels": 16356,
+      "protected_changed_pixels": {
+        "portrait-frame-street": 0,
+        "top-wall": 0,
+        "bottom-wall": 0
+      },
+      "technical": "pass",
+      "visual_review": "pending"
+    },
+    {
+      "id": "ja",
+      "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\product-revision\\japanese.png",
+      "sha256": "60ad7a987f111740f4124c6c6cef4489b5ab6769f4d41e462a308a3491eda3f5",
+      "rgba_sha256": "5bee37caa5f527947194f63cff9d3e98dfbc59dab3bbdf0191543ab33140f0a4",
+      "size": [
+        300,
+        250
+      ],
+      "difference": "differences/001.png",
+      "changed_pixels": 15928,
+      "protected_changed_pixels": {
+        "portrait-frame-street": 0,
+        "top-wall": 0,
+        "bottom-wall": 0
+      },
+      "technical": "pass",
+      "visual_review": "pending"
+    }
+  ],
+  "notes": [
+    "Current Agent-reviewed candidates; comparison generation itself performs no visual approval. User acceptance not recorded."
+  ],
+  "artifact_sha256": {
+    "board.png": "49879d79440d5dec38d82fbfb6c8b9c8e3b4fd52969ab6ce138290c46166cf20",
+    "differences/000.png": "595876f159a927c425801e984e5467705426a316d0acb2e366d9489365a1c624",
+    "differences/001.png": "bf131ffb757d4ae76459b230b06dedec916096e37a7336a366ea249851fdadd2",
+    "regions/000.png": "0e30c4ff22da6d26f4779a02538b5c553a8c3a77d05ea7164fe971f2cf06680e",
+    "review-template.json": "3718c1d2ff0479ae327a9e2087996aa9c9339ea0b3947d999d711bc87fe40baf",
+    "spec.json": "20204a525eafbb5e212f8912bca1b8f554d7c7f0f22f2de1ea6a34944101b1ab"
+  }
+}

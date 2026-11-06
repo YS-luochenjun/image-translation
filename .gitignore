@@ -8,3 +8,7 @@ __pycache__/
 runs/
 work/
 outputs/
+state/fireplay/
+.review-desk/
+audit/
+audit-*/

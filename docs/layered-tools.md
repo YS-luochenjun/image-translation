@@ -2,6 +2,8 @@
 
 这条入口把两次案例中的重复执行代码变成可复用工具。Agent仍负责看图、识字、译文与标签角色、修复依据、视觉设计和真实审核；配置不等于自动识图。现有 `init/packet/validate/render/quality` 基础接口保持原合同；本工具使用单独的计划和审核合同，不把它塞进旧manifest。
 
+新任务建议先读[原生观感任务入口](native-workflow.md)，把语义、资源与多个语言统一管理；本页保留低层操作合同。
+
 ## 按难点选择工具
 
 | 当前难点 | 首选路线 |
@@ -52,7 +54,7 @@ background.operations支持：
 - `sample_rows`：`{type,bbox,donors:[bbox],row_radius,rgb_min:[r,g,b],rgb_max:[r,g,b]}`。每行从原图donor矩形内y±radius采样，通道范围inclusive，取各通道中位数并向下取整；没有有效样本就报错，不猜色。适合有可信邻近色的平色/平缓底面，不能恢复未知照片纹理。
 - `restore`：`{type,bbox}`，按原图恢复局部及alpha，同时清除此处编辑mask，用于保留分隔线等原图细节。
 
-rows每项：`{id,text,font_path,font_size,center:[x,y],color,angle?,stroke?}`。font_size为实际画布像素，可小数；角度单位度、正值逆时针；默认angle/stroke为0。center按实际裁字后的画面中心放置。字体必须真实本地路径；文字单行、非空；溢出报错，不静默裁字或压扁。复杂文字仍需RAQM，字体字形覆盖仍须真实看图。
+rows每项：`{id,text,font_path,font_size,center:[x,y],color,angle?,stroke?}`。font_size为实际画布像素，可小数；角度单位度、正值逆时针；默认angle/stroke为0。center按实际裁字后的画面中心放置。字体必须真实本地路径；文字单行、非空；溢出报错，不静默裁字或压扁。现在基础及分层都会解析TTF/OTF/TTC face0的Unicode cmap4/12/13，缺字阻断；复杂文字仍需RAQM。字符覆盖不证明整形或字面视觉质量，仍须真实看图。
 
 assets每项：`{id,path,kind,position:[x,y],size?,crop?}`。kind只允许text/decoration/compound；crop先按素材坐标xywh裁切，再按size缩放。非等比缩放会警告，素材越界报错。compound明确表示文字与容器一体的栅格图形，不能称可编辑纯字层。
 
@@ -65,6 +67,14 @@ receipt保存实际输入与产物哈希、保护区变化像素、工具执行�
 审核填写真实reviewer、self/independent身份、绑定的output/plan哈希、六项bool检查（语义、完整性、可读性、修复、风格、保护内容）、源图/背景/字层/合成的具体stage_notes。minor问题如实写；major/critical或false阻断通过。素材非同比缩放、清除文字alpha的advisories需在advisory_reviews逐项真实核对后填true；任何缺项pending。用户验收仍在案例反馈中独立记录，不继承旧图认可。
 
 计时只测命令内部执行，不包含Agent思考、配置编写、生图请求或实际审核。可对比工具重跑成本，不能宣传“新图片一秒自动翻译”。
+
+## 字效、语义与具体风格要求
+
+rows允许effects字面渐变、shadow/contact/depth/highlight；每个对象内的字段、透明度、方向及组件含义详见[任务指南](native-workflow.md)。省略effects维持旧绘制方式，新字效的全部长度以最终画布像素计。组件供实际检查，不自动把“加过阴影”当“达到源图深度”。
+
+计划可选visual_targets、semantic_manifest/target_language/region_map、background_review。声明语义清单就必须逐区匹配实际字层并显式包含语义保护；source/语言/画布/定稿哈希一起核对。background_review存在时，直接render-layered也要求对应当前背景回执的实际审核。任务生成的计划带这些字段。
+
+存在visual_targets时，review需要逐项style_comparisons的具体目标观察、verdict与当前哈希产物证据；源要求被削弱或证据引用旧文件会失败；空白/uncertain待审、fail阻断。旧计划没有这些字段时保留旧合同，不把历史pass升级成通过新标准。
 
 ## 迁移边界
 

@@ -10,11 +10,14 @@ import re
 
 from PIL import Image, ImageChops, ImageDraw
 
-from .contracts import box, require
+from .production_timing import timed_production
+from .contracts import box, require, validate_manifest
+from .visual_review import validate_visual_targets, comparison_template, check_comparisons
 from .pipeline import read_json, sha256, write_json
 
 PLAN_KEYS = {'schema_version', 'source', 'source_sha256', 'background', 'rows', 'assets',
-             'protected_regions', 'text_clear_boxes', 'working_scale', 'view_scale', 'notes'}
+             'protected_regions', 'text_clear_boxes', 'working_scale', 'view_scale', 'notes',
+             'visual_targets', 'semantic_manifest', 'target_language', 'background_review', 'region_map'}
 REVIEW_CHECKS = ('semantic', 'completeness', 'legibility', 'restoration', 'style', 'protected_content')
 
 
@@ -59,7 +62,23 @@ def load_plan(path: Path) -> tuple[dict, Image.Image, dict[str, str]]:
         box(bbox, *source.size, 'text_clear_boxes')
     notes = plan.get('notes', [])
     require(isinstance(notes, list) and all(isinstance(note, str) for note in notes), 'notes must be strings')
-    return plan, source, {str(source_path): sha256(source_path)}
+    validate_visual_targets(plan.get('visual_targets', []), source.size)
+    inputs = {str(source_path): sha256(source_path)}
+    if 'semantic_manifest' in plan or 'target_language' in plan:
+        manifest_path = _path(path.resolve().parent, plan.get('semantic_manifest'))
+        manifest = read_json(manifest_path)
+        validate_manifest(manifest)
+        require(manifest['source']['sha256'] == plan['source_sha256'], 'Semantic manifest source mismatch')
+        require(manifest['target_language'] == plan.get('target_language'), 'Semantic target language mismatch')
+        require((manifest['canvas']['width'], manifest['canvas']['height']) == source.size, 'Semantic canvas mismatch')
+        from .job_content import validate_region_map, merged_protections
+        validate_region_map(plan, manifest)
+        required_protections = merged_protections(plan.get('protected_regions', []),
+                                                  [(plan['target_language'], manifest)], source.size)
+        require(plan.get('protected_regions', []) == required_protections,
+                'Plan must include all semantic preserve regions in protected_regions')
+        inputs[str(manifest_path)] = sha256(manifest_path)
+    return plan, source, inputs
 
 
 def _difference(first: Image.Image, second: Image.Image) -> Image.Image:
@@ -87,7 +106,9 @@ def _background_key(plan: dict, inputs: dict) -> str:
 
 
 def _background_inputs(plan_path: Path, plan: dict, inputs: dict) -> dict:
-    result = dict(inputs)
+    # Semantic edits do not invalidate a previously prepared background.
+    source_path = _path(plan_path.resolve().parent, plan['source'])
+    result = {str(source_path): inputs[str(source_path)]}
     background = plan.get('background', {'operations': []})
     require(isinstance(background, dict), 'background must be an object')
     if 'path' in background:
@@ -109,6 +130,7 @@ def _save_receipt(output: Path, stage: str, inputs: dict, started: float, extra:
     return receipt
 
 
+@timed_production(input_name='plan_path', output_name='output', scope='background')
 def prepare_layered(plan_path: Path, output: Path) -> dict:
     from .layer_ops import repair_background
 
@@ -165,8 +187,10 @@ def _verify(output: Path, stage: str) -> dict:
     return receipt
 
 
+@timed_production(input_name='plan_path', output_name='output')
 def render_layered(plan_path: Path, prepared: Path, output: Path) -> dict:
-    from .layer_ops import compose_assets, paint_text_layer
+    from .layer_ops import compose_assets
+    from .lettering import render_lettering
 
     started = perf_counter()
     require(not output.exists(), 'Output already exists; choose a new render directory')
@@ -178,8 +202,14 @@ def render_layered(plan_path: Path, prepared: Path, output: Path) -> dict:
     clean = _image(prepared / 'background.png')
     require(clean.size == source.size, 'Prepared background size mismatch')
     resolved_rows = deepcopy(plan.get('rows', []))
-    inputs = {str(plan_path.resolve()): sha256(plan_path), **background_inputs,
+    inputs = {str(plan_path.resolve()): sha256(plan_path), **source_inputs, **background_inputs,
               str((prepared / 'receipt.json').resolve()): sha256(prepared / 'receipt.json')}
+    if 'background_review' in plan:
+        from .stage_review import verify_background_review
+        review_path = _path(plan_path.resolve().parent, plan['background_review'])
+        verify_background_review(review_path, source_sha256=plan['source_sha256'],
+                                 background=prepared / 'background.png', receipt=prepared / 'receipt.json')
+        inputs[str(review_path)] = sha256(review_path)
     for row in resolved_rows:
         require(isinstance(row, dict), 'Each row must be an object')
         path = _path(plan_path.resolve().parent, row.get('font_path'))
@@ -191,8 +221,19 @@ def render_layered(plan_path: Path, prepared: Path, output: Path) -> dict:
         path = _path(plan_path.resolve().parent, asset.get('path'))
         asset['path'] = str(path)
         inputs[str(path)] = sha256(path)
-    lettering, text_layout = paint_text_layer(source.size, resolved_rows, scale=plan.get('working_scale', 6),
-                                              preserve_boxes=plan.get('text_clear_boxes', []))
+    lettering, text_layout, components = render_lettering(
+        source.size, resolved_rows, scale=plan.get('working_scale', 6), base_dir=plan_path.resolve().parent)
+    for clear_box in plan.get('text_clear_boxes', []):
+        x, y, width, height = clear_box
+        rectangle = (x, y, x + width, y + height)
+        cleared = _count(lettering.getchannel('A').crop(rectangle))
+        lettering.paste((0, 0, 0, 0), rectangle)
+        for component in components.values():
+            component.paste(0 if component.mode == 'L' else (0, 0, 0, 0), rectangle)
+        text_layout.append({'type': 'preserve', 'bbox': clear_box, 'cleared_alpha_pixels': cleared,
+                            'requires_review': bool(cleared), 'warnings': [
+                                'Protection cleared text alpha and may damage glyphs; actual visual review is required.'
+                            ] if cleared else []})
     assets, asset_layout = compose_assets(source.size, resolved_assets, base_dir=plan_path.resolve().parent)
     overlay = Image.alpha_composite(lettering, assets)
     final = Image.alpha_composite(clean, overlay)
@@ -206,6 +247,9 @@ def render_layered(plan_path: Path, prepared: Path, output: Path) -> dict:
     source.save(output / 'source.png')
     clean.save(output / 'background.png')
     lettering.save(output / 'text-layer.png')
+    for name, component in components.items():
+        require(re.fullmatch(r'[a-z][a-z0-9-]*', name), 'Invalid effect component name')
+        component.save(output / f'effects-{name}.png')
     assets.save(output / 'asset-layer.png')
     overlay.save(output / 'overlay.png')
     allowed.save(output / 'allowed-edit-mask.png')
@@ -233,6 +277,8 @@ def render_layered(plan_path: Path, prepared: Path, output: Path) -> dict:
                 'reviewer': '', 'review_kind': 'self', 'checks': {name: None for name in REVIEW_CHECKS},
                 'stage_notes': {name: '' for name in ('source', 'background', 'lettering', 'composite')},
                 'issues': [], 'user_acceptance': 'not_recorded'}
+    if plan.get('visual_targets'):
+        template['style_comparisons'] = comparison_template(plan['visual_targets'])
     write_json(output / 'review-template.json', template)
     technical = 'fail' if outside or any(protection.values()) else 'pass'
     receipt = _save_receipt(output, 'render', inputs, started,
@@ -267,6 +313,8 @@ def check_layered(output: Path) -> dict:
         checks = review.get('checks', {})
         require(isinstance(checks, dict), 'Review checks must be an object')
         values = [checks.get(name) for name in REVIEW_CHECKS]
+        values.extend(check_comparisons(plan.get('visual_targets', []), review.get('style_comparisons'),
+                                        set(receipt['artifact_sha256'])))
         require(all(value is None or type(value) is bool for value in values), 'Review checks must be boolean/null')
         notes = review.get('stage_notes', {})
         require(isinstance(notes, dict), 'stage_notes must be an object')

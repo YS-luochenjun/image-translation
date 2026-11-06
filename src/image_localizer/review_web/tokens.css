@@ -1,0 +1,32 @@
+/* Hallmark · pre-emit critique: P4 H5 E4 S5 R5 V4 */
+:root {
+  --color-paper: oklch(98.6% 0.004 90);
+  --color-surface: oklch(99.6% 0.002 90);
+  --color-rail: oklch(96.9% 0.006 90);
+  --color-stage: oklch(94% 0.006 90);
+  --color-check: oklch(90% 0.006 90);
+  --color-ink: oklch(24% 0.012 90);
+  --color-muted: oklch(47% 0.012 90);
+  --color-rule: oklch(84% 0.009 90);
+  --color-strong-rule: oklch(62% 0.01 90);
+  --color-accent: oklch(41% 0.07 168);
+  --color-accent-soft: oklch(94% 0.023 168);
+  --color-focus: oklch(46% 0.12 168);
+  --color-error: oklch(43% 0.15 28);
+  --color-error-soft: oklch(96% 0.02 28);
+  --color-overlay: oklch(65% 0.15 168 / 0.12);
+  --color-overlay-border: oklch(37% 0.13 168);
+  --color-backdrop: oklch(20% 0.01 90 / 0.35);
+  --font-display: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-body: 'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  --font-mono: 'Cascadia Code', 'SFMono-Regular', monospace;
+  --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px;
+  --space-lg: 24px; --space-xl: 32px; --space-2xl: 48px;
+  --text-xs: 11px; --text-sm: 12px; --text-base: 13px; --text-lg: 16px; --text-title: 28px;
+  --radius-sm: 3px; --radius-md: 6px;
+  --rule-hairline: 1px; --rule-focus: 2px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms; --dur-short: 220ms;
+}

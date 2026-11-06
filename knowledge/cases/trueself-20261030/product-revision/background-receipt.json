@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "stage": "background",
+  "input_sha256": {
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\inputs\\f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861.png": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\inputs\\96cd14ae8e7495a493a410c77a08d438297fe061ddc75c3323f462f7a0ed8c0f.png": "96cd14ae8e7495a493a410c77a08d438297fe061ddc75c3323f462f7a0ed8c0f",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\prepared-v2\\inputs\\63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804.png": "63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804"
+  },
+  "artifact_sha256": {
+    "background-plan.json": "8bda6bafc6bca6c3ba89fa456985a82342903a583a6e0df270589a9d76e9d2a9",
+    "background.png": "f799c90e532e935900f4b19672e7e3a2e014d892484deff121730830ff80e99c",
+    "edit-mask.png": "63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804",
+    "repair-layout.json": "f43b8e915080532bf990281102eb488105a099b69caa5aee2f7d4c014d00d6f2",
+    "source.png": "d186ca1d6824952e08cbcd012334d80c66204838838cec58e7bf655473ac9068"
+  },
+  "elapsed_seconds": 0.0641,
+  "status": "pending",
+  "background_key": "d77088a0d5bb23477c664b58294adcc0cae51e3a72e4a2d1ae36aff1c24ece3f",
+  "protected_changed_pixels": {
+    "portrait-frame-street": 0,
+    "top-wall": 0,
+    "bottom-wall": 0
+  },
+  "outside_mask_changed_pixels": 0,
+  "review_required": "Actually view background before lettering"
+}

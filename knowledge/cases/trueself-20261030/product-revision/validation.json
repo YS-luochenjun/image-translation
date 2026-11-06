@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-30",
+  "python": "3.12.14",
+  "pillow": "12.3.0",
+  "project_version": "0.2.0",
+  "unittest": {
+    "command": "python -m unittest discover -s tests -q",
+    "tests": 153,
+    "seconds": 23.672,
+    "status": "pass",
+    "skipped": 0
+  },
+  "technical_job": "pass",
+  "agent_quality": "pass_with_minor",
+  "user_acceptance": "not_recorded",
+  "protected_changed_pixels": {
+    "order": [
+      "portrait-frame-street",
+      "top-wall",
+      "bottom-wall"
+    ],
+    "languages": {
+      "zh-CN": [
+        0,
+        0,
+        0
+      ],
+      "ja": [
+        0,
+        0,
+        0
+      ]
+    }
+  },
+  "benchmark": {
+    "cases": 5,
+    "technical_pass": 4,
+    "technical_fail": 1,
+    "technical_expectations": "pass",
+    "visual_review": "pending"
+  },
+  "glyph_coverage": "All actual sample row characters mapped; missing demo glyph blocked by regression.",
+  "portability": "Relative input/font sample; frozen package copied then re-prepared in automated test; fresh approval remains empty.",
+  "review_identity": "Primary self review and separately identified independent actual visual reviewer; currentv2 outputs reopened.",
+  "new_image_model_calls": 0,
+  "new_ocr_api_calls": 0,
+  "limitations": [
+    "Hidden plaster is approximate; original occluded texture fidelity uncertain.",
+    "CJK fine strokes and block density differ from source Latin; minor suggestions retained.",
+    "No automatic visual beauty score, unattended OCR, reference/mask editing API, or general perspective/curved typography."
+  ]
+}

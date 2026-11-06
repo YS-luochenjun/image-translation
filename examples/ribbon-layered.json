@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "source": "../runs/desktop-1-zh-redo/source.png",
+  "source": "../knowledge/cases/ribbon-20261029/evidence/source.png",
   "source_sha256": "886f01336ce95e27e770eae25a6fab947a4e756e39f0cb7ca22dcc2faa8a7a70",
   "background": {
-    "path": "../runs/desktop-1-zh-redo/02-clean-background.png",
-    "mask": "../runs/desktop-1-zh-redo/02-edit-mask.png"
+    "path": "assets/ribbon-background.png",
+    "mask": "assets/ribbon-mask.png"
   },
   "rows": [],
   "assets": [
     {
       "id": "authorized-ribbon-panel",
-      "path": "../runs/desktop-1-zh-art-direction/generated-panel-clean-alpha.png",
+      "path": "assets/ribbon-panel.png",
       "kind": "compound",
       "position": [28, 180],
       "size": [280, 94]

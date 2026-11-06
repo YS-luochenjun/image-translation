@@ -135,6 +135,8 @@ def _layout_region(region: dict) -> tuple[dict, Image.Image]:
     text = region.get("target_text", "").replace("\r\n", "\n").replace("\r", "\n")
     if _requires_raqm(text) and not features.check_feature("raqm"):
         raise ValueError(f"Region {region['id']}: complex-script text requires Pillow RAQM support")
+    from .lettering import check_font_coverage
+    check_font_coverage(font_path, text.replace("\n", ""))
     _, _, box_width, box_height = region["bbox"]
     padding = style.get("padding", 4)
     available_width = box_width - 2 * padding

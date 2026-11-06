@@ -1,6 +1,6 @@
 # 单张图片翻译框架
 
-一个由当前 AI 宿主执行内容理解和翻译、由 Python 完成精确排版与证据管理的本地项目。第一版关注单张图片的文字准确、版式美观和主体保真，不含需求接入、上传网站、视频或音频处理。
+一个由当前 AI 宿主执行理解、翻译和实际视觉迭代，由 Python 完成分层排版与证据管理的本地项目。目标是让译图像按目标语言原生设计：语义忠实、主体保真、字形材质与画面协调。处理本地单图，并支持 Fireplay 图片翻译需求接入、原图下载与宿主调用正式连接器提交；不处理视频或音频。当前0.2版新增可配置字效、多语共享背景、逐区文字绑定和可复现输入；不宣称任意图片首稿都完全无痕。
 
 ## 已实现
 
@@ -12,6 +12,41 @@
 - **保护内容**：保留区域、人物、产品、图标等保护区不得与翻译区相交。
 - **可复查输出**：译图、透明文字层、前后对照、排版数据、输入/字体/输出哈希及版本化回执。
 - **质量门禁**：逐区域检查语义、完整性、可读性、背景还原和风格；审核绑定当前成图，改图或改译稿需重新审核。明确区分技术完成、Agent自审和用户验收。
+
+## Fireplay 图片翻译需求
+
+可以让 Agent 查询 Fireplay 的图片需求、读取正文确认翻译意图，登记本地承接并下载原图，再为每张原图创建现有多语任务。入口为 `fireplay-discover`、`fireplay-register`、`fireplay-accept`、`fireplay-status`、`fireplay-download` 和 `fireplay-job`，示例和回执结构见 [接入使用说明](docs/fireplay-intake.md)。
+
+需求查询与正式提交由宿主已有连接器执行，CLI 保存实际回执并验证分页、内容版本和交付证据。本地承接与平台认领分别记录；连接器不可用时明确报告缺口。在线发现、矩阵规划、80分交付评分及发布后核验见[自主交付流程](agent/workflows/fireplay-autonomous.md)和[自动交付合同](docs/delivery-automation.md)。下载验证真实静态 PNG/JPEG/WebP 字节、尺寸和 SHA256，之后衔接下列制作流程。
+
+## 本地审阅台
+
+双击项目根目录的 [打开审阅台.cmd](打开审阅台.cmd)，或在终端运行 `python bin/it.py review-desk --open`，打开 <http://127.0.0.1:8765/>。同一项目服务已运行时会复用；双击入口会自动查找项目或 Harness 的 Python。
+
+审阅台按原图 SHA256 归组语言和制作版本，支持双图/滑杆/原尺寸对照、背景与文字层、紧凑逐区表格、筛选批量认可、追加反馈和已保存意见返工指令。反馈绑定当前原图、成图和译稿哈希，保留已有技术检查与 Agent 审核。使用方式见[审阅台说明](docs/review-desk.md)。
+
+## 推荐的新任务入口
+
+直接让本项目Agent处理本地图片和目标语言即可；配置、分析与审核由Agent完成。单语言也能使用这条分阶段入口。
+
+```powershell
+python bin/it.py init-job "D:\images\poster.png" --targets "zh-CN,ja" --output runs/poster-author
+# Agent实际识读和定稿，配置字层、保护区与源图关键视觉要求。
+python bin/it.py prepare-job runs/poster-author/job.json --output runs/poster-prepared-v1
+# Agent先单独看背景并记录当前background-review.json，然后才进入排字。
+python bin/it.py render-job runs/poster-prepared-v1 --output runs/poster-render-v1
+# Agent实际看各语言全图/局部，发现缺口自主返工，再记录当前review.json。
+python bin/it.py check-job runs/poster-render-v1
+```
+
+字段、字效、字体、版本迁移和评测详见[原生观感任务指南](docs/native-workflow.md)。可直接复现[真实中日配置](examples/trueself-job.json)，它自带小型开放字体子集、底图/蒙版及已归档源图，无本机绝对路径。
+
+新增内容：
+
+- **独立字效组件**：字面渐变、接触暗部、柔化投影、浅立体层与字内高光；原尺寸参数控制，单独输出供实际审看，不默认给所有图加影。
+- **缺字阻断**：基础与分层入口解析真实字体cmap，找不到字形直接报告U+码；复杂整形仍取决于RAQM。
+- **多语完整性**：定稿逐区映射所有实际文字，语义保留区并入像素保护；逐语言产物绑定，不能复制一份译图冒充另一语言。
+- **评测证据**：同尺寸整图/局部、真实RGBA差异与历史失败样本。技术检查通过不自动判审美合格；空观察、uncertain及major问题阻断交付。
 
 ## imagegen 能否直接完成
 
@@ -82,16 +117,17 @@ runs/<ID>/
 
 ## 目录导航与扩展顺序
 
+- [图片翻译阶段成果](docs/image-localization-milestone-20261106.md)：图组范围、分层制作、视觉交付取舍、复用与验证边界。
 - [Agent执行入口](AGENTS.md) 与 [单图工作流](agent/workflows/single-image.md)：后续制作按此执行。
 - [架构与字段合同](docs/architecture.md)：填写解析与审核记录时参考。
 - [参考项目复用说明](docs/reference-reuse.md)：解释哪些方法保留、哪些视频假设被舍弃。
-- [验证记录](docs/validation.md)：83项测试、两个已认可案例的配置重建及真实审核边界。
+- [验证记录](docs/validation.md)：历史验证、真实双语任务、失败回归与历史案例重建；本阶段测试与覆盖范围见[阶段成果](docs/image-localization-milestone-20261106.md)。
 - [知识目录](knowledge/README.md)：保存有来源、适用范围和真实结果的经验。
 - [命令实现](src/image_localizer/cli.py)、[工作包与门禁](src/image_localizer/pipeline.py)、[图像排版](src/image_localizer/rendering.py)：可独立扩展。
 
-优先扩展：真实图像编辑工具适配、字体缺字检测、透视和任意形保护蒙版、设计稿文字层导出、复杂文字排版支持。倾斜排字和现有素材合成已可用配置执行；新增能力先用真实困难样例验证，避免把API成功当作画面和翻译质量通过。
+优先扩展：真实图像编辑工具适配、透视和任意形保护蒙版、设计稿文字层导出、复杂文字排版支持。字体缺字检查和可配置分层字效已实现；倾斜排字和现有素材合成已可用配置执行；新增能力先用真实困难样例验证，避免把API成功当作画面和翻译质量通过。
 
-基础 CLI 的边界是横平竖直矩形区域与基础横排；复杂路线按 [内容路由](knowledge/methods/content-routing.md) 选择，缺可靠能力或证据时 pending。独立底图、透明字层和五阶段真实观察需单独核实，quality 文件存在不自动证明成立。字体测量不证明字形覆盖；全图缩略、100%和局部审核还需检查 [文字构图](knowledge/methods/typography-composition.md) 的字重、黑白面积、行宽/容器关系、弧度与张力，不能只说字号相同。
+基础 CLI 的边界是横平竖直矩形区域与基础横排；复杂路线按 [内容路由](knowledge/methods/content-routing.md) 选择，缺可靠能力或证据时 pending。独立底图、透明字层和五阶段真实观察需单独核实，quality 文件存在不自动证明成立。cmap检查现已验证字符映射，但不证明复杂整形或视觉质量；全图缩略、100%和局部审核还需检查 [文字构图](knowledge/methods/typography-composition.md) 的字重、黑白面积、行宽/容器关系、弧度与张力，不能只说字号相同。
 
 合成产品海报仅是回归样例；真实 [336×280缎带案例](knowledge/cases/ribbon-20261029/README.md) 的当前艺术字重设计已获用户正向反馈，见 [版本反馈](knowledge/cases/ribbon-20261029/user-feedback.json)。case保留partial，表示单样例覆盖与已披露构图取舍，不再把旧版张力、弧形和行宽问题写成当前未处理事项。旧run/审核保留，反馈单独追加。
 

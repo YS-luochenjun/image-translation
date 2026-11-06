@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "source_sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+  "background_sha256": "f799c90e532e935900f4b19672e7e3a2e014d892484deff121730830ff80e99c",
+  "receipt_sha256": "2c847af9d2f697c1aadecb7cca4932ba84716a35405fb5245b244fb08244181b",
+  "reviewer": "Codex primary Agent; actual prepared-v2 native background and source/enlarged comparisons viewed",
+  "review_kind": "self",
+  "checks": {
+    "no_residual_text": true,
+    "seam_continuity": true,
+    "protected_content": true
+  },
+  "observations": "Actually opened prepared-v2/background/background.png at300x250 after inspecting source/adaptive native and10x left edge comparisons. Background bytes equal the previously reviewed candidate. No readable Portuguese or bottom P, repeated vertical column pattern, complete hard rectangle or left-edge bright island. Wall edge dark ridge and protected scene retained; technical stage protection counts0. Hidden grain is unknown and approximated.",
+  "issues": [
+    {
+      "severity": "minor",
+      "note": "At enlargement, repair region has somewhat more uniform fine grain and top/bottom tone transitions differ; visible local plaster is approximated, not recovered."
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 {
   "version": 1,
   "entries": [
+    {"id":"source-set-and-size-planning","path":"knowledge/methods/source-set-and-size-planning.md","kind":"method","status":"active","tags":["source-set","sizes","batch","localization","delivery"],"scope":"先区分已有原图整组翻译与明确七成员扩图；五来源六语言=六组30张；尺寸优先级、逐语言完整覆盖与合格字节复用"},
+    {"id":"delivery-balanced-review","path":"knowledge/methods/delivery-balanced-review.md","kind":"method","status":"active","tags":["delivery","review","workflow","localization","repair"],"scope":"2026-11-06用户通用指示：画面流畅基本一致，允许局部补全；80分及底线通过即交付，最多两轮局部返工；评分来自实际看图"},
     {
       "id": "layered-localization",
       "path": "knowledge/methods/layered-localization.md",

@@ -52,3 +52,10 @@
 ## 回溯材料
 
 [原阶段记录](../../../runs/trueself-bilingual-20261030/stage-record.json)、[首次语义和风格记录](../../../runs/trueself-bilingual-20261030/01-analysis.json)、[用户纠错记录](../../../runs/trueself-bilingual-20261030/04-user-feedback.json)、[字效修订记录](../../../runs/trueself-bilingual-20261030/04-revision-record.json)、[修订独立视觉审核](../../../runs/trueself-bilingual-20261030/04-independent-appearance-review.json)。历史记录保持原状，新反馈与新知识单独追加。
+
+
+## 后续产品化验证：2026-10-30
+
+新增[独立产品化记录](product-revision/README.md)：字面/接触/柔影参数已进入可复用模块；中日定稿逐区绑定实际字层，共享背景和资源快照有独立阶段门禁。新的局部背景补全改善了历史规则竖纹，并针对实际发现的左缘亮块返工。当前[中文](product-revision/chinese.png)、[日文](product-revision/japanese.png)具有新的哈希，主自审及独立视觉复核分别记录。
+
+这次字效与前述已改善修订版接近，不夸大为又一次风格大跃升。用户“目前确实好了一些”仍只绑定旧修订，未迁移给新成图。新图Agent判定可交付带minor，隐藏灰泥忠实性uncertain，用户验收仍未记录；本案例保持partial。旧证据/反馈/回执未改写。

@@ -1,0 +1,612 @@
+{
+  "schema_version": 1,
+  "source": "../knowledge/cases/trueself-20261030/evidence/source.png",
+  "source_sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+  "background": {
+    "path": "assets/trueself-background.png",
+    "mask": "assets/trueself-mask.png"
+  },
+  "protected_regions": [
+    {
+      "id": "portrait-frame-street",
+      "bbox": [
+        0,
+        0,
+        182,
+        250
+      ]
+    },
+    {
+      "id": "top-wall",
+      "bbox": [
+        182,
+        0,
+        118,
+        31
+      ]
+    },
+    {
+      "id": "bottom-wall",
+      "bbox": [
+        182,
+        205,
+        118,
+        45
+      ]
+    }
+  ],
+  "working_scale": 6,
+  "view_scale": 3,
+  "visual_targets": [
+    {
+      "id": "native-depth",
+      "bbox": [
+        185,
+        34,
+        114,
+        169
+      ],
+      "source_observation": "Gold serif faces have a bright upper face, close dark contact edge and broader lower-right soft shadow, visible at300x250.",
+      "criterion": "At native size, target must read as raised warm lettering rather than flat bright shapes; do not count a hard duplicate as soft shadow."
+    },
+    {
+      "id": "weight-hierarchy",
+      "bbox": [
+        185,
+        34,
+        114,
+        169
+      ],
+      "source_observation": "Source has substantial serif strokes, a centered right column, larger short words and compact line rhythm.",
+      "criterion": "Keep readable serif weight and purposeful line lengths for each language; no horizontal glyph stretching, merged strokes, clipped tails or crowded right edge."
+    },
+    {
+      "id": "plaster-continuity",
+      "bbox": [
+        182,
+        31,
+        118,
+        174
+      ],
+      "source_observation": "Visible wall has irregular warm plaster grain and local tone changes; original text obscures some unknown structure.",
+      "criterion": "No Portuguese residues or rectangular seams at native size; inspect bare background and enlarged wall for repetitive stripes, smears and bright repair islands. Unknown texture is approximation."
+    },
+    {
+      "id": "scene-integrity",
+      "bbox": [
+        0,
+        0,
+        182,
+        250
+      ],
+      "source_observation": "Portrait, frame, brick edge and street are the principal source scene.",
+      "criterion": "Retain all protected source pixels exactly and check whole-image harmony without lettering invading the frame."
+    }
+  ],
+  "support_files": [
+    "assets/fonts/OFL.txt",
+    "assets/fonts/provenance.json"
+  ],
+  "targets": [
+    {
+      "language": "zh-CN",
+      "manifest": "trueself-manifests/zh-CN.json",
+      "rows": [
+        {
+          "id": "face-0",
+          "text": "轻触画框",
+          "font_path": "assets/fonts/demo-serif-sc.otf",
+          "font_size": 23,
+          "center": [
+            241,
+            53
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.36,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        },
+        {
+          "id": "face-1",
+          "text": "看看你的",
+          "font_path": "assets/fonts/demo-serif-sc.otf",
+          "font_size": 23,
+          "center": [
+            241,
+            91
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.36,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        },
+        {
+          "id": "face-2",
+          "text": "真实",
+          "font_path": "assets/fonts/demo-serif-sc.otf",
+          "font_size": 30,
+          "center": [
+            241,
+            133
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.36,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        },
+        {
+          "id": "face-3",
+          "text": "个性",
+          "font_path": "assets/fonts/demo-serif-sc.otf",
+          "font_size": 30,
+          "center": [
+            241,
+            176
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.36,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        }
+      ],
+      "assets": [],
+      "text_clear_boxes": [],
+      "region_map": [
+        {
+          "region_id": "personality-cta",
+          "row_ids": [
+            "face-0",
+            "face-1",
+            "face-2",
+            "face-3"
+          ],
+          "asset_texts": []
+        }
+      ],
+      "notes": [
+        "Demo font is a renamed OFL subset with these characters only. Use a full licensed font for other text."
+      ]
+    },
+    {
+      "language": "ja",
+      "manifest": "trueself-manifests/ja.json",
+      "rows": [
+        {
+          "id": "face-0",
+          "text": "額縁を",
+          "font_path": "assets/fonts/demo-serif-jp.otf",
+          "font_size": 25,
+          "center": [
+            239.5,
+            49
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.28,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        },
+        {
+          "id": "face-1",
+          "text": "タップして",
+          "font_path": "assets/fonts/demo-serif-jp.otf",
+          "font_size": 21,
+          "center": [
+            239.5,
+            80
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.28,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        },
+        {
+          "id": "face-2",
+          "text": "本当の",
+          "font_path": "assets/fonts/demo-serif-jp.otf",
+          "font_size": 24,
+          "center": [
+            239.5,
+            113
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.28,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        },
+        {
+          "id": "face-3",
+          "text": "性格を",
+          "font_path": "assets/fonts/demo-serif-jp.otf",
+          "font_size": 25,
+          "center": [
+            239.5,
+            146
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.28,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        },
+        {
+          "id": "face-4",
+          "text": "見てみよう",
+          "font_path": "assets/fonts/demo-serif-jp.otf",
+          "font_size": 21,
+          "center": [
+            239.5,
+            180
+          ],
+          "color": "#f9dd8b",
+          "stroke": 0.28,
+          "effects": {
+            "face_gradient": {
+              "top": "#ffe89f",
+              "bottom": "#f1c463"
+            },
+            "shadow": {
+              "offset": [
+                1.7,
+                2.8
+              ],
+              "blur": 1.15,
+              "opacity": 0.77,
+              "color": "#0f0a05"
+            },
+            "contact": {
+              "offset": [
+                0.5,
+                1.0
+              ],
+              "blur": 0.32,
+              "opacity": 1,
+              "color": "#2d1c09"
+            },
+            "depth": {
+              "offset": [
+                0.65,
+                1
+              ],
+              "steps": 4,
+              "color": "#664114"
+            },
+            "highlight": {
+              "offset": [
+                0.34,
+                0.42
+              ],
+              "opacity": 0.24,
+              "color": "#fff2b6"
+            }
+          }
+        }
+      ],
+      "assets": [],
+      "text_clear_boxes": [],
+      "region_map": [
+        {
+          "region_id": "personality-cta",
+          "row_ids": [
+            "face-0",
+            "face-1",
+            "face-2",
+            "face-3",
+            "face-4"
+          ],
+          "asset_texts": []
+        }
+      ],
+      "notes": [
+        "Demo font is a renamed OFL subset with these characters only. Use a full licensed font for other text."
+      ]
+    }
+  ],
+  "notes": [
+    "Reproducible case only. Chinese and Japanese semantics are curated, not automatic OCR or translation.",
+    "User earlier said only partial improvement; this new product version is not user-accepted.",
+    "Hidden plaster is approximated from actual neighbouring wall; reject visible artifacts rather than certifying pixel identity inside the translated area."
+  ]
+}

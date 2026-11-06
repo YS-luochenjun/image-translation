@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "files": {
+    "background-method.md": "ead9028d115558b0a917fb38c0569af5ff2ebdfc9487203cf9697d1e008d7ba8",
+    "background-receipt.json": "2c847af9d2f697c1aadecb7cca4932ba84716a35405fb5245b244fb08244181b",
+    "background-review.json": "8a2dca181b75aa625a1a3d43e6f55e72dce3d803e6a7c1f226700dd16f741f19",
+    "background.png": "f799c90e532e935900f4b19672e7e3a2e014d892484deff121730830ff80e99c",
+    "benchmark-report.json": "e45b6f190d786e297431ea7bb4ed9c59b3e74674946ef4b0b9b225043a24889e",
+    "bundle-manifest.json": "d60643acb38dd4708a43b399ea56fd194df8a3cda7071d807cb960b5ef3ac33b",
+    "chinese-receipt.json": "d218f95fab2e5a756945d30d5f23dbf420791ce121d8db76e29905b093881752",
+    "chinese-self-review.json": "0f7bab3787ce2464f1565025b7fc5fd9fba76fe7eac1cc78b8cd0ad5267ac77c",
+    "chinese.png": "d9dc13e7035bfa2cf4bd514d79529175ac175b006a5089e8e0d72449c23c9628",
+    "comparison-report.json": "df152db232398dbed2de41dad51b3003dd16604556d117bc91c7e0d2a9ee07d0",
+    "comparison.png": "49879d79440d5dec38d82fbfb6c8b9c8e3b4fd52969ab6ce138290c46166cf20",
+    "independent-review.json": "4ff1f5003f7c2791609f18fb5eb25cd0aabbc6bdb1e8782420a42f00e33acd35",
+    "japanese-receipt.json": "385f132762f2edc3f3cc79f6b197aeeb14f78da712754c5a1740cb617f4e374a",
+    "japanese-self-review.json": "2e72fe3d58da583e30340173e36d520369c9068a77f9718620ab90fe223f7f6f",
+    "japanese.png": "60ad7a987f111740f4124c6c6cef4489b5ab6769f4d41e462a308a3491eda3f5",
+    "lettering-wall-comparison.png": "0e30c4ff22da6d26f4779a02538b5c553a8c3a77d05ea7164fe971f2cf06680e",
+    "quality.json": "d5630ee16058cc4190196e24afefebdf871aa34fcf488db3938fe1d57f88af15",
+    "README.md": "79b17cd622bf8c19a4d1447ad56dedd116612ee1b393ad422cbd2aebfb429d59",
+    "validation.json": "64157d10c1d7edced92da5a0f52435048072a8b8a9fd9e44ac6b894388f7b4f6"
+  },
+  "status": "Agent pass with minor; user acceptance not recorded",
+  "previous_feedback_unchanged": true,
+  "no_new_model_calls": true
+}

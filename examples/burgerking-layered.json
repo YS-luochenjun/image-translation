@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "../runs/burgerking-zh-20261029/source.png",
+  "source": "../knowledge/cases/burgerking-20261029/evidence/source.png",
   "source_sha256": "dd2ed34fd1c7d45d68bb9c33193e67ea92020d3fa07605142944ebb84e727ca9",
   "background": {
     "operations": [

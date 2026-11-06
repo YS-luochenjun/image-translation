@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "spec": {
+    "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\visual-regressions.json",
+    "sha256": "44c2dad5b91d0b572c7ac1221b766aee6b630bf7de70ab263f0a1ddcd7a70ad6"
+  },
+  "cases": [
+    {
+      "id": "old-flat-zh",
+      "report": "000-old-flat-zh/comparison/report.json",
+      "report_sha256": "d780480e8fcdbcf1e5c4c87100f01801607b5f68379b9e9a04b2ff3d9613b2c5",
+      "binding": {
+        "spec": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\benchmark-v2\\000-old-flat-zh\\spec.json",
+          "sha256": "c6107c5ea36cdea57e2ab16c1e639d5f8ffd4ef775a5b280156a24496be9926e"
+        },
+        "source": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\source.png",
+          "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+          "rgba_sha256": "31410fb3fc1c37f028cc75745e774e4c7278f0569b5be57b4b852142825c3972",
+          "size": [
+            300,
+            250
+          ]
+        },
+        "candidates": [
+          {
+            "id": "old-flat-zh",
+            "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\chinese-before.png",
+            "sha256": "e58482db922d59df696b3813fc96fd72ac9e08789098d0df264ecca6616a684a",
+            "rgba_sha256": "34defe2067626e4df17738ba146d2a617ee9d86d5299e66e41ba66bda9a2ec63",
+            "size": [
+              300,
+              250
+            ]
+          }
+        ]
+      },
+      "technical": "pass",
+      "expected_technical": "pass",
+      "expectation_matched": true,
+      "known_visual_defects": [
+        "User historical feedback: flat type and insufficient soft shadow. A technical pass cannot approve this image."
+      ],
+      "known_visual_defects_provenance": "Supplied benchmark labels; requires actual visual review",
+      "visual_review": "pending"
+    },
+    {
+      "id": "old-flat-ja",
+      "report": "001-old-flat-ja/comparison/report.json",
+      "report_sha256": "a18fd9e824001c60518e4ae7f340b7ec0c904be7659f8e224beaaa5d6fdb4a5f",
+      "binding": {
+        "spec": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\benchmark-v2\\001-old-flat-ja\\spec.json",
+          "sha256": "333ddae48d32e780209fe2b814d8dde02a0f4807493f92c81dd25ec68bfb4508"
+        },
+        "source": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\source.png",
+          "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+          "rgba_sha256": "31410fb3fc1c37f028cc75745e774e4c7278f0569b5be57b4b852142825c3972",
+          "size": [
+            300,
+            250
+          ]
+        },
+        "candidates": [
+          {
+            "id": "old-flat-ja",
+            "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\japanese-before.png",
+            "sha256": "59c5b75947eeb6cfcb9bf79ae661d59aec9dc9fd5ba484553b690cd80a2ba639",
+            "rgba_sha256": "285e3cf7d66ebaf5a068401564598b48a0ed306be152525e5c224baf63be014f",
+            "size": [
+              300,
+              250
+            ]
+          }
+        ]
+      },
+      "technical": "pass",
+      "expected_technical": "pass",
+      "expectation_matched": true,
+      "known_visual_defects": [
+        "User historical feedback: flat type and insufficient soft shadow; source/candidate actual visual comparison required."
+      ],
+      "known_visual_defects_provenance": "Supplied benchmark labels; requires actual visual review",
+      "visual_review": "pending"
+    },
+    {
+      "id": "native-zh",
+      "report": "002-native-zh/comparison/report.json",
+      "report_sha256": "8b3d0370dd669c3870559b94a38f48d82b1fe00bfed99340eef804785fb61af0",
+      "binding": {
+        "spec": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\benchmark-v2\\002-native-zh\\spec.json",
+          "sha256": "c0d8afea00895ecf447a04df4b711246888b12bb0b2c358ba38b27262b2f3a8e"
+        },
+        "source": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\source.png",
+          "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+          "rgba_sha256": "31410fb3fc1c37f028cc75745e774e4c7278f0569b5be57b4b852142825c3972",
+          "size": [
+            300,
+            250
+          ]
+        },
+        "candidates": [
+          {
+            "id": "native-zh",
+            "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\product-revision\\chinese.png",
+            "sha256": "d9dc13e7035bfa2cf4bd514d79529175ac175b006a5089e8e0d72449c23c9628",
+            "rgba_sha256": "db152888cdbb2affefeb45e7d995e4b3b137ef6e1ecb6ef7c2e4d9ffedadf856",
+            "size": [
+              300,
+              250
+            ]
+          }
+        ]
+      },
+      "technical": "pass",
+      "expected_technical": "pass",
+      "expectation_matched": true,
+      "known_visual_defects": [
+        "Independent minor: upper/lower Chinese block density differs; plaster is approximate."
+      ],
+      "known_visual_defects_provenance": "Supplied benchmark labels; requires actual visual review",
+      "visual_review": "pending"
+    },
+    {
+      "id": "native-ja",
+      "report": "003-native-ja/comparison/report.json",
+      "report_sha256": "17742e67587b36b0ed77bb5433d47cd4554b6c580edb91a808ae6afa69bf3019",
+      "binding": {
+        "spec": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\benchmark-v2\\003-native-ja\\spec.json",
+          "sha256": "daa1b5725d65f03fe6d9984a4b43d98f65400404c353d53c4b04d09b2a5c6b5c"
+        },
+        "source": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\source.png",
+          "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+          "rgba_sha256": "31410fb3fc1c37f028cc75745e774e4c7278f0569b5be57b4b852142825c3972",
+          "size": [
+            300,
+            250
+          ]
+        },
+        "candidates": [
+          {
+            "id": "native-ja",
+            "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\product-revision\\japanese.png",
+            "sha256": "60ad7a987f111740f4124c6c6cef4489b5ab6769f4d41e462a308a3491eda3f5",
+            "rgba_sha256": "5bee37caa5f527947194f63cff9d3e98dfbc59dab3bbdf0191543ab33140f0a4",
+            "size": [
+              300,
+              250
+            ]
+          }
+        ]
+      },
+      "technical": "pass",
+      "expected_technical": "pass",
+      "expectation_matched": true,
+      "known_visual_defects": [
+        "Independent minor: complex first-line kanji somewhat dense; plaster is approximate."
+      ],
+      "known_visual_defects_provenance": "Supplied benchmark labels; requires actual visual review",
+      "visual_review": "pending"
+    },
+    {
+      "id": "actual-protection-damage",
+      "report": "004-actual-protection-damage/comparison/report.json",
+      "report_sha256": "0d76bf549b3a0e134245e37bbf1e65d98c78527612ded0a116f5372aca46d58d",
+      "binding": {
+        "spec": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\runs\\product-native-20261030\\benchmark-v2\\004-actual-protection-damage\\spec.json",
+          "sha256": "3b4b859a96c77cc9c36e530404b9f93ae726d364dcf82ec156febca16a9c4750"
+        },
+        "source": {
+          "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\source.png",
+          "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+          "rgba_sha256": "31410fb3fc1c37f028cc75745e774e4c7278f0569b5be57b4b852142825c3972",
+          "size": [
+            300,
+            250
+          ]
+        },
+        "candidates": [
+          {
+            "id": "actual-protection-damage",
+            "path": "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\assets\\protection-damage.png",
+            "sha256": "8027ada6e09c184030d5feb5039bdadd9a07987aeb246e7157c9d36683fca828",
+            "rgba_sha256": "b9b0a210c22aa3bb07637ab41fc2847f3d7cb0d8e645417aadfdd64fc112c774",
+            "size": [
+              300,
+              250
+            ]
+          }
+        ]
+      },
+      "technical": "fail",
+      "expected_technical": "fail",
+      "expectation_matched": true,
+      "known_visual_defects": [
+        "Authored regression failure: green pixel at25,60 damages protected scene."
+      ],
+      "known_visual_defects_provenance": "Supplied benchmark labels; requires actual visual review",
+      "visual_review": "pending"
+    }
+  ],
+  "technical_expectations": "pass",
+  "visual_review": "pending",
+  "status": "pending",
+  "notes": [
+    "Known visual labels come from historical user feedback or current independent review, not automatic visual detection. Expected technical results are4pass/1fail; all generated benchmark visual reviews remainpending."
+  ]
+}

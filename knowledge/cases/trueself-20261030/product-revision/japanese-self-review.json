@@ -1,0 +1,111 @@
+{
+  "output_sha256": "60ad7a987f111740f4124c6c6cef4489b5ab6769f4d41e462a308a3491eda3f5",
+  "plan_sha256": "41af17fd36ca4076f62618da54bdcaa4bd8921b1209a90ba66d4cb6ffcc8c1f5",
+  "advisories": {},
+  "advisory_reviews": {},
+  "reviewer": "Codex primary Agent; actual native/comparison/text-layer/3x visual review, independent reviewer report recorded separately",
+  "review_kind": "self",
+  "checks": {
+    "semantic": true,
+    "completeness": true,
+    "legibility": true,
+    "restoration": true,
+    "style": true,
+    "protected_content": true
+  },
+  "stage_notes": {
+    "source": "Actually viewed source300x250 and source/target native comparisons. Portuguese CTA means touch framed picture to see true personality; quadro is not mirror, personalidade not physical appearance. No other text instance found.",
+    "background": "Prepared-v2 bare background actually opened; same SHA as reviewed adaptive repair. No residual text or rectangular hard seam at native size. Unknown hidden plaster remains a disclosed approximation.",
+    "lettering": "Actual transparent layer and3x views read as 額縁を / タップして / 本当の / 性格を / 見てみよう. Font cmap coverage and region mapping independently check all actual row characters. Face/contact/soft shadow are separate assets; visible native depth checked, not inferred from effects config.",
+    "composite": "Five readable Japanese lines with fairly even rhythm. First-line 額縁 is more dense than kana below, but counters remain visible; second/fifth lines retain side margins and no shadow clipping. Portrait/frame/street checked alongside source; current exact protection measurements0. Finalv2 visual artifacts byte-identical to actual-viewed v1, and independent reviewer also reopened both currentv2 native images."
+  },
+  "issues": [
+    {
+      "severity": "minor",
+      "note": "Five readable Japanese lines with fairly even rhythm. First-line 額縁 is more dense than kana below, but counters remain visible; second/fifth lines retain side margins and no shadow clipping."
+    },
+    {
+      "severity": "minor",
+      "note": "Reconstructed plaster is visually plausible, with more uniform fine grain and small enlarged tone/texture differences. Original hidden wall structure is unknown; this is not recovery of hidden pixels."
+    }
+  ],
+  "user_acceptance": "not_recorded",
+  "style_comparisons": [
+    {
+      "id": "native-depth",
+      "bbox": [
+        185,
+        34,
+        114,
+        169
+      ],
+      "source_observation": "Gold serif faces have a bright upper face, close dark contact edge and broader lower-right soft shadow, visible at300x250.",
+      "criterion": "At native size, target must read as raised warm lettering rather than flat bright shapes; do not count a hard duplicate as soft shadow.",
+      "target_observation": "At300x250 the gold faces show an adjacent warm dark edge and a distinct softer lower-right wall shadow. Depth remains visible without enlargement; neither a lone hard duplicate nor a flat gold fill. CJK fine horizontals remain lighter than source Latin serif stems.",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "view.png",
+        "text-layer.png",
+        "effects-shadow.png",
+        "effects-contact.png"
+      ]
+    },
+    {
+      "id": "weight-hierarchy",
+      "bbox": [
+        185,
+        34,
+        114,
+        169
+      ],
+      "source_observation": "Source has substantial serif strokes, a centered right column, larger short words and compact line rhythm.",
+      "criterion": "Keep readable serif weight and purposeful line lengths for each language; no horizontal glyph stretching, merged strokes, clipped tails or crowded right edge.",
+      "target_observation": "Five readable Japanese lines with fairly even rhythm. First-line 額縁 is more dense than kana below, but counters remain visible; second/fifth lines retain side margins and no shadow clipping.",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "view.png"
+      ]
+    },
+    {
+      "id": "plaster-continuity",
+      "bbox": [
+        182,
+        31,
+        118,
+        174
+      ],
+      "source_observation": "Visible wall has irregular warm plaster grain and local tone changes; original text obscures some unknown structure.",
+      "criterion": "No Portuguese residues or rectangular seams at native size; inspect bare background and enlarged wall for repetitive stripes, smears and bright repair islands. Unknown texture is approximation.",
+      "target_observation": "Actually compared prepared bare background, native source/candidate and enlarged wall/left-edge. No readable Portuguese, regular column repetition, rectangular hard patch or previous bright island. Fine grain inside the repair is more uniform; unknown original hidden grain is not recoverable from this source.",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "view.png",
+        "background.png"
+      ]
+    },
+    {
+      "id": "scene-integrity",
+      "bbox": [
+        0,
+        0,
+        182,
+        250
+      ],
+      "source_observation": "Portrait, frame, brick edge and street are the principal source scene.",
+      "criterion": "Retain all protected source pixels exactly and check whole-image harmony without lettering invading the frame.",
+      "target_observation": "Portrait, hair, carved oval frame, brick edge and street appear continuous in native and3x comparisons. The current receipt separately measures all three protection regions at0 changed pixels; no target lettering enters them.",
+      "verdict": "pass",
+      "evidence": [
+        "source.png",
+        "translated.png",
+        "view.png"
+      ]
+    }
+  ]
+}

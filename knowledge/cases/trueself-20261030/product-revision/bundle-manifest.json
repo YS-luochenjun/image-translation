@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "files": {
+    "background-review-template.json": "dbdba5cd7557cd192355cfde168d929e79de98bab84bdf1348e90b19baae787e",
+    "job.json": "cbdbf9ff8b22e2d4c8abea6fc87e0d326e75828aad92a55eff682412934790bd",
+    "plan-ja.json": "41af17fd36ca4076f62618da54bdcaa4bd8921b1209a90ba66d4cb6ffcc8c1f5",
+    "plan-zh-CN.json": "b006f68420c5e193303c4481c34d2073b6c0ff936a7b505606c838176a91216d",
+    "background/background-plan.json": "8bda6bafc6bca6c3ba89fa456985a82342903a583a6e0df270589a9d76e9d2a9",
+    "background/background.png": "f799c90e532e935900f4b19672e7e3a2e014d892484deff121730830ff80e99c",
+    "background/edit-mask.png": "63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804",
+    "background/receipt.json": "2c847af9d2f697c1aadecb7cca4932ba84716a35405fb5245b244fb08244181b",
+    "background/repair-layout.json": "f43b8e915080532bf990281102eb488105a099b69caa5aee2f7d4c014d00d6f2",
+    "background/source.png": "d186ca1d6824952e08cbcd012334d80c66204838838cec58e7bf655473ac9068",
+    "inputs/07727a339b462a76d3f5502e7261deb2ff9b2741ed5e308a360e8dfa31e6d4a0.otf": "07727a339b462a76d3f5502e7261deb2ff9b2741ed5e308a360e8dfa31e6d4a0",
+    "inputs/63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804.png": "63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804",
+    "inputs/6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+    "inputs/96cd14ae8e7495a493a410c77a08d438297fe061ddc75c3323f462f7a0ed8c0f.png": "96cd14ae8e7495a493a410c77a08d438297fe061ddc75c3323f462f7a0ed8c0f",
+    "inputs/9d2339258d5e039c0bc1503a63c1e9600d177aac71aa775debcdfd9f9ed9afa6.otf": "9d2339258d5e039c0bc1503a63c1e9600d177aac71aa775debcdfd9f9ed9afa6",
+    "inputs/f3b7c7500f1db10ef0b438eeb159617bc9291f39efe41d4312a658a210b663cf.json": "f3b7c7500f1db10ef0b438eeb159617bc9291f39efe41d4312a658a210b663cf",
+    "inputs/f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861.png": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+    "semantics/ja.json": "40e78a2489cd5b9181d1efd24c7f0bf94588ba9a881db8147b00ea59f85a4d72",
+    "semantics/zh-CN.json": "69f18178200d643a13fc0dea724c7de4493d6d01b76a9c6834cc31759da4c2cb"
+  },
+  "origin_inputs": {
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\knowledge\\cases\\trueself-20261030\\evidence\\source.png": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\assets\\trueself-background.png": "96cd14ae8e7495a493a410c77a08d438297fe061ddc75c3323f462f7a0ed8c0f",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\assets\\trueself-mask.png": "63bdb66ed9bc954980650a93627c26cf923c461eaa2811b8afdabe248ded4804",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\assets\\fonts\\OFL.txt": "6a73f9541c2de74158c0e7cf6b0a58ef774f5a780bf191f2d7ec9cc53efe2bf2",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\assets\\fonts\\provenance.json": "f3b7c7500f1db10ef0b438eeb159617bc9291f39efe41d4312a658a210b663cf",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\assets\\fonts\\demo-serif-sc.otf": "9d2339258d5e039c0bc1503a63c1e9600d177aac71aa775debcdfd9f9ed9afa6",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\trueself-manifests\\zh-CN.json": "8ba88fdb57c9ca4d66536f97c6c3540219747e3d5194927e631670cce0a31813",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\assets\\fonts\\demo-serif-jp.otf": "07727a339b462a76d3f5502e7261deb2ff9b2741ed5e308a360e8dfa31e6d4a0",
+    "C:\\Users\\Echo\\Desktop\\单图片翻译\\examples\\trueself-manifests\\ja.json": "d3db99de31a405f236c88310ae508d7e9aeed3b8b97bcc2b534c5bfbe84b9afa"
+  },
+  "notice": "Origin paths are provenance only. Frozen job inputs do not depend on those paths. Visual review is not automated."
+}

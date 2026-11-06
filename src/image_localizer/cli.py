@@ -25,7 +25,7 @@ def doctor() -> dict:
             "host_vision": "must be verified by actually reading an image in this session",
             "imagegen": {"current_tool": "text-to-image only", "reference_input": False,
                          "provider_verified": False, "note": "Project does not read host credentials or invoke imagegen."},
-            "render_support": "basic: axis-aligned regions; layered: sampled repair, rotated text, local assets, protected-pixel checks; complex scripts need RAQM; no automatic OCR"}
+            "render_support": "basic: axis-aligned regions; layered: sampled repair, rotated text, configurable face/contact/depth/soft shadow, cmap glyph checks, local assets; jobs: shared reviewed background and frozen inputs; no automatic OCR or visual approval"}
 
 
 def demo(output: Path) -> dict:
@@ -103,11 +103,79 @@ def main(argv: list[str] | None = None) -> int:
             command.add_argument('--background', type=Path, required=True)
     layered_check = commands.add_parser('check-layered', help='Verify layered artifacts and actual review evidence')
     layered_check.add_argument('output', type=Path)
+    job_init = commands.add_parser('init-job', help='Start an Agent-led local multi-language image job')
+    job_init.add_argument('source', type=Path)
+    job_init.add_argument('--targets', required=True, help='Comma-separated language identifiers')
+    job_init.add_argument('--output', required=True, type=Path)
+    for name, argument in [('prepare-job', 'job'), ('render-job', 'prepared'),
+                           ('compare', 'spec'), ('benchmark', 'spec')]:
+        command = commands.add_parser(name)
+        command.add_argument(argument, type=Path)
+        command.add_argument('--output', required=True, type=Path)
+    job_check = commands.add_parser('check-job', help='Check all language outputs without inventing user acceptance')
+    job_check.add_argument('output', type=Path)
+    font_check = commands.add_parser('font-check', help='Verify Unicode glyph mappings in a real local font')
+    font_check.add_argument('font', type=Path)
+    font_check.add_argument('--text', required=True)
     example = commands.add_parser("demo", help="Create and render an authored synthetic example")
     example.add_argument("--output", type=Path, default=Path("work/demo"))
+    fireplay_scan = commands.add_parser('fireplay-discover', help='Prepare image requirement queries or inspect saved connector pages')
+    fireplay_scan.add_argument('--receipt', type=Path, help='Actual query and summary_pages responses from the host connector')
+    fireplay_register = commands.add_parser('fireplay-register', help='Register exact image requirement summary and brief receipts')
+    fireplay_register.add_argument('code')
+    fireplay_register.add_argument('--snapshot', type=Path, required=True)
+    for name in ('fireplay-accept', 'fireplay-status', 'fireplay-download', 'fireplay-job'):
+        command = commands.add_parser(name, help='Manage a locally accepted image requirement and verified source')
+        command.add_argument('code')
+        if name in ('fireplay-download', 'fireplay-job'):
+            command.add_argument('--image', type=int, default=1, help='One-based source image index')
+        if name == 'fireplay-job':
+            command.add_argument('--output', type=Path, required=True)
+    review_desk = commands.add_parser('review-desk', help='Open a local image comparison and user feedback desk')
+    review_desk.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[2])
+    review_desk.add_argument('--port', type=int, default=8765)
+    review_desk.add_argument('--open', action='store_true', help='Open the desk in the default browser')
+    review_desk.add_argument('--dsh-origin', help='Exact loopback HTTP origin allowed to embed the desk')
+    for name in ('material-size-plan', 'material-size-validate'):
+        command = commands.add_parser(name, help='Plan or read-only validate production dimensions and byte coverage')
+        command.add_argument('spec', type=Path)
+    for name in ('delivery-score', 'delivery-next', 'delivery-gate'):
+        command = commands.add_parser(name, help='Read-only balanced delivery score or explicit member next actions')
+        command.add_argument('spec', type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.command == "doctor":
+        if args.command == 'review-desk':
+            from .review_desk import serve
+            serve(args.root, port=args.port, open_browser=args.open, dsh_origin=args.dsh_origin)
+            return 0
+        if args.command.startswith('fireplay-'):
+            from . import fireplay
+            from .pipeline import read_json
+            root = Path(__file__).resolve().parents[2]
+            if args.command == 'fireplay-discover':
+                result = fireplay.discover(read_json(args.receipt) if args.receipt else None)
+            elif args.command == 'fireplay-register':
+                result = fireplay.register(args.code, read_json(args.snapshot), root)
+            elif args.command == 'fireplay-accept':
+                result = fireplay.accept(args.code, root)
+            elif args.command == 'fireplay-status':
+                result = fireplay.status(args.code, root)
+            else:
+                from .fireplay_download import download_source, initialize_source_job
+                result = (download_source(args.code, args.image, root)
+                          if args.command == 'fireplay-download'
+                          else initialize_source_job(args.code, args.image, args.output, root))
+        elif args.command in ('material-size-plan', 'material-size-validate'):
+            from .material_sizes import plan_sizes, validate_sizes
+            result = (plan_sizes if args.command == 'material-size-plan' else validate_sizes)(args.spec)
+        elif args.command == 'delivery-score':
+            from .delivery_quality import assess_delivery
+            from .pipeline import read_json
+            result = assess_delivery(read_json(args.spec), args.spec.resolve().parent)
+        elif args.command in ('delivery-next', 'delivery-gate'):
+            from .delivery_autopilot import next_delivery, publication_gate
+            result = (next_delivery if args.command == 'delivery-next' else publication_gate)(args.spec)
+        elif args.command == "doctor":
             result = doctor()
         elif args.command == "init":
             result = initialize(args.source, args.target, args.run)
@@ -120,7 +188,25 @@ def main(argv: list[str] | None = None) -> int:
             elif args.command == 'render-layered':
                 result = render_layered(args.plan, args.background, args.output)
             else:
-                result = check_layered(args.output)
+                from .check_records import record_check
+                result = record_check('check-layered', args.output, check_layered)
+        elif args.command in ('init-job', 'prepare-job', 'render-job', 'check-job'):
+            from .jobs import initialize_job, prepare_job, render_job, check_job
+            if args.command == 'init-job':
+                result = initialize_job(args.source, [value.strip() for value in args.targets.split(',')], args.output)
+            elif args.command == 'prepare-job':
+                result = prepare_job(args.job, args.output)
+            elif args.command == 'render-job':
+                result = render_job(args.prepared, args.output)
+            else:
+                from .check_records import record_check
+                result = record_check('check-job', args.output, check_job)
+        elif args.command in ('compare', 'benchmark'):
+            from .evaluation import build_comparison, run_benchmark
+            result = (build_comparison if args.command == 'compare' else run_benchmark)(args.spec, args.output)
+        elif args.command == 'font-check':
+            from .lettering import check_font_coverage
+            result = check_font_coverage(args.font, args.text)
         elif args.command == "packet":
             result = packet(args.run)
         elif args.command == "validate":
@@ -133,9 +219,15 @@ def main(argv: list[str] | None = None) -> int:
         else:
             result = quality(args.run)
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        if args.command in ('quality', 'check-layered'):
+        if args.command in ('material-size-plan', 'material-size-validate') and result.get('status') in ('fail', 'unsupported'):
+            return 1
+        if args.command in ('quality', 'check-layered', 'check-job'):
             return {"pass": 0, "pending": 2, "fail": 1}[result["status"]]
-        if args.command == 'render-layered' and result.get('status') == 'fail':
+        if args.command in ('render-layered', 'render-job') and result.get('status') == 'fail':
+            return 1
+        if args.command == 'benchmark' and result.get('technical_expectations') == 'fail':
+            return 1
+        if args.command == 'compare' and result.get('technical') == 'fail':
             return 1
         return 0
     except (ValueError, OSError, KeyError, TypeError) as error:

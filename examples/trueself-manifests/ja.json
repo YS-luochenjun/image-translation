@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "source": {
+    "path": "../../knowledge/cases/trueself-20261030/evidence/source.png",
+    "sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861",
+    "original_sha256": "f5c1fad0cd3665a920a01a28050f9d0fe2f204bd609d522422fc1d0b2b77f861"
+  },
+  "canvas": {
+    "width": 300,
+    "height": 250
+  },
+  "target_language": "ja",
+  "analysis": {
+    "complete": true,
+    "unresolved": [],
+    "content_tags": [
+      "antique-poster",
+      "portrait",
+      "textured-background",
+      "serif-typography"
+    ],
+    "observations": [
+      "Actually viewed original300x250 and4x. Portuguese single call-to-action: Toque no Quadro para Ver Sua Verdadeira Personalidade.",
+      "quadro refers to framed picture, not mirror; personalidade means personality, not physical appearance. No brand, prices, conditions, publisher or other writing found.",
+      "Gold heavy serif centered right column, short dark shadow. Original portrait/frame/street protected as entire left182 columns. Local plaster background approximated from observed blank wall.",
+      "Source and translation independently checked. Bilingual configurations share actual cleaned background and individual font/hash inputs.",
+      "Current reproduction input is archived normalized PNG; original_sha256 here refers to that actual input, not the historical JPEG."
+    ]
+  },
+  "regions": [
+    {
+      "id": "personality-cta",
+      "action": "translate",
+      "source_text": "Toque no Quadro para Ver Sua Verdadeira Personalidade",
+      "target_text": "額縁をタップして、本当の性格を見てみよう。",
+      "bbox": [
+        185,
+        34,
+        114,
+        169
+      ],
+      "confidence": 0.99,
+      "recognition_verified": true,
+      "notes": "Meaning quadro=framed picture, personalidade=personality. Explicit row mapping binds all words; punctuation omitted at visual line breaks only. Bitmaps do not perform translation.",
+      "style": {
+        "font_path": "../assets/fonts/demo-serif-jp.otf",
+        "min_font_size": 17,
+        "max_font_size": 30,
+        "color": "#f9dd8b",
+        "padding": 0,
+        "align": "center"
+      },
+      "repair": {
+        "mode": "clean_plate"
+      }
+    }
+  ],
+  "protected_regions": [
+    {
+      "id": "portrait-frame-street",
+      "bbox": [
+        0,
+        0,
+        182,
+        250
+      ]
+    },
+    {
+      "id": "top-wall",
+      "bbox": [
+        182,
+        0,
+        118,
+        31
+      ]
+    },
+    {
+      "id": "bottom-wall",
+      "bbox": [
+        182,
+        205,
+        118,
+        45
+      ]
+    }
+  ],
+  "glossary": []
+}

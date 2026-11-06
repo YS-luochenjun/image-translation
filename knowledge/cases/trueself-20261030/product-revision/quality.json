@@ -1,0 +1,40 @@
+{
+  "status": "pass",
+  "languages": {
+    "zh-CN": {
+      "status": "pass",
+      "technical": "pass",
+      "user_acceptance": "not_recorded",
+      "reasons": [],
+      "review_kind": "self",
+      "issues": [
+        {
+          "severity": "minor",
+          "note": "Four readable Chinese lines, no glyph stretching or clipped tails. Upper four-character blocks are denser than lower two-character blocks; larger lower font creates clear hierarchy but density transition remains a minor tradeoff."
+        },
+        {
+          "severity": "minor",
+          "note": "Reconstructed plaster is visually plausible, with more uniform fine grain and small enlarged tone/texture differences. Original hidden wall structure is unknown; this is not recovery of hidden pixels."
+        }
+      ]
+    },
+    "ja": {
+      "status": "pass",
+      "technical": "pass",
+      "user_acceptance": "not_recorded",
+      "reasons": [],
+      "review_kind": "self",
+      "issues": [
+        {
+          "severity": "minor",
+          "note": "Five readable Japanese lines with fairly even rhythm. First-line 額縁 is more dense than kana below, but counters remain visible; second/fifth lines retain side margins and no shadow clipping."
+        },
+        {
+          "severity": "minor",
+          "note": "Reconstructed plaster is visually plausible, with more uniform fine grain and small enlarged tone/texture differences. Original hidden wall structure is unknown; this is not recovery of hidden pixels."
+        }
+      ]
+    }
+  },
+  "user_acceptance": "not_recorded"
+}
