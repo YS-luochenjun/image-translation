@@ -161,6 +161,63 @@ class DiscoveryTests(unittest.TestCase):
         negative = fireplay._content(row(description='Do not translate ' + URL), {}, None)
         self.assertFalse(negative['translation_intent'])
 
+    def test_user_business_language_aliases(self):
+        groups = {
+            'en': 'en us us2',
+            'pt': 'pt por portuguese portugal br bra brazil brasil ptbr pt-br',
+            'es': 'es esp spanish spain mx mexico cl co pe',
+            'ja': 'ja jp jpn japanese japan',
+            'de': 'de deu ger german germany',
+            'fr': 'fr fra fre french france',
+            'it': 'it ita italian italy',
+            'id': 'id ind indonesian indonesia',
+            'th': 'th tha thai thailand',
+            'vi': 'vi vie vietnamese vietnam vn',
+            'ko': 'ko kor korean kr korea',
+            'zh': 'zh cn chs chinese china hk',
+            'zh-TW': 'zh-tw zhtw cht traditionalchinese tw taiwan',
+            'ru': 'ru rus russian russia',
+            'tr': 'tr tur turkish turkey',
+            'ar': 'ar ara arabic',
+            'hi': 'hi hin hindi in india',
+            'pl': 'pl pol polish poland',
+            'nl': 'nl dut dutch netherlands',
+            'fi': 'fi fin finnish finland',
+            'sv': 'sv swe swedish sweden se',
+            'da': 'da dan danish denmark dk',
+            'ms': 'ms may malay malaysia',
+            'ro': 'ro ron romanian romania',
+            'bn': 'bn ben bengali bd bangladesh',
+            'fil': 'fil tl tgl tagalog filipino ph philippines',
+            'hu': 'hu hun hungarian hungary',
+        }
+        self.assertEqual(fireplay.LANGUAGE_ALIAS_GROUPS,
+                         {language: aliases.split() for language, aliases in groups.items()})
+        for language, aliases in groups.items():
+            for alias in aliases.split():
+                with self.subTest(language=language, alias=alias):
+                    self.assertEqual(fireplay._locale(alias), language)
+                    self.assertEqual(fireplay._locale(' ' + alias.upper() + ' '), language)
+
+    def test_requirement_business_locales_keep_hindi_distinct_from_indonesian(self):
+        raw = ['kr', 'in', 'fr', 'ru', 'nl', 'pt']
+        parsed = fireplay._content(row(locales=raw), {}, None)
+        self.assertEqual(parsed['targets'], ['ko', 'hi', 'fr', 'ru', 'nl', 'pt'])
+        self.assertEqual(parsed['blockers'], [])
+        self.assertEqual(raw, ['kr', 'in', 'fr', 'ru', 'nl', 'pt'])
+        aliases = fireplay._content(row(locales=['in', 'hi', 'india', 'id', 'ind', 'indonesia']), {}, None)
+        self.assertEqual(aliases['targets'], ['hi', 'id'])
+        self.assertEqual(aliases['blockers'], [])
+
+    def test_explicit_locale_tags_and_existing_display_aliases_remain_supported(self):
+        for raw, expected in [('zh_CN', 'zh-CN'), ('traditional chinese', 'zh-TW'),
+                              ('en_gb', 'en-GB'), ('hi_IN', 'hi-IN'), ('uk', 'uk')]:
+            with self.subTest(raw=raw):
+                self.assertEqual(fireplay._locale(raw), expected)
+        for raw in ['Klingon', 'miss', 'ejn', '', None]:
+            with self.subTest(raw=raw):
+                self.assertIsNone(fireplay._locale(raw))
+
     def test_evidence_and_connector_error_parsing(self):
         with self.assertRaises(ValueError):
             fireplay.payload({'isError': True})

@@ -104,6 +104,19 @@ class DeliveryQualityTests(unittest.TestCase):
         self.review['targeted_reworks'] = 2
         self.assertEqual('blocked', self.assess()['next_action'])
 
+    def test_photo_concealment_cannot_be_offset_by_high_readability_score(self):
+        # Models still supply the observation; this checks that scoring cannot waive it.
+        self.review['checks']['no_visible_seams'] = {
+            'checked': False,
+            'notes': 'A wide dark blurred band removes dress and road texture in the text area.',
+        }
+        result = self.assess()
+        self.assertEqual(100, result['score'])
+        self.assertEqual('blocked', result['status'])
+        self.assertEqual('rework', result['next_action'])
+        self.review['targeted_reworks'] = 2
+        self.assertEqual('blocked', self.assess()['next_action'])
+
     def test_unresolved_facts_block_without_guessing_even_at_high_score(self):
         self.review['unresolved_facts'] = ['Source price digit is illegible; cannot confirm 19 or 79.']
         for rounds in (0, 1, 2):

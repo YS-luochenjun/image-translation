@@ -70,6 +70,88 @@ test('rejects schema drift before writing journal or dispatching',async t=>{
   await assert.rejects(readFile(join(f.folder,'publication-journal.jsonl')),/ENOENT/);
 });
 
+test('reviewed per-demand contract overrides stale global cache and is journaled',async t=>{
+  const f=await fixture(t);
+  const definition={...definitions[0],schema_version:'a'.repeat(64)};
+  const contractPath=join(f.folder,`contract-${definition.name}.json`);
+  const snapshot=JSON.stringify(definition);
+  await writeFile(contractPath,snapshot);
+  const original=f.transport.call;
+  f.transport.call=async(name,args)=>name==='tool_catalog'
+    ? {structuredContent:definition} : original(name,args);
+  await run(f,{...f.upload,schema_version:definition.schema_version});
+  const entry=JSON.parse((await readFile(join(f.folder,'publication-journal.jsonl'),'utf8')).trim().split('\n')[0]);
+  assert.ok(entry.contract.path.endsWith(`contract-${definition.name}.json`));
+  assert.equal(entry.contract.sha256,createHash('sha256').update(snapshot).digest('hex'));
+});
+
+test('per-demand contract needs only the selected tool and no global catalog',async t=>{
+  const f=await fixture(t);
+  await writeFile(join(f.folder,`contract-${f.upload.tool}.json`),JSON.stringify(definitions[0]));
+  await rm(join(f.root,'work','fireplay-readonly','publication-full-definitions.json'));
+  await run(f,f.upload);
+  assert.equal(f.calls.length,2);
+});
+
+test('invalid per-demand contract cannot silently fall back to old cache',async t=>{
+  const f=await fixture(t);
+  const contractPath=join(f.folder,`contract-${f.upload.tool}.json`);
+  await writeFile(contractPath,'not json');
+  await assert.rejects(run(f,f.upload),SyntaxError);
+  await writeFile(contractPath,JSON.stringify(definitions[1]));
+  await assert.rejects(run(f,f.upload),/tool mismatch/);
+  await writeFile(contractPath,JSON.stringify({...definitions[0],schema_version:'a'.repeat(64)}));
+  await assert.rejects(run(f,f.upload),/pin cached schema/);
+  assert.equal(f.calls.length,0);
+  await assert.rejects(readFile(join(f.folder,'publication-journal.jsonl')),/ENOENT/);
+});
+
+test('live drift from scoped contract still blocks all business writes',async t=>{
+  const f=await fixture(t);
+  await writeFile(join(f.folder,`contract-${f.upload.tool}.json`),JSON.stringify(definitions[0]));
+  f.transport.call=async()=>({structuredContent:{...definitions[0],invoke_via:'other_write'}});
+  await assert.rejects(run(f,f.upload),/contract drift/);
+  await assert.rejects(readFile(join(f.folder,'publication-journal.jsonl')),/ENOENT/);
+});
+
+for(const style of ['snake','both']) {
+  test(`accepts ${style} upload receipt aliases through own import and bind`,async t=>{
+    const f=await fixture(t);
+    const original=f.transport.call;
+    f.transport.call=async(name,args)=>{
+      if(name==='tool_write'&&args.tool===f.upload.tool) {
+        return {structuredContent:{success:true,public_url:publicUrl,resource_id:resourceId,
+          ...(style==='both'?{publicUrl,resourceId}:{})}};
+      }
+      return original(name,args);
+    };
+    const uploadId=randomUUID();
+    await run(f,f.upload,uploadId);
+    await run(f,importRequest(uploadId));
+    await run(f,{tool:'requirement_bind_materials',schema_version:definitions[3].schema_version,
+      arguments:{confirmed:true,items:[{requirement_id:requirementId,material_ids:[materialId]}]}});
+  });
+}
+
+test('ambiguous, invalid or unsuccessful upload receipts cannot authorize import',async t=>{
+  for(const extra of [
+    {public_url:'https://example.invalid/different.png'},
+    {resource_id:randomUUID()},
+    {success:false},
+    {resourceId:null},
+  ]) {
+    const f=await fixture(t);
+    const original=f.transport.call;
+    f.transport.call=async(name,args)=>name==='tool_write'&&args.tool===f.upload.tool
+      ? {structuredContent:{publicUrl,resourceId,...extra}} : original(name,args);
+    const uploadId=randomUUID();
+    await run(f,f.upload,uploadId);
+    f.calls.length=0;
+    await assert.rejects(run(f,importRequest(uploadId)),/does not prove one reviewed resource/);
+    assert.equal(f.calls.length,0);
+  }
+});
+
 test('rejects forbidden tool, wrong demand bind and unproven material',async t=>{
   const f=await fixture(t);
   await assert.rejects(run(f,{tool:'requirement_update_status',arguments:{}}),/Tool forbidden/);

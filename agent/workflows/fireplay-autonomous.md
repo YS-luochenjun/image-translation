@@ -23,7 +23,7 @@
 
 运行 `material-size-plan SPEC.json`；来源id、源文件SHA、去重语言、member_id、尺寸、范围依据必须对应。当前 `reference_seven_set` 需要真实七参考resource与证据；没有七参考而用户正文明确1长3方3竖时用新增 `explicit_members` 交付模式，不伪造resource_id。没有提供完整集合也没有七成员依据时，先核正文/当前组参考，再集中一次确认，不能自行把所有image扩七。
 
-业务语言jp→ja、kr→ko、in→id、tw→zh-TW、vn→vi按本项目明确映射规范化、保留原值证据，目标去重后制作。未知/错拼如ejn、miss、翻译剩余语言不能猜，回看正文或一次询问。已交付合格SHA复用，缺项才制作。
+业务语言按用户提供的完整[语言映射](../../src/image_localizer/languages.py)规范化，保留原值证据，目标去重后制作。其中in→hi（印地语），id/ind→id（印尼语），kr→ko；业务别名以该表为准，不能套用通用标准把in解释为印尼语。未知/错拼如ejn、miss、翻译剩余语言不能猜，回看正文或一次询问。已交付合格SHA复用，缺项才制作。
 
 ## 3. 生产与交付取舍
 
@@ -39,6 +39,7 @@
 
 1. `material-size-validate` 核已输出矩阵及技术缺项。`delivery-score`每成员ready才进上传；`delivery-next` 汇总make/review/rework/upload/import/attribute/bind/verify；`delivery-gate STATE.json`从当前已审合格成员生成兼容旧发布器的gate JSON（保存到需求目录后交给gate_file），缺成员时requirement_complete仍false。字段与示例见[自动交付合同](../../docs/delivery-automation.md)。不能靠文件数或绑定数宣布完成。
 2. 原始发布器要求已有intake、当前合同schema版本、gate_file、原操作UUID；它保留了历史批次的人名排除策略，普通新需求先按当前任务核实归属，不能把旧规则当所有需求默认。旧37原会话归档/unknown限制由该批次控制合同承担，不是普通发现入口的候选白名单；新需求无需等待旧会话。不要为通用自动化绕过原journal或默改归属。
+   合同先从当前官方`tool_catalog`读取并审查，保存完整定义到该需求目录的`contract-工具名.json`；发布器优先使用该工具的需求级快照，再与live合同逐项比对。没有需求级文件时兼容旧全局缓存；已有文件损坏、版本不符或live漂移须刷新审查，不能静默回退或复制修改发布器绕过检查。journal同时记录实际快照路径与SHA。上传回执兼容`publicUrl/resourceId`及`public_url/resource_id`，相同别名去重，值冲突或失败回执不授权入库；同需求已审SHA来源校验及unknown不重放保持有效。
 3. 图组可共用一个material多resource，button按官方单URL规则；图片数≠素材记录数。只上传新改SHA，既有合格绑定保留。
 4. designer_ids依据当前明确任务归属与真实成员查证。AI模式owner不自动等于素材设计师，旧批次排除罗晨钧/邹彬不外推所有新项目。共享部门以官方有效ID为准。平台canBindMaterials和canUpdateStatus是独立权限，不自动改需求状态。
 5. unknown超时不得换key重放/假reconciled；现有发布器unknown会阻断整个需求，先等官方原回执，继续其他需求。只有实际实现并验证的成员隔离才能缩小阻断，不能文档先行绕过。

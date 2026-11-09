@@ -76,6 +76,45 @@ class KnowledgeTests(unittest.TestCase):
         self.assertFalse(result['manifest']['analysis']['complete'])
         self.assertNotIn('pass',result.get('status',''))
 
+    def test_photo_case_preserves_scoped_acceptance_and_portable_evidence(self):
+        root = Path(__file__).resolve().parents[1]
+        case = root / 'knowledge/cases/she-032-20261109'
+        feedback = json.loads((case / 'user-feedback.json').read_text(encoding='utf-8'))
+        result = load_knowledge(root, source_sha256=feedback['source_sha256'])
+        selected = next(item for item in result['related_cases'] if item['id'] == 'she-032-20261109')
+        self.assertEqual('partial', selected['status'])
+        self.assertEqual('partial', selected['user_feedback'])
+        unrelated = load_knowledge(root, source_sha256='0'*64)
+        self.assertNotIn('she-032-20261109', [item['id'] for item in unrelated['related_cases']])
+        self.assertNotEqual(feedback['generated_sha256'], feedback['background_used_sha256'])
+        evidence = json.loads((case / 'evidence-manifest.json').read_text(encoding='utf-8'))
+        for item in evidence['files']:
+            path = (case / item['path']).resolve()
+            self.assertTrue(path.is_relative_to(case.resolve()))
+            self.assertEqual(item['sha256'], hashlib.sha256(path.read_bytes()).hexdigest())
+            if path.suffix in ('.png', '.jpg'):
+                with Image.open(path) as image:
+                    image.load()
+                    self.assertEqual([image.width, image.height], item['size'])
+        self.assertEqual(len(feedback['case_evidence']), 5)
+        for name, digest in feedback['case_evidence'].items():
+            self.assertEqual(digest, hashlib.sha256((case / 'evidence' / name).read_bytes()).hexdigest())
+
+    def test_photo_delivery_snapshot_has_exact_matrix_and_equal_reviewed_download_hashes(self):
+        path = Path(__file__).resolve().parents[1] / 'knowledge/cases/she-032-20261109/delivery-snapshot.json'
+        snapshot = json.loads(path.read_text(encoding='utf-8'))
+        members = snapshot['members']
+        languages = {'zh-TW','es','pt','fr','th','pl','tr','hi','ar','it','vi','ko','ja','nl'}
+        expected = {('source-1', language, size) for language in languages for size in ('336x280','300x250')}
+        self.assertEqual(len(members), len(expected))
+        self.assertEqual({(m['source_id'],m['language'],m['member_id']) for m in members}, expected)
+        for member in members:
+            self.assertEqual(member['reviewed_sha256'], member['downloaded_sha256'])
+            self.assertEqual(member['member_id'], f"{member['width']}x{member['height']}")
+            self.assertLessEqual(member['bytes'], 153600)
+        self.assertFalse(snapshot['live_platform_rechecked'])
+        self.assertFalse(snapshot['final_outputs_user_accepted'])
+
 
 if __name__=='__main__':
     unittest.main()

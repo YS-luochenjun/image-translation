@@ -2,7 +2,7 @@
 /** Restricted image publication caller. Importing this module never connects. */
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFile, open, realpath, stat } from 'node:fs/promises';
+import { readFile, open, realpath, stat, lstat } from 'node:fs/promises';
 import { dirname, join, relative, resolve, isAbsolute } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 
@@ -112,6 +112,38 @@ function recordsFor(entries, tool) {
   return entries.filter(entry => entry.state === 'received' && !entry.response?.isError && entry.tool === tool);
 }
 
+function uploadResource(result) {
+  const urls = [...new Set([...collect(result, 'publicUrl'), ...collect(result, 'public_url')])];
+  const ids = [...new Set([...collect(result, 'resourceId'), ...collect(result, 'resource_id')])];
+  if (result?.success === false || urls.length !== 1 || ids.length !== 1 ||
+      typeof urls[0] !== 'string' || !urls[0].trim() ||
+      typeof ids[0] !== 'string' || !UUID.test(ids[0])) {
+    fail('Upload receipt does not prove one reviewed resource');
+  }
+  return {url:urls[0],id:ids[0]};
+}
+
+async function publicationContract(root, folder, tool) {
+  const scopedPath = join(folder, `contract-${tool}.json`);
+  let scoped = true;
+  try {
+    await lstat(scopedPath);
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    // Legacy batches can keep their pinned catalog; a present scoped file is authoritative.
+    scoped = false;
+  }
+  const path = scoped ? await realpath(scopedPath)
+    : join(root, 'work', 'fireplay-readonly', 'publication-full-definitions.json');
+  if (scoped && !inside(folder, path)) fail('Contract outside requirement folder');
+  const bytes = await readFile(path);
+  const snapshot = JSON.parse(bytes.toString('utf8'));
+  if (!scoped && !Array.isArray(snapshot)) fail('Cached catalog must be an array');
+  const definition = scoped ? snapshot : snapshot.find(item => item.name === tool);
+  if (definition?.name !== tool) fail('Contract snapshot tool mismatch');
+  return {definition, evidence:{path:relative(root, path),sha256:sha256(bytes)}};
+}
+
 async function prepareArguments({ request, intake, folder, entries }) {
   const args = structuredClone(request.arguments || {});
   if ('feishu_user_id' in args) fail('Caller identity must come from JWT');
@@ -134,10 +166,9 @@ async function prepareArguments({ request, intake, folder, entries }) {
     const uploads = recordsFor(entries, 'material_r2_upload_from_bytes').filter(entry => request.upload_operation_ids.includes(entry.operation_id));
     if (uploads.length !== new Set(request.upload_operation_ids).size) fail('Upload provenance not found');
     const pairs = uploads.flatMap(entry => {
-      const result = decodeResult(entry.response);
-      const urls = collect(result, 'publicUrl'); const ids = collect(result, 'resourceId');
-      if (urls.length !== 1 || ids.length !== 1 || !hashes.has(entry.outputs?.[0]?.sha256)) fail('Upload receipt does not prove one reviewed resource');
-      return [{url:urls[0],id:ids[0],hash:entry.outputs[0].sha256}];
+      const resource = uploadResource(decodeResult(entry.response));
+      if (!hashes.has(entry.outputs?.[0]?.sha256)) fail('Upload receipt does not prove one reviewed resource');
+      return [{...resource,hash:entry.outputs[0].sha256}];
     });
     const used = [];
     for (const item of args.items) {
@@ -196,8 +227,7 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     const unresolved = entries.filter(entry => entry.state === 'unknown').filter(entry => !entries.some(other => other.operation_id === entry.operation_id && other.state === 'received'));
     if (unresolved.length) fail('Unknown operation exists; inspect remote state, no automatic retry');
     const prepared = await prepareArguments({request,intake,folder,entries});
-    const cached = await json(join(root,'work','fireplay-readonly','publication-full-definitions.json'));
-    const definition = cached.find(item => item.name === request.tool);
+    const {definition, evidence:contract} = await publicationContract(root, folder, request.tool);
     if (!definition || request.schema_version !== definition.schema_version) fail('Request does not pin cached schema version');
     validateSchema(prepared.args,definition.inputSchema);
     const live = decodeResult(await transport.call('tool_catalog',{tool:request.tool}));
@@ -205,7 +235,7 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     const receiptPath = join(folder,`publication-${operationId}.json`);
     const receipt = await open(receiptPath,'wx');
     try {
-      const entry = {operation_id:operationId,requirement_id:intake.summary.id,code,tool:request.tool,schema_version:definition.schema_version,request_sha256:sha256(JSON.stringify(request)),outputs:prepared.outputs,state:'unknown'};
+      const entry = {operation_id:operationId,requirement_id:intake.summary.id,code,tool:request.tool,schema_version:definition.schema_version,contract,request_sha256:sha256(JSON.stringify(request)),outputs:prepared.outputs,state:'unknown'};
       await appendJournal(journalPath,entry);
       const parameters = definition.invoke_via === 'tool_write' ? {tool:request.tool,schema_version:definition.schema_version,arguments:prepared.args} : prepared.args;
       const response = await transport.call(definition.invoke_via,parameters);

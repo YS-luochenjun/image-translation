@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "path": "evidence/source.png",
+      "sha256": "b25d1f966420d274987aa0dbb918a617a715789562b2e6a812a4b180bbfed571",
+      "bytes": 170243,
+      "size": [
+        336,
+        280
+      ]
+    },
+    {
+      "path": "evidence/rejected-ko-336x280.png",
+      "sha256": "b4f62999c5c4e16332dd90f1395308198872d139efbb07034dfc535def2ab60f",
+      "bytes": 123832,
+      "size": [
+        336,
+        280
+      ]
+    },
+    {
+      "path": "evidence/approved-clean-generated.png",
+      "sha256": "85931ce3d91997c7c18a435a8d4f3c5818976f34a92c7da4470a32f85140711e",
+      "bytes": 2538699,
+      "size": [
+        1374,
+        1145
+      ]
+    },
+    {
+      "path": "evidence/background.png",
+      "sha256": "ec02f74c7e43adae069714596e0eae2cfb2984d3ea7a722fd1523858dd553c98",
+      "bytes": 210689,
+      "size": [
+        336,
+        280
+      ]
+    },
+    {
+      "path": "evidence/redo-ko-336x280.jpg",
+      "sha256": "3d5846a969d8bacfa80f682d64c4c73ceb7437908bb7c28924442f2958117b4f",
+      "bytes": 57982,
+      "size": [
+        336,
+        280
+      ]
+    },
+    {
+      "path": "user-feedback.json",
+      "sha256": "20bf4216ced6e78ea6dcc0141956d5446f65017046f2e08351ade6e10dfbd0eb",
+      "bytes": 19597
+    },
+    {
+      "path": "delivery-snapshot.json",
+      "sha256": "c4ff33e5bb68552cb0a87c61b5cadcb3a904d08703a60fe1c82d9abea809aee8",
+      "bytes": 12199
+    }
+  ]
+}

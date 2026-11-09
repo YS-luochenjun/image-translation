@@ -1,0 +1,2 @@
+# Evidence manifests bind JSON to exact bytes, including on Windows checkouts.
+*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

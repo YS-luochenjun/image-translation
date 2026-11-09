@@ -88,7 +88,7 @@ def packet(run: Path) -> dict:
             {"id": "composite", "output": "candidate composite and layout records"},
             {"id": "adapt-review", "output": "whole-image and regional review bound to current artifacts"},
         ],
-        "capabilities": {"host_vision": "agent must actually view source", "builtin_imagegen": "text-to-image only; no reference image or mask", "local_compositor": True,
+        "capabilities": {"host_vision": "agent must actually view source", "builtin_imagegen": "host-provided; verify reference-image inputs against current session tool schema and actual results", "local_compositor": True,
                          "basic_cli": "axis-aligned rectangular solid/clean_plate only",
                          "enhanced_layers": "prepare-layered/render-layered/check-layered: explicit sampled repair, rotated text and local assets; Agent supplies semantics and actual review",
                          "layered_guide": str(PROJECT_ROOT / 'docs' / 'layered-tools.md')},

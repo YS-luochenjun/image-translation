@@ -1,0 +1,352 @@
+{
+  "requirement_code": "SHE-20261109-032",
+  "local_rechecked_at": "2026-11-09T10:28:47.267890+00:00",
+  "live_platform_rechecked": false,
+  "final_outputs_user_accepted": false,
+  "scope": "Saved platform observation plus rehashed local reviewed/downloaded files; not new visual or user acceptance. Only five curated images are distributed with this case.",
+  "historical_verification_summary": {
+    "complete": true,
+    "expected": 28,
+    "verified": 28,
+    "requirement_id": "f33b9bc0-d68a-574e-92f3-4d9708c1b63d",
+    "platform_status": "done",
+    "platform_updated_at": "2026-11-09T10:05:00.834Z",
+    "observed_at": "2026-11-09T10:07:20.907Z",
+    "requirement_status_modified_by_this_session": false,
+    "creative_risk_counts": {
+      "pending": 28
+    },
+    "warnings": [],
+    "compression_notices": [],
+    "all_sha256_equal_to_reviewed": true,
+    "all_dimensions_and_bytes_equal": true
+  },
+  "production_records": [
+    {
+      "path": "work/fireplay-production/SHE-20261109-032/redo-20261109-no-overlay/outputs.json",
+      "sha256": "40842f1217269aa9d671cc1340e3b63e9c3a2b9d68a7980c70f0471f72d355ac"
+    },
+    {
+      "path": "work/fireplay-production/SHE-20261109-032/redo-20261109-no-overlay/stage-evidence.json",
+      "sha256": "467649ef6ff5733ab7637be66eb34be3b50414d25a21c9f8f7334ea4cbd4ccc3"
+    },
+    {
+      "path": "work/fireplay-production/SHE-20261109-032/redo-20261109-no-overlay/fresh/verified-resources.json",
+      "sha256": "c108e2fa7ab1640e955c27676231acabdc291713d2d6feaade5d5b260e38feaf"
+    },
+    {
+      "path": "work/fireplay-production/SHE-20261109-032/redo-20261109-no-overlay/fresh/verification-summary.json",
+      "sha256": "d08f4c2fa65feeb46e12afa91d14347b8edb9693b2dc52f886329076ca5aaad9"
+    }
+  ],
+  "members": [
+    {
+      "source_id": "source-1",
+      "language": "zh-TW",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 57429,
+      "format": "JPEG",
+      "reviewed_sha256": "378cb3e466e60ff781598a2650cab0e70b59f3015b2d8734289c3db4c73e7aba",
+      "downloaded_sha256": "378cb3e466e60ff781598a2650cab0e70b59f3015b2d8734289c3db4c73e7aba"
+    },
+    {
+      "source_id": "source-1",
+      "language": "zh-TW",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 47771,
+      "format": "JPEG",
+      "reviewed_sha256": "ca99103bf06712270e4d9e3b5af6fefffa35c9ee5907a052e7a5d19f8b7202dc",
+      "downloaded_sha256": "ca99103bf06712270e4d9e3b5af6fefffa35c9ee5907a052e7a5d19f8b7202dc"
+    },
+    {
+      "source_id": "source-1",
+      "language": "es",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 59659,
+      "format": "JPEG",
+      "reviewed_sha256": "0e60210e9bccaef5b6c969af10ea95ffb1d3c1c3a63f1e448b9145390de323ae",
+      "downloaded_sha256": "0e60210e9bccaef5b6c969af10ea95ffb1d3c1c3a63f1e448b9145390de323ae"
+    },
+    {
+      "source_id": "source-1",
+      "language": "es",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 48719,
+      "format": "JPEG",
+      "reviewed_sha256": "2d64fc770c90539d7145188a52db58aa138841e119628012e3b8f1aa2adf8673",
+      "downloaded_sha256": "2d64fc770c90539d7145188a52db58aa138841e119628012e3b8f1aa2adf8673"
+    },
+    {
+      "source_id": "source-1",
+      "language": "pt",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 61853,
+      "format": "JPEG",
+      "reviewed_sha256": "8c04fbc44b9af3818920659220a0ab2eaf96fa4cf9a882535c87edd3af2c34fb",
+      "downloaded_sha256": "8c04fbc44b9af3818920659220a0ab2eaf96fa4cf9a882535c87edd3af2c34fb"
+    },
+    {
+      "source_id": "source-1",
+      "language": "pt",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 50551,
+      "format": "JPEG",
+      "reviewed_sha256": "82ea940c21863cc7ed6ff1c98b4b405935ff8a1615d41b7a96981d0312249b6c",
+      "downloaded_sha256": "82ea940c21863cc7ed6ff1c98b4b405935ff8a1615d41b7a96981d0312249b6c"
+    },
+    {
+      "source_id": "source-1",
+      "language": "fr",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 62724,
+      "format": "JPEG",
+      "reviewed_sha256": "94b043885bc0fec0a5e4086fe4a805e6bd90da7b99406cc5d61f2ef0094c7dad",
+      "downloaded_sha256": "94b043885bc0fec0a5e4086fe4a805e6bd90da7b99406cc5d61f2ef0094c7dad"
+    },
+    {
+      "source_id": "source-1",
+      "language": "fr",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 51911,
+      "format": "JPEG",
+      "reviewed_sha256": "af1453a19c15c9a9323105ecc8a3ab9a9042adbbe2a00282415c5942ba867fca",
+      "downloaded_sha256": "af1453a19c15c9a9323105ecc8a3ab9a9042adbbe2a00282415c5942ba867fca"
+    },
+    {
+      "source_id": "source-1",
+      "language": "th",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 56964,
+      "format": "JPEG",
+      "reviewed_sha256": "aa7d534ef766d5f09fb9c9bf44ef5ada587f82e5b04665671e772cb31d545654",
+      "downloaded_sha256": "aa7d534ef766d5f09fb9c9bf44ef5ada587f82e5b04665671e772cb31d545654"
+    },
+    {
+      "source_id": "source-1",
+      "language": "th",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 47863,
+      "format": "JPEG",
+      "reviewed_sha256": "40f61f75ed50552d053d572bd6407b5ed52e2bf5267f5ba37c48ae5668dc3209",
+      "downloaded_sha256": "40f61f75ed50552d053d572bd6407b5ed52e2bf5267f5ba37c48ae5668dc3209"
+    },
+    {
+      "source_id": "source-1",
+      "language": "pl",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 61120,
+      "format": "JPEG",
+      "reviewed_sha256": "ba6e8c4725f34ad02d2e6498a0a5a8b8ce7823160588d2aeeb8e57af6877c7b4",
+      "downloaded_sha256": "ba6e8c4725f34ad02d2e6498a0a5a8b8ce7823160588d2aeeb8e57af6877c7b4"
+    },
+    {
+      "source_id": "source-1",
+      "language": "pl",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 50550,
+      "format": "JPEG",
+      "reviewed_sha256": "9ca7d0ad92a905f076d4b99b852c485ad2f44c81b94fd33ab52d96ce40f5a1f7",
+      "downloaded_sha256": "9ca7d0ad92a905f076d4b99b852c485ad2f44c81b94fd33ab52d96ce40f5a1f7"
+    },
+    {
+      "source_id": "source-1",
+      "language": "tr",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 59002,
+      "format": "JPEG",
+      "reviewed_sha256": "98718a74251a619e2cb94812a40047e9ef9fba6ced68dcb0ca8377b6f7395442",
+      "downloaded_sha256": "98718a74251a619e2cb94812a40047e9ef9fba6ced68dcb0ca8377b6f7395442"
+    },
+    {
+      "source_id": "source-1",
+      "language": "tr",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 48527,
+      "format": "JPEG",
+      "reviewed_sha256": "c4ec7e675c3603f2297cdbe925b9347a1d8dbba125b57009d930b3106f3a14e2",
+      "downloaded_sha256": "c4ec7e675c3603f2297cdbe925b9347a1d8dbba125b57009d930b3106f3a14e2"
+    },
+    {
+      "source_id": "source-1",
+      "language": "hi",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 61384,
+      "format": "JPEG",
+      "reviewed_sha256": "f7e2b2b2d860218d346ce38920d09a182ad8ca187ef00cd4ed5df4ef9d3df042",
+      "downloaded_sha256": "f7e2b2b2d860218d346ce38920d09a182ad8ca187ef00cd4ed5df4ef9d3df042"
+    },
+    {
+      "source_id": "source-1",
+      "language": "hi",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 51638,
+      "format": "JPEG",
+      "reviewed_sha256": "fb228a4d01e872ef61309423706782072639271d40d09ffdeb65595219488c72",
+      "downloaded_sha256": "fb228a4d01e872ef61309423706782072639271d40d09ffdeb65595219488c72"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ar",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 61733,
+      "format": "JPEG",
+      "reviewed_sha256": "081b893d9895d0e45cd61a496d97b387e4b159fb721f90fe2c635248daa67419",
+      "downloaded_sha256": "081b893d9895d0e45cd61a496d97b387e4b159fb721f90fe2c635248daa67419"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ar",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 51998,
+      "format": "JPEG",
+      "reviewed_sha256": "e44869bbd0e572783b3113f540ee588f9f7b19b9ff479b8d2bed61c44b1ca1c4",
+      "downloaded_sha256": "e44869bbd0e572783b3113f540ee588f9f7b19b9ff479b8d2bed61c44b1ca1c4"
+    },
+    {
+      "source_id": "source-1",
+      "language": "it",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 61977,
+      "format": "JPEG",
+      "reviewed_sha256": "7f9999ac28c083b7a567fab60d555c54c43127af26670c3b6c70f7fbcdb5d387",
+      "downloaded_sha256": "7f9999ac28c083b7a567fab60d555c54c43127af26670c3b6c70f7fbcdb5d387"
+    },
+    {
+      "source_id": "source-1",
+      "language": "it",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 51076,
+      "format": "JPEG",
+      "reviewed_sha256": "cdfb25f2dd96238b1b57761586fdd138323ca763aa217e762975dc5ff46cc392",
+      "downloaded_sha256": "cdfb25f2dd96238b1b57761586fdd138323ca763aa217e762975dc5ff46cc392"
+    },
+    {
+      "source_id": "source-1",
+      "language": "vi",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 62751,
+      "format": "JPEG",
+      "reviewed_sha256": "214568a4612f00ae23752c607b34361127d36319762cdb7acdf7d0d4781d15cd",
+      "downloaded_sha256": "214568a4612f00ae23752c607b34361127d36319762cdb7acdf7d0d4781d15cd"
+    },
+    {
+      "source_id": "source-1",
+      "language": "vi",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 51985,
+      "format": "JPEG",
+      "reviewed_sha256": "f3e4ddadaff97c28e5876a0a271abf84ec8afb2d6c8967378fee4c9e17166437",
+      "downloaded_sha256": "f3e4ddadaff97c28e5876a0a271abf84ec8afb2d6c8967378fee4c9e17166437"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ko",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 57982,
+      "format": "JPEG",
+      "reviewed_sha256": "3d5846a969d8bacfa80f682d64c4c73ceb7437908bb7c28924442f2958117b4f",
+      "downloaded_sha256": "3d5846a969d8bacfa80f682d64c4c73ceb7437908bb7c28924442f2958117b4f"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ko",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 48652,
+      "format": "JPEG",
+      "reviewed_sha256": "5dd9491b8035ddc4ba55fde855793b5021f21b908bd254235e123e3911ad1976",
+      "downloaded_sha256": "5dd9491b8035ddc4ba55fde855793b5021f21b908bd254235e123e3911ad1976"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ja",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 60759,
+      "format": "JPEG",
+      "reviewed_sha256": "682424a4483890210f07e7dcbdcdfcbbad64bd3f49a5c85b93eb04cdb6ab3a0b",
+      "downloaded_sha256": "682424a4483890210f07e7dcbdcdfcbbad64bd3f49a5c85b93eb04cdb6ab3a0b"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ja",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 50014,
+      "format": "JPEG",
+      "reviewed_sha256": "a4b6ba3b5683e8b27b27cb905dca6ee084b2d38a96090923b2be83c4fa9f80b2",
+      "downloaded_sha256": "a4b6ba3b5683e8b27b27cb905dca6ee084b2d38a96090923b2be83c4fa9f80b2"
+    },
+    {
+      "source_id": "source-1",
+      "language": "nl",
+      "member_id": "336x280",
+      "width": 336,
+      "height": 280,
+      "bytes": 61492,
+      "format": "JPEG",
+      "reviewed_sha256": "4ce1440565c941e1aa8d71f6ce54fa4208f994d91956778ab0e314ae7d82bbd5",
+      "downloaded_sha256": "4ce1440565c941e1aa8d71f6ce54fa4208f994d91956778ab0e314ae7d82bbd5"
+    },
+    {
+      "source_id": "source-1",
+      "language": "nl",
+      "member_id": "300x250",
+      "width": 300,
+      "height": 250,
+      "bytes": 50546,
+      "format": "JPEG",
+      "reviewed_sha256": "d5316c2ad00d6d3a4792be6415c32926f1d5edc78ec85b3220768cba43c1fd14",
+      "downloaded_sha256": "d5316c2ad00d6d3a4792be6415c32926f1d5edc78ec85b3220768cba43c1fd14"
+    }
+  ]
+}

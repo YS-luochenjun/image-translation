@@ -10,6 +10,7 @@
 - [原图图组与尺寸规划](methods/source-set-and-size-planning.md)：active；已有整组逐图翻译、明确七成员、尺寸覆盖或跨语言缺图时读取。五图×六语是六组30张，逐来源和语言核完整性。
 - [五阶段分层方法](methods/layered-localization.md)：active，用户授权的通用执行流程。
 - [按内容选路](methods/content-routing.md)：provisional，图种技术候选及适用/不适用/保护/停止条件。
+- [摄影图去字与遮罩退化检查](methods/photographic-background-repair.md)：active；摄影文字修复时检查自然亮度、纹理与主体，先审底图再排字；[SHE-032案例](cases/she-032-20261109/README.md)保留旧暗带被否定、新去字底图获认可及28张新版交付证据。
 - [文字与构图](methods/typography-composition.md)：provisional，语义类型、字形力度与容器协调的检查维度。
 - [视觉差异自检与内部迭代](methods/visual-fidelity-self-review.md)：active，从本图关键特征提出可失败的标准，主动找差异、返工与复审，不等待用户漏检反馈；不是自动审美评分。
 - [标签语义与商标保留](methods/semantic-roles-and-brand-preservation.md)：active，先判断品牌、产品名、普通文案、规格条件和发布标识的角色，再选择翻译或保留；本次用户认可这一判断方向。

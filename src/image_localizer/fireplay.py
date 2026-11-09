@@ -8,16 +8,17 @@ import re
 from urllib.parse import urlsplit
 from uuid import UUID, uuid4
 
+from .languages import LANGUAGE_ALIASES, LANGUAGE_ALIAS_GROUPS
+
 QUERY = {'scope': 'all', 'view': 'summary', 'asset_type': 'image',
          'pagination': 'cursor', 'limit': 200, 'offset': 0}
-ALIASES = {'english': 'en', '英语': 'en', '英文': 'en', 'en': 'en',
-           'japanese': 'ja', '日语': 'ja', '日文': 'ja', 'ja': 'ja', 'jp': 'ja',
-           'chinese': 'zh-CN', '中文': 'zh-CN', '简体中文': 'zh-CN', 'zh-cn': 'zh-CN',
-           'traditional chinese': 'zh-TW', '繁体中文': 'zh-TW', 'zh-tw': 'zh-TW', 'tw': 'zh-TW',
-           'korean': 'ko', '韩语': 'ko', 'ko': 'ko', 'kr': 'ko', 'german': 'de', '德语': 'de', 'de': 'de',
-           'french': 'fr', '法语': 'fr', 'fr': 'fr', 'spanish': 'es', '西班牙语': 'es', 'es': 'es',
-           'portuguese': 'pt', '葡萄牙语': 'pt', 'pt': 'pt', 'indonesian': 'id', '印尼语': 'id', 'id': 'id', 'in': 'id', 'vn': 'vi', '越南语': 'vi',
-           'arabic': 'ar', '阿拉伯语': 'ar', 'ar': 'ar', 'russian': 'ru', '俄语': 'ru', 'ru': 'ru'}
+ALIASES = {'english': 'en', '英语': 'en', '英文': 'en',
+           '日语': 'ja', '日文': 'ja',
+           '中文': 'zh-CN', '简体中文': 'zh-CN', 'zh-cn': 'zh-CN',
+           'traditional chinese': 'zh-TW', '繁体中文': 'zh-TW',
+           '韩语': 'ko', '德语': 'de', '法语': 'fr', '西班牙语': 'es',
+           '葡萄牙语': 'pt', '印尼语': 'id', '印地语': 'hi', '越南语': 'vi',
+           '阿拉伯语': 'ar', '俄语': 'ru', **LANGUAGE_ALIASES}
 
 
 def _require(condition, message):
@@ -226,7 +227,7 @@ def _locale(value):
     if alias:
         return alias
     parts = text.split('-')
-    if parts[0].lower() not in set(ALIASES.values()) | {'zh', 'th', 'vi', 'hi', 'it', 'tr', 'nl', 'pl', 'uk', 'ms'}:
+    if parts[0].lower() not in set(LANGUAGE_ALIAS_GROUPS) | {'uk'}:
         return None
     if not re.fullmatch(r'[a-zA-Z]{2,3}(?:-[a-zA-Z]{2}|-[a-zA-Z]{4}|-\d{3}){0,2}', text):
         return None

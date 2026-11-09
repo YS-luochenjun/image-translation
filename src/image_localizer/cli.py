@@ -23,8 +23,8 @@ def doctor() -> dict:
     return {"python": sys.version.split()[0], "executable": sys.executable, "pillow": pillow_version,
             "raqm": features.check_feature("raqm"), "font_candidates": available_fonts(),
             "host_vision": "must be verified by actually reading an image in this session",
-            "imagegen": {"current_tool": "text-to-image only", "reference_input": False,
-                         "provider_verified": False, "note": "Project does not read host credentials or invoke imagegen."},
+            "imagegen": {"current_tool": "host-provided; inspect current session tool schema", "reference_input": None,
+                         "provider_verified": False, "note": "CLI cannot inspect host tool capabilities. Verify reference input and actual results in the current session; project does not read host credentials or invoke imagegen."},
             "render_support": "basic: axis-aligned regions; layered: sampled repair, rotated text, configurable face/contact/depth/soft shadow, cmap glyph checks, local assets; jobs: shared reviewed background and frozen inputs; no automatic OCR or visual approval"}
 
 
