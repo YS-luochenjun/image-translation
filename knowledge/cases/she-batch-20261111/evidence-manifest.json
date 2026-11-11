@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "scope": "Original bytes copied locally; no image re-encoding. Snapshots are historical evidence, not fresh platform resource verification.",
+  "files": [
+    {
+      "path": "batch-snapshot.json",
+      "sha256": "db277237da65cc9f50773258968a17f64231aca42ba36372d101f218d36ff529",
+      "bytes": 13864
+    },
+    {
+      "path": "evidence/023-source-7-es-final.jpg",
+      "sha256": "7671dd9e872439b74ebde6a344957963dfa40cdafabc635631e5fecbe64a71fe",
+      "bytes": 81926,
+      "size": [
+        300,
+        250
+      ],
+      "format": "JPEG"
+    },
+    {
+      "path": "evidence/023-source-7.jpg",
+      "sha256": "57f0f86706ca25c203fb8097b4d14ba389f1751d506e73fbc535fd5b5f68a1d9",
+      "bytes": 41551,
+      "size": [
+        300,
+        250
+      ],
+      "format": "JPEG"
+    },
+    {
+      "path": "evidence/025-source-2-hi.jpg",
+      "sha256": "ea32aa3e3f51e20bad04091b53730b6cecff0151a94659769ea67979882dfc33",
+      "bytes": 112924,
+      "size": [
+        300,
+        600
+      ],
+      "format": "JPEG"
+    },
+    {
+      "path": "evidence/025-source-2.png",
+      "sha256": "07fc3545ef0e27b4407f556240f327132d71d2a30edc6060f5ecaf37cc93f882",
+      "bytes": 304476,
+      "size": [
+        300,
+        600
+      ],
+      "format": "PNG"
+    },
+    {
+      "path": "evidence/031-source-1-ar.jpg",
+      "sha256": "f60602d38961ef16c4c0620e13bc177f3292cc2424765893f2f52f15f3a3d698",
+      "bytes": 115260,
+      "size": [
+        970,
+        250
+      ],
+      "format": "JPEG"
+    },
+    {
+      "path": "evidence/031-source-1.png",
+      "sha256": "cfd24c7a1393bc8adcea13400b1741bf06035f78a87e976d26899356d46ef455",
+      "bytes": 418169,
+      "size": [
+        970,
+        250
+      ],
+      "format": "PNG"
+    }
+  ]
+}

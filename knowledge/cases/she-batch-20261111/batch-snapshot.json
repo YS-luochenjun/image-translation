@@ -1,0 +1,318 @@
+{
+  "version": 1,
+  "recorded_at": "2026-11-11T06:52:53.828316+00:00",
+  "last_summary_server_time": "2026-11-11T06:47:16.113Z",
+  "summary_query": {
+    "scope": "all",
+    "view": "summary",
+    "asset_type": [
+      "image",
+      "button"
+    ],
+    "ai_mode": "image_translate_or_resize",
+    "pagination": "cursor",
+    "limit": 200,
+    "offset": 0
+  },
+  "summary_coverage": {
+    "complete": true,
+    "rows": 19,
+    "candidates": 0
+  },
+  "summary_live_rechecked": true,
+  "resource_live_rechecked_in_this_pass": false,
+  "local_files_rehashed_in_this_pass": 492,
+  "current_self_review_records_checked": 492,
+  "controller_review_kind": "Matrix/hash/evidence audit plus actual visual samples; not independent full visual review.",
+  "final_outputs_user_accepted": false,
+  "requirements": [
+    {
+      "code": "SHE-20261111-023",
+      "requirement_id": "e73e2d1e-96ce-5b0b-ba7d-1b7b4c8dd99c",
+      "source_count": 7,
+      "language_count": 14,
+      "sizes": [
+        [
+          300,
+          250
+        ],
+        [
+          336,
+          280
+        ]
+      ],
+      "member_count": 196,
+      "download_and_output_sha_verified": 196,
+      "current_source_and_review_sha_verified": 196,
+      "summary_status": "done",
+      "binding_evidence": "Saved exact UUID official delivery materials matched the member matrix; not a fresh binding query in this organization pass.",
+      "last_resource_risk_status": "pending",
+      "user_acceptance": "not_recorded"
+    },
+    {
+      "code": "SHE-20261111-024",
+      "requirement_id": "204931c1-4d39-5368-8c7f-140436aeb7d6",
+      "source_count": 4,
+      "language_count": 14,
+      "sizes": [
+        [
+          300,
+          250
+        ],
+        [
+          336,
+          280
+        ]
+      ],
+      "member_count": 112,
+      "download_and_output_sha_verified": 112,
+      "current_source_and_review_sha_verified": 112,
+      "summary_status": "done",
+      "binding_evidence": "Saved exact UUID official delivery materials matched the member matrix; not a fresh binding query in this organization pass.",
+      "last_resource_risk_status": "pending",
+      "user_acceptance": "not_recorded"
+    },
+    {
+      "code": "SHE-20261111-025",
+      "requirement_id": "522945c6-6dfc-5110-9b51-e288b45f8159",
+      "source_count": 4,
+      "language_count": 14,
+      "sizes": [
+        [
+          300,
+          600
+        ]
+      ],
+      "member_count": 56,
+      "download_and_output_sha_verified": 56,
+      "current_source_and_review_sha_verified": 56,
+      "summary_status": "done",
+      "binding_evidence": "Saved exact UUID official delivery materials matched the member matrix; not a fresh binding query in this organization pass.",
+      "last_resource_risk_status": "pending",
+      "user_acceptance": "not_recorded"
+    },
+    {
+      "code": "SHE-20261111-028",
+      "requirement_id": "a9ec328b-2582-5c43-a377-e88b5bd49f21",
+      "source_count": 3,
+      "language_count": 10,
+      "sizes": [
+        [
+          970,
+          250
+        ]
+      ],
+      "member_count": 30,
+      "download_and_output_sha_verified": 30,
+      "current_source_and_review_sha_verified": 30,
+      "summary_status": "done",
+      "binding_evidence": "Saved exact UUID official delivery materials matched the member matrix; not a fresh binding query in this organization pass.",
+      "last_resource_risk_status": "pending",
+      "user_acceptance": "not_recorded"
+    },
+    {
+      "code": "SHE-20261111-029",
+      "requirement_id": "01a1c883-b2cd-7e7b-9e1f-37367e5119ad",
+      "source_count": 3,
+      "language_count": 14,
+      "sizes": [
+        [
+          300,
+          600
+        ]
+      ],
+      "member_count": 42,
+      "download_and_output_sha_verified": 42,
+      "current_source_and_review_sha_verified": 42,
+      "summary_status": "done",
+      "binding_evidence": "Saved exact UUID official delivery materials matched the member matrix; not a fresh binding query in this organization pass.",
+      "last_resource_risk_status": "pending",
+      "user_acceptance": "not_recorded"
+    },
+    {
+      "code": "SHE-20261111-030",
+      "requirement_id": "01a1c885-6f41-7c8e-9d94-6db8a6fd9761",
+      "source_count": 1,
+      "language_count": 14,
+      "sizes": [
+        [
+          970,
+          250
+        ]
+      ],
+      "member_count": 14,
+      "download_and_output_sha_verified": 14,
+      "current_source_and_review_sha_verified": 14,
+      "summary_status": "done",
+      "binding_evidence": "Saved exact UUID official delivery materials matched the member matrix; not a fresh binding query in this organization pass.",
+      "last_resource_risk_status": "pending",
+      "user_acceptance": "not_recorded"
+    },
+    {
+      "code": "SHE-20261111-031",
+      "requirement_id": "01a1c885-ffac-77bb-b132-23533808e974",
+      "source_count": 3,
+      "language_count": 14,
+      "sizes": [
+        [
+          970,
+          250
+        ]
+      ],
+      "member_count": 42,
+      "download_and_output_sha_verified": 42,
+      "current_source_and_review_sha_verified": 42,
+      "summary_status": "done",
+      "binding_evidence": "Saved exact UUID official delivery materials matched the member matrix; not a fresh binding query in this organization pass.",
+      "last_resource_risk_status": "pending",
+      "user_acceptance": "not_recorded"
+    }
+  ],
+  "attachment_deduplication": {
+    "code": "SHE-20261111-031",
+    "method": "Downloaded bytes SHA256 equality plus matching purpose",
+    "attachments": [
+      {
+        "attachment_index": 1,
+        "attachment_id": "01a1c886-4c19-744d-955a-0b53586a17ed",
+        "source_index": 1,
+        "downloaded_sha256": "20c3731cd4a8fd58cdddca760a9627f17e55b34be89887cf1e285540151614a7"
+      },
+      {
+        "attachment_index": 2,
+        "attachment_id": "01a1c886-669f-7138-9c6e-ec3bc72a80a6",
+        "source_index": 2,
+        "downloaded_sha256": "5a2fe7c68552d3b2ef713325b977fd7b7b2e4e7181dbe925a1350fe9592e95ac"
+      },
+      {
+        "attachment_index": 3,
+        "attachment_id": "01a1c886-7f6f-7170-9c54-97f9039739e2",
+        "source_index": 3,
+        "downloaded_sha256": "f89ff87f3b034e30c92ee4df6e5acc7de98ce5dd69cbe1b24ea5e828d91cd027"
+      },
+      {
+        "attachment_index": 4,
+        "attachment_id": "01a1c886-aeaa-7c30-b390-7f733e5d539a",
+        "source_index": 1,
+        "downloaded_sha256": "20c3731cd4a8fd58cdddca760a9627f17e55b34be89887cf1e285540151614a7"
+      },
+      {
+        "attachment_index": 5,
+        "attachment_id": "01a1c886-be30-72b2-b99b-3fd59970bcf4",
+        "source_index": 2,
+        "downloaded_sha256": "5a2fe7c68552d3b2ef713325b977fd7b7b2e4e7181dbe925a1350fe9592e95ac"
+      },
+      {
+        "attachment_index": 6,
+        "attachment_id": "01a1c886-c44c-7c4c-b401-ba61f93fa45b",
+        "source_index": 3,
+        "downloaded_sha256": "f89ff87f3b034e30c92ee4df6e5acc7de98ce5dd69cbe1b24ea5e828d91cd027"
+      }
+    ]
+  },
+  "examples": [
+    {
+      "code": "SHE-20261111-025",
+      "source_id": "source-2",
+      "language": "hi",
+      "member_id": "300x600",
+      "material_id": "01a1c8b4-d103-79d3-9039-4ef32d03b9aa",
+      "resource_id": "01a1c8b2-954d-7a55-9a67-2fbcdc4b6f37",
+      "source": {
+        "path": "evidence/025-source-2.png",
+        "sha256": "07fc3545ef0e27b4407f556240f327132d71d2a30edc6060f5ecaf37cc93f882"
+      },
+      "artifact": {
+        "path": "evidence/025-source-2-hi.jpg",
+        "sha256": "ea32aa3e3f51e20bad04091b53730b6cecff0151a94659769ea67979882dfc33"
+      },
+      "downloaded_sha256": "ea32aa3e3f51e20bad04091b53730b6cecff0151a94659769ea67979882dfc33",
+      "bytes": 112924,
+      "review_kind": "self",
+      "original_review_file": "work/fireplay-production/SHE-20261111-025/reviews/source2-hi-300x600.json",
+      "self_attestation": {
+        "source_viewed": true,
+        "candidate_viewed": true,
+        "notes": "Host opened actual source, isolated background, transparent glyph sheets, native-size final encoded JPEG sheets, and complex-script 2x detail where applicable. Source2 only: the 1960s, everyone used these, most people cannot name them now, and conditional ability to name them implies a still impressively sharp mind. No age-over-60/65 or twelve-item condition added. Devanagari conjuncts, headline and vowel marks inspected in final 2x detail. No tofu or clipped matras; smaller source3 body still readable at native scale. Final quality95 JPEG has no new ringing that impairs text."
+      },
+      "controller_review": "Actual source and final file opened in this organization pass; visual sample only, not an independent full matrix review."
+    },
+    {
+      "code": "SHE-20261111-031",
+      "source_id": "source-1",
+      "language": "ar",
+      "member_id": "970x250",
+      "material_id": "01a1c90b-76e4-7d5b-bf1b-43d9b64543d6",
+      "resource_id": "01a1c90a-1812-7f5b-8f0b-8fb3a9b63c90",
+      "source": {
+        "path": "evidence/031-source-1.png",
+        "sha256": "cfd24c7a1393bc8adcea13400b1741bf06035f78a87e976d26899356d46ef455",
+        "representation": "Normalized PNG used by the original self review; SHA differs from downloaded JPEG bytes."
+      },
+      "artifact": {
+        "path": "evidence/031-source-1-ar.jpg",
+        "sha256": "f60602d38961ef16c4c0620e13bc177f3292cc2424765893f2f52f15f3a3d698"
+      },
+      "downloaded_sha256": "f60602d38961ef16c4c0620e13bc177f3292cc2424765893f2f52f15f3a3d698",
+      "bytes": 115260,
+      "review_kind": "self",
+      "original_review_file": "work/fireplay-production/SHE-20261111-031/reviews/source-1-ar.json",
+      "self_attestation": {
+        "source_viewed": true,
+        "candidate_viewed": true,
+        "notes": "Actually viewed original, isolated clean background, separate text layer on neutral sheet, full output sheets, then individually reopened this final JPEG at 970x250. Three connected RTL lines retain the sixties, إيصال أصواتهم and sharp understanding. No image flipping. CTA ابدأ is complete."
+      },
+      "controller_review": "Actual source and final file opened in this organization pass; visual sample only, not an independent full matrix review.",
+      "downloaded_source_sha256": "20c3731cd4a8fd58cdddca760a9627f17e55b34be89887cf1e285540151614a7",
+      "decoded_rgb_equal_to_downloaded_source_checked_in_this_pass": true
+    },
+    {
+      "code": "SHE-20261111-023",
+      "source_id": "source-7",
+      "language": "es",
+      "member_id": "300x250",
+      "material_id": "01a1c926-fc3c-7bd2-abad-8960e266323d",
+      "resource_id": "01a1c925-d9f6-7a44-9997-3c43403445bd",
+      "source": {
+        "path": "evidence/023-source-7.jpg",
+        "sha256": "57f0f86706ca25c203fb8097b4d14ba389f1751d506e73fbc535fd5b5f68a1d9"
+      },
+      "artifact": {
+        "path": "evidence/023-source-7-es-final.jpg",
+        "sha256": "7671dd9e872439b74ebde6a344957963dfa40cdafabc635631e5fecbe64a71fe"
+      },
+      "downloaded_sha256": "7671dd9e872439b74ebde6a344957963dfa40cdafabc635631e5fecbe64a71fe",
+      "bytes": 81926,
+      "review_kind": "self",
+      "original_review_file": "work/fireplay-production/SHE-20261111-023/reviews-full-v2/source-7/300x250/es-jpeg-recovery.json",
+      "self_attestation": {
+        "source_viewed": true,
+        "candidate_viewed": true,
+        "notes": "Leafy green perimeter and field remain continuous, with naturally soft central green reconstruction. Actual white hand and yellow capsule remain intact. Bold centered black text with thin pale edge is legible; no ghost letters, dark band or visible repair seam. Spanish accents and question/exclamation marks are visible. Complete localized condition and CTA are centered; dense condensed Latin lines remain readable with margins. Actual 300x250 lettering/full final reviewed in v3 native pair sheets; unchanged bytes reused, all changed current final bytes separately viewed in boundary-review sheets1..19. Full matrix thumbnails viewed. Evidence full-v2/source-7/review-views-v4 pair1..7 and thumbnail; source5 ar/hi/th score details additionally enlarged. Prior source/background observations retained. Actual final JPEG Q98 4:4:4 individually opened at300x250 after two explicit remote fetch-failed responses. Leaf detail, original pointing hand, complete over60/all12 naming warning and yellow CTA remain clear. No loss of accents, Chinese strokes, clipping or newly visible seams. Only final file encoding changed; lower bytes documented."
+      },
+      "controller_review": "Actual source and final file opened in this organization pass; visual sample only, not an independent full matrix review."
+    }
+  ],
+  "encoding_history": {
+    "code": "SHE-20261111-023",
+    "member": [
+      "source-7",
+      "es",
+      "300x250"
+    ],
+    "historical_png_sha256": "b8bcbbab6f911735d828adda8bc01960a1ef2a16625db5679f87823331397ea6",
+    "current_jpeg_sha256": "7671dd9e872439b74ebde6a344957963dfa40cdafabc635631e5fecbe64a71fe",
+    "old_review_preserved": true,
+    "matching_rule": "Select an applicable review by exact current output SHA. Historical pass is not transferred."
+  },
+  "unknown_recovery": {
+    "code": "SHE-20261111-024",
+    "original_import_operation_id": "150d9aeb-4462-4017-bffc-a9777e681c56",
+    "original_import_state": "unknown",
+    "user_instruction": "请你绑定到需求",
+    "authorization_scope": "Single existing-material binding, no replay or generic publisher bypass",
+    "bind_operation_id": "79b0c41e-6a23-4149-82ae-0c6cd24d0ac1",
+    "bound_verified": 112,
+    "general_recovery_implemented": false
+  }
+}

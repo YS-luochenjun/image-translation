@@ -4,7 +4,7 @@
 
 ## 共享业务入口
 
-- `fireplay-discover-translations.mjs`：真实合同、完整分页和官方选项驱动的发现逻辑。
+- `fireplay-discover-translations.mjs`：真实合同、完整分页和官方选项驱动的只读发现。`--department DEPT_ID`查指定部门；追加`--all-departments`查全可读范围，DEPT_ID只用来核官方选项。持久去重与版本交接见[轮询流程](../agent/workflows/fireplay-polling.md)。
 - `fireplay-mcp-publication.mjs`：受约束上传/入库/归属/绑定，冻结审核字节并持久化原operation UUID；结果未知先核实。
 - `fireplay-image-processing.mjs`：按合同调用图片处理，费用与写入需要当前明确授权。
 - `fireplay-offline-test-contracts.mjs`：合成测试合同，不能用于真实业务调用。
@@ -16,13 +16,15 @@ $env:PYTHONUTF8 = '1'
 $env:PYTHONPATH = "$PWD/src"
 # 使用本机实际Python解释器，或已安装本项目的虚拟环境。
 python -m unittest discover -s tests -q
-$testFiles = @(rg --files plugins scripts -g '*.test.js' -g '*.test.mjs')
+$testFiles = @(rg --files plugins scripts tests -g '*.test.js' -g '*.test.mjs')
 node --test --test-isolation=none @testFiles
 node scripts/check_dsh_bridge.mjs
 node scripts/plugin-contract-check.mjs
 ```
 
 Node命令需要支持 `--test-isolation=none` 的版本；本轮使用24.14.0。调度回归从 `plugins/fireplay-session-dispatch/fixtures/` 读取有限历史样本，在临时目录模拟Host，不依赖忽略的生产回执，不执行真实派发。
+
+发现脚本的跨语言回执测试需将`TEST_PYTHON`设为实际Python解释器路径；未设置时该项明确skip，不当作Python交接通过。Node测试需包含`tests/`，仅枚举plugins/scripts会漏掉发现与处理入口回归。
 
 ## 按需诊断与实机验证
 

@@ -12,11 +12,15 @@
 
 ## 1. 发现待办，不靠标题猜
 
-执行只读 `node scripts/fireplay-discover-translations.mjs --department DEPT_ID`。DEPT_ID用当前授权组查询结果，不能凭名称猜。命令先读当前tool_catalog和requirement_create_options，从 `fixed.aiModes` 精确匹配 enabled=true、label=图片翻译，取得value；2026-11-06官方SHE选项核实为 `image_translate_or_resize`。再以 `view=summary,scope=all,dept_id=...,asset_type=[image,button],ai_mode=实际值,pagination=cursor,offset=0` 全部翻页。maxPages耗尽返回partial及next_cursor；先交给Python fireplay-discover验证该次回执，其host_actions给出保持相同过滤的续页参数；收集续页到原summary_pages再次验证，不能把局部页重新从头计为完整。缺连接器/权限报告不可用，不报“没有需求”。status不硬编码未知本地枚举，done/cancelled/canceled不作为新生产候选，其余读正文核实。
+执行只读 `node scripts/fireplay-discover-translations.mjs --department DEPT_ID`。DEPT_ID用当前授权组查询结果，不能凭名称猜。跨部门轮询显式追加 `--all-departments`：该部门仅用于读取官方选项，summary查询不带dept_id；命令核对回执未被隐式缩窄。省略该参数仍为指定部门范围，scope=all本身不消除部门过滤。
+
+命令先读当前tool_catalog和requirement_create_options，从 `fixed.aiModes` 精确匹配 enabled=true、label=图片翻译，取得value；2026-11-06官方SHE选项核实为 `image_translate_or_resize`。再以 `view=summary,scope=all,asset_type=[image,button],ai_mode=实际值,pagination=cursor,offset=0` 全部翻页；部门模式另带dept_id。maxPages耗尽返回partial及next_cursor；先交给Python fireplay-discover验证该次回执，其host_actions给出保持相同过滤的续页参数；收集续页到原summary_pages再次验证，不能把局部页重新从头计为完整。缺连接器/权限报告不可用，不报“没有需求”。status不硬编码未知本地枚举，done/cancelled/canceled不作为新生产候选，其余读正文核实。
 
 返回的summary_pages可交给 `fireplay-discover --receipt FILE` 验证。线上查询是live keyset，不是冻结快照；重复ID/编号或翻页漂移停止当前扫描，不能擅自丢弃。AI模式为空的旧任务只有用户明确编号范围/有来源分类决策才能补入；不把标题含翻译或历史旧37固定清单当自动发现范围。
 
 每个候选精确UUID读blind_brief，并读当前delivery（必要时素材详情），核对updatedAt、正文、原图、语言、assetType和执行权限。盲选接口waiting_selection返回的空materials不是无素材，遵守其实际选择流程。当前assigneeIds是设计执行人，materials.designerIds是已存归属，uploader/launcher不是设计师。部门共享ID与需求deptId可能不同，通过官方可用共享部门资源核实，不字符串替换。发布前fresh核实权限与身份，不把历史intake当永远有效。
+
+持续轮询、已派发需求扩单或出现重复附件时，读[轮询与范围变更](fireplay-polling.md)。发现命令仅提供查询回执；派发去重、排队和版本比较由主控持久记录承担。
 
 ## 2. 规格先冻结成成员矩阵
 

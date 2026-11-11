@@ -17,7 +17,7 @@ const listSchema={type:'object',additionalProperties:false,
   asset_type:{type:'array',items:{type:'string',enum:['image','button']}},ai_mode:{type:'string',minLength:1},
   pagination:{type:'string',enum:['cursor']},limit:{type:'integer',minimum:1,maximum:200},offset:{type:'integer',minimum:0},
   cursor:{type:'string',minLength:1}},
- required:['scope','dept_id','view','asset_type','ai_mode','pagination','limit','offset']};
+ required:['scope','view','asset_type','ai_mode','pagination','limit','offset']};
 const clone=value=>structuredClone(value);
 const contracts={
  requirement_create_options:{name:'requirement_create_options',operation_class:'read',invoke_via:'tool_read',schema_version:evidence.schema_version,
@@ -36,6 +36,11 @@ function livePage(items=[],cursor=null){
  const value=page(items,{next_cursor:cursor,next_offset:null,total:items.length,returned:items.length});
  delete value.has_more;
  Object.assign(value.query_meta,{total_exact:true,returned:items.length});
+ return value;
+}
+function globalPage(items=[],cursor=null){
+ const value=livePage(items,cursor);
+ value.deptId=null;value.query_meta.filters_applied.dept_id=null;
  return value;
 }
 function fixture({pages=[page([row()])],options=clone(evidence.response_excerpt),definitions=clone(contracts),wrapper='structured'}={}){
@@ -81,6 +86,44 @@ test('pagination preserves exact filters and returns terminal cursor evidence',a
  const f=fixture({pages:[first,second]});const result=await run(f);
  assert.equal(result.complete,true);assert.equal(result.next_cursor,null);assert.equal(result.summary_pages.length,2);
  assert.deepEqual(result.summary_pages[1].arguments,{...result.query,cursor:'cursor-two'});
+});
+
+test('explicit all-departments mode uses a seed for options and follows every visible department',async()=>{
+ const f=fixture({pages:[globalPage([row()],'next'),
+  globalPage([row({id:'f3e17b15-2e91-4a5c-b5a8-a04b457d02bc',code:'MOG-20261106-002',deptId:'other-visible-department',assetType:'button'})])]});
+ const result=await run(f,{allDepartments:true});
+ assert.equal(result.complete,true);assert.equal(result.candidates.length,2);
+ assert.equal(Object.hasOwn(result.query,'dept_id'),false);
+ assert.ok(result.summary_pages.every(item=>!Object.hasOwn(item.arguments,'dept_id')));
+ assert.equal(result.option_evidence.dept_id,deptId);
+ assert.deepEqual(f.calls.find(call=>call.name==='tool_read'&&call.args.tool==='requirement_create_options').args.arguments,{dept_id:deptId});
+ const partial=await run(fixture({pages:[globalPage([row()],'remaining')]}),{allDepartments:true,maxPages:1});
+ assert.equal(partial.complete,false);assert.equal(partial.next_cursor,'remaining');assert.equal(partial.state,'partial');
+});
+
+test('all-departments mode rejects implicit department narrowing and invalid row scope evidence',async()=>{
+ for(const mutate of [
+  value=>{value.deptId=deptId;},
+  value=>{value.query_meta.filters_applied.dept_id=deptId;},
+  value=>{delete value.deptId;},
+  value=>{delete value.query_meta.filters_applied.dept_id;},
+  value=>{value.items[0].deptId=null;},
+  value=>{value.query_meta.filters_applied.status='not_started';},
+ ]){
+  const response=globalPage([row()]);mutate(response);
+  await assert.rejects(run(fixture({pages:[response]}),{allDepartments:true}),/filters|filter/);
+ }
+ // Department-scoped callers keep their previous restriction.
+ await assert.rejects(run(fixture({pages:[globalPage([row()])]})),/filters/);
+ const f=fixture();
+ await assert.rejects(run(f,{allDepartments:'true'}),/boolean/);assert.equal(f.calls.length,0);
+});
+
+test('all-departments queries still require a compatible current contract',async()=>{
+ const definitions=clone(contracts);definitions.requirement_list.inputSchema.required.push('dept_id');
+ const f=fixture({definitions,pages:[globalPage([row()])]});
+ await assert.rejects(run(f,{allDepartments:true}),/dept_id/);
+ assert.equal(f.calls.filter(call=>call.args.tool==='requirement_list'&&call.name==='tool_read').length,0);
 });
 
 test('maxPages retains partial proof and resumable next cursor; empty is complete',async()=>{
@@ -178,9 +221,11 @@ test('generated complete and partial receipts are consumable by Python discover 
   {pages:[livePage([row()])],complete:true,count:1},
   {pages:[livePage([row()],'next')],complete:false,count:1},
   {pages:[livePage([row()],'next'),livePage([row({id:'f3e17b15-2e91-4a5c-b5a8-a04b457d02bc',code:'SHE-20261106-002'})])],complete:true,count:2},
+  {pages:[globalPage([row()],'next'),globalPage([row({id:'f3e17b15-2e91-4a5c-b5a8-a04b457d02bc',code:'MOG-20261106-002',deptId:'other-visible-department'})])],allDepartments:true,complete:true,count:2},
+  {pages:[globalPage([row()],'remaining')],allDepartments:true,complete:false,count:1},
  ];
  for(const item of cases){
-  const result=await run(fixture({pages:item.pages}),{maxPages:item.pages.length});
+  const result=await run(fixture({pages:item.pages}),{maxPages:item.pages.length,allDepartments:item.allDepartments??false});
   const child=spawnSync(python,['-c',"import json,sys;sys.path.insert(0,'src');from image_localizer.fireplay import discover;v=discover(json.load(sys.stdin));print(json.dumps({'complete':v['complete'],'selected':len(v['selected'])}))"],
    {input:JSON.stringify(result),encoding:'utf8',cwd:new URL('..',import.meta.url)});
   assert.equal(child.status,0,child.stderr);assert.deepEqual(JSON.parse(child.stdout),{complete:item.complete,selected:item.count});

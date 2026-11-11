@@ -43,8 +43,10 @@ function verifyPage(response,query){
  const same=(left,right)=>JSON.stringify([...list(left)].sort())===JSON.stringify([...list(right)].sort());
  if(!Array.isArray(response?.items))fail('Missing summary items');
  nextCursor(response);
- if(response.view!=='summary'||response.scope!==query.scope||response.deptId!==query.dept_id
-    ||!filters||filters.scope!==query.scope||filters.dept_id!==query.dept_id
+ const expectedDepartment=query.dept_id??null;
+ if(expectedDepartment===null&&(!Object.hasOwn(response,'deptId')||!filters||!Object.hasOwn(filters,'dept_id')))fail('Missing explicit all-departments filter evidence');
+ if(response.view!=='summary'||response.scope!==query.scope||(response.deptId??null)!==expectedDepartment
+    ||!filters||filters.scope!==query.scope||(filters.dept_id??null)!==expectedDepartment
     ||!same(filters.asset_type,query.asset_type)||!same(filters.ai_mode,query.ai_mode))fail('Response filters do not match discovery query');
  for(const field of ['requester_ids','assignee_ids','requirement_ids','keyword','status','date_from','date_to']){
   if(!same(filters[field],query[field]))fail(`Response filter mismatch: ${field}`);
@@ -53,8 +55,9 @@ function verifyPage(response,query){
  if(typeof response.serverTime!=='string'||!Number.isFinite(Date.parse(response.serverTime)))fail('Missing server time evidence');
 }
 
-export async function discoverTranslations({transport,deptId,maxPages=100}){
+export async function discoverTranslations({transport,deptId,maxPages=100,allDepartments=false}){
  if(typeof deptId!=='string'||!deptId.trim())fail('A visible department ID is required to resolve current AI mode options');
+ if(typeof allDepartments!=='boolean')fail('allDepartments must be an explicit boolean');
  if(!Number.isInteger(maxPages)||maxPages<1||maxPages>1000)fail('Invalid page limit');
  const optionsContract=await definition(transport,'requirement_create_options');
  const listContract=await definition(transport,'requirement_list');
@@ -67,7 +70,8 @@ export async function discoverTranslations({transport,deptId,maxPages=100}){
   const matches=Array.isArray(assetTypes)?assetTypes.filter(item=>item.value===value&&item.label===label):[];
   if(matches.length!==1||matches[0].enabled===false)fail(`Current type option missing or ambiguous: ${label}`);
  }
- const query={scope:'all',dept_id:deptId,view:'summary',asset_type:['image','button'],ai_mode:modes[0].value,pagination:'cursor',limit:200,offset:0};
+ // The seed department resolves official options; it only filters rows in department mode.
+ const query={scope:'all',...(!allDepartments?{dept_id:deptId}:{}),view:'summary',asset_type:['image','button'],ai_mode:modes[0].value,pagination:'cursor',limit:200,offset:0};
  const summaryPages=[],seenCursors=new Set(),seenIds=new Set(),seenCodes=new Set(),rows=[];
  let cursor;
  for(let page=0;page<maxPages;page++){
@@ -80,7 +84,8 @@ export async function discoverTranslations({transport,deptId,maxPages=100}){
    const identity=row.id.toLowerCase();
    if(seenIds.has(identity)||seenCodes.has(row.code))fail('Live pagination moved or duplicated rows; refresh before production');
    seenIds.add(identity);seenCodes.add(row.code);
-   if(row.deptId!==deptId||row.aiMode!==modes[0].value||!['image','button'].includes(row.assetType))fail('Response does not match exact AI/type/department filters');
+   if(typeof row.deptId!=='string'||!row.deptId.trim()||(!allDepartments&&row.deptId!==deptId)
+      ||row.aiMode!==modes[0].value||!['image','button'].includes(row.assetType))fail('Response does not match exact AI/type/department filters');
    rows.push(row);
   }
   cursor=nextCursor(response);
@@ -98,9 +103,9 @@ export async function discoverTranslations({transport,deptId,maxPages=100}){
 }
 
 async function main(){
- const [flag,deptId]=process.argv.slice(2);
- if(flag!=='--department'||!deptId||process.argv.length!==4)fail('Usage: node scripts/fireplay-discover-translations.mjs --department DEPT_ID');
+ const [flag,deptId,coverage,...extra]=process.argv.slice(2);
+ if(flag!=='--department'||!deptId||(coverage!==undefined&&coverage!=='--all-departments')||extra.length)fail('Usage: node scripts/fireplay-discover-translations.mjs --department DEPT_ID [--all-departments]');
  const transport=await connectProxy();
- try{console.log(JSON.stringify(await discoverTranslations({transport,deptId}),null,2));}finally{transport.close();}
+ try{console.log(JSON.stringify(await discoverTranslations({transport,deptId,allDepartments:coverage==='--all-departments'}),null,2));}finally{transport.close();}
 }
 if(process.argv[1]&&pathToFileURL(resolve(process.argv[1])).href===import.meta.url)main().catch(error=>{console.error(JSON.stringify({state:'discovery_failed',message:error.message,external_write:false}));process.exitCode=1;});

@@ -157,6 +157,44 @@ class KnowledgeTests(unittest.TestCase):
         self.assertFalse(snapshot['live_platform_rechecked'])
         self.assertFalse(snapshot['final_outputs_user_accepted'])
 
+    def test_batch_case_preserves_portable_bytes_and_current_review_identity(self):
+        root = Path(__file__).resolve().parents[1]
+        case = root / 'knowledge/cases/she-batch-20261111'
+        manifest = json.loads((case / 'evidence-manifest.json').read_text(encoding='utf-8'))
+        for item in manifest['files']:
+            path = (case / item['path']).resolve()
+            self.assertTrue(path.is_relative_to(case.resolve()))
+            self.assertEqual(item['sha256'], hashlib.sha256(path.read_bytes()).hexdigest())
+            self.assertEqual(item['bytes'], path.stat().st_size)
+            if 'size' in item:
+                with Image.open(path) as image:
+                    image.load()
+                    self.assertEqual((item['size'], item['format']), (list(image.size), image.format))
+                    self.assertEqual({'.png': 'PNG', '.jpg': 'JPEG'}[path.suffix], image.format)
+        snapshot = json.loads((case / 'batch-snapshot.json').read_text(encoding='utf-8'))
+        for example in snapshot['examples']:
+            for field in ('source', 'artifact'):
+                item = example[field]
+                self.assertEqual(item['sha256'], hashlib.sha256((case / item['path']).read_bytes()).hexdigest())
+            self.assertEqual(example['artifact']['sha256'], example['downloaded_sha256'])
+            self.assertEqual('self', example['review_kind'])
+        attachments = snapshot['attachment_deduplication']['attachments']
+        self.assertEqual(6, len(attachments))
+        self.assertEqual(3, len({a['downloaded_sha256'] for a in attachments}))
+        self.assertEqual([1, 2, 3, 1, 2, 3], [a['source_index'] for a in attachments])
+        normalized = next(e for e in snapshot['examples'] if e['code'] == 'SHE-20261111-031')
+        self.assertEqual(attachments[0]['downloaded_sha256'], normalized['downloaded_source_sha256'])
+        self.assertNotEqual(normalized['source']['sha256'], normalized['downloaded_source_sha256'])
+        history = snapshot['encoding_history']
+        self.assertNotEqual(history['historical_png_sha256'], history['current_jpeg_sha256'])
+        self.assertEqual(snapshot['examples'][-1]['artifact']['sha256'], history['current_jpeg_sha256'])
+        self.assertEqual(492, sum(r['member_count'] for r in snapshot['requirements']))
+        self.assertFalse(snapshot['resource_live_rechecked_in_this_pass'])
+        self.assertFalse(snapshot['final_outputs_user_accepted'])
+        self.assertEqual('unknown', snapshot['unknown_recovery']['original_import_state'])
+        result = load_knowledge(root, source_sha256=attachments[0]['downloaded_sha256'])
+        self.assertEqual('partial', next(c for c in result['related_cases'] if c['id'] == 'she-batch-20261111')['status'])
+
 
 if __name__=='__main__':
     unittest.main()

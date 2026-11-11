@@ -1,6 +1,7 @@
 {
   "version": 1,
   "entries": [
+    {"id":"she-batch-20261111","source_sha256":"20c3731cd4a8fd58cdddca760a9627f17e55b34be89887cf1e285540151614a7","path":"knowledge/cases/she-batch-20261111/README.md","kind":"case","status":"partial","tags":["source-revision","attachment-deduplication","complex-script","final-encoding","970x250","300x600"],"scope":"七需求492张：扩单差额、六附件三个SHA、复杂文字实际成形、最终JPEG审核与024单次绑定例外；有限代表图及静态核验摘要，无用户验收"},
     {"id":"she-028-20261111","source_sha256":"aeb13a673ccdde8dd9242417c0462316b11beaf570033881449bc10fadbe5857","path":"knowledge/cases/she-028-20261111/README.md","kind":"case","status":"partial","tags":["flat-color","wide-banner","970x250","multilingual","cta","review-failure"],"scope":"三来源十语30张原生横幅；共享背景和保留选项像素，法语CTA补回现在，最终JPEG与下载SHA核验；自审完成但无用户验收，禁则换行尚未实现"},
     {"id":"photographic-background-repair","path":"knowledge/methods/photographic-background-repair.md","kind":"method","status":"active","tags":["photography","background","repair","overlay","review"],"scope":"摄影去字保留自然亮度和纹理，先独立审底图，再检查成图暗带与糊化；实际工具能力及有限返工"},
     {"id":"she-032-20261109","source_sha256":"b25d1f966420d274987aa0dbb918a617a715789562b2e6a812a4b180bbfed571","path":"knowledge/cases/she-032-20261109/README.md","kind":"case","status":"partial","tags":["photography","background","repair","overlay","review-failure","336x280","300x250","multilingual"],"scope":"旧版28张暗带被否定；用户只认可新去字底图，新版14语双尺寸已自审、上传绑定及fresh字节核验","user_feedback":"partial","feedback_path":"knowledge/cases/she-032-20261109/user-feedback.json"},
