@@ -1,0 +1,13 @@
+{
+  "name": "@local/image-review-desk",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Native project image review with managed local service and explicit conversation handoff",
+  "exports": {".": "./native-host.js", "./client": "./client.js", "./locale/*.json": "./locale/*.json", "./icon": "./icon.svg"},
+  "files": ["native-host.js", "host-adapter.js", "native-verify.js", "client.js", "cordis.patch.yml", "locale/*.json", "icon.svg", "README.md"],
+  "dsh": {
+    "bundle": {"patch": "./cordis.patch.yml"},
+    "client": {"platform": "web", "immediately": true, "inject": ["@deepseek-ai/dsh-client-ui-sidebar", "@deepseek-ai/dsh-client-ui-layout", "@deepseek-ai/dsh-client-ui-workspace", "@deepseek-ai/dsh-api-session-controller"]}
+  }
+}

@@ -1,0 +1,96 @@
+[
+  {
+    "tool": "material_r2_upload_from_bytes",
+    "different_fields": {
+      "observedAt": {
+        "old": "2026-11-03T10:02:04.490Z",
+        "new": null
+      },
+      "description": {
+        "old": "**一步上传**：参数传入 **file_base64**（纯 base64 或 data URL），服务端写入 R2，返回 **publicUrl**、**resourceId**（与预签名链路相同的 `materials/{id}.{ext}`）。**不**自动写入素材库；需要 `material_id` 时请再调 **material_upload_from_url**：`already_in_r2: true` + `url`=本工具返回的 publicUrl + `resource_id`=resourceId。\n若是视频，下一步入库默认省略 VedioSouce，按 UI 自动上传 YouTube；只有用户明确不要上传 YouTube 时才传 Other；`material_upload_from_url` 会优先取第 2 秒、失败再试第 3 秒生成缩略图和封面，失败时返回 `thumbnail_warning` 但不阻断入库。\n单文件 ≤ 50 MB；需 Bearer 登录。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=submit · risk=write",
+        "new": "**一步上传**：参数传入 **file_base64**（纯 base64 或 data URL），服务端写入 R2，返回 **publicUrl**、**resourceId**（与预签名链路相同的 `materials/{id}.{ext}`）。**不**自动写入素材库；需要 `material_id` 时请再调 **material_upload_from_url**：`already_in_r2: true` + `url`=本工具返回的 publicUrl + `resource_id`=resourceId。\n若是视频，下一步入库默认省略 VedioSouce，按 UI 自动上传 YouTube；只有用户明确不要上传 YouTube 时才传 Other；`material_upload_from_url` 先入库，再异步生成封面。用原素材 ID 调 material_thumbnail_status 查询，用户要求补封面时用 material_thumbnail_retry；不要重新入库。\n单文件 ≤ 50 MB；需 Bearer 登录。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=submit · risk=write"
+      },
+      "catalog_version": {
+        "old": "90c41d84889415d8ff3a010e16c19c54dd6061664a4403b38a48dd721cade6cb",
+        "new": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed"
+      },
+      "schema_version": {
+        "old": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+        "new": "35c5fbcb2302f23a4234308b03666a5f4840b267cc8295685a148096550c6470"
+      }
+    }
+  },
+  {
+    "tool": "material_upload_from_url",
+    "different_fields": {
+      "observedAt": {
+        "old": "2026-11-03T10:02:05.062Z",
+        "new": null
+      },
+      "description": {
+        "old": "普通入库默认保持原流程。仅显式传 publication_scope=AI_组名才按 AI 素材入库；不要求 requirement_id、idempotency_key 或 external_source，不能为通过校验擅自补 AI 范围。AI 来源可选；AI 幂等键省略时自动生成并返回，普通入库不使用此键去重。上传不绑定需求，关联请另调 requirement_bind_ai_materials。\nMCP 入库自动带 source=MCP；button 在 UI/API/MCP 入库时统一验证真实文件，超过 150KB 的 JPG/PNG 自动保持尺寸压缩后入库。\n设计师和创作类型不可人工指定：图片/文件素材优先解析入库 `name` 末尾的 `_D288` / `_D288+D299`，原创追加 `_$`，二创追加 `_#`；未在 `name` 标注时兼容解析原始 `file_name` / `file_names`。视频 URL 如需声明归属，必须以 `?_D288` / `?_D288+D299_$` / `?_D288_#` 结尾，不兼容直接拼接或 `&_DID`，已有归属的视频可直接提交裸链接。每次调用实时查询 AuthHub 映射，只保存全部 designerIds/creationType；缺失或未知 DID 仍可入库，成功项会返回实际保存的 designers/creation_type/warnings。标注段入库前会完整剥离，不影响标题、Tag、视频 ID 与下载。YouTube 视频始终新增；若数据库已有同一视频 ID 的原创/二创素材，新素材会继承其全部 designerIds 和 creationType，覆盖本次命名归属且不依赖 DID 映射服务。此规则与 UI、第三方接口共用，兼容 watch/shorts/youtu.be、有无 www 和分享参数，排除下线资源和已删除素材。\n每个成功结果都返回 material_id；顶层同时返回精确 `check_url`（成功素材 ID 过滤）供用户跳到素材超市检查，素材多导致 GET URL 过长时拆为 `check_urls`。面向飞书/聊天最终回复时优先用 `check_link_markdown`、`feishu_post_message` 或 `feishu_card_message` 按短链接/按钮展示，不要直接贴裸长 URL。YouTube 链接成功入库且尚无 R2 原视频时，还会在顶层 `youtube_original_download_items` 返回已配好的 `material_id` + `youtube_url`，调用方不得猜测或另行搜索素材 ID。每项可选两种链路：\n1) **远端 URL（默认）**：服务端下载后再写入 R2 —— `url` 单张 / `urls` 组图 / `video_url` 外链视频。YouTube 未传 name 时自动查询并使用视频标题作为素材名，标题不可用时回退为 youtube-{videoId}；默认只保存链接和 R2 缩略图。用户明确选择同时保存原视频时，先用 `material_youtube_original_lookup` 查询。找到时把 `video_r2_url` 一起传入；缺失时先创建链接素材，再把返回的 `youtube_original_download_items` 直接交给 `material_youtube_original_download` 后台自动回填（每批最多 5 条，超过 5 条分批）。大按钮单张须传 `type: \"button\"`。\n2) **R2 已直传**：**网页**走 **`POST /api/upload/r2/presign-batch`** → PUT → **`already_in_r2: true`** + **publicUrl**（+ **resource_id** / **resource_ids**）；**MCP Agent** 可先 **`material_r2_upload_from_bytes`** 拿 publicUrl/resourceId 再登记。服务端会私有读取真实图片；超限 button 写入新的压缩对象，保留原文件。\n普通视频文件（非 YouTube）入库时会先由服务端下载视频到临时文件，再优先取第 2 秒画面、失败再试第 3 秒，生成缩略图并作为封面；截帧失败会返回 `thumbnail_warning`，但不阻断视频入库。\nbutton 每项只用 url 传一张 GIF/JPG/PNG，必须匹配固定尺寸；150KB=153600 字节。超限 JPG/PNG 自动压缩，可能降低画质或转 JPG 白底；超限 GIF 不支持动画压缩，返回失败，禁止截取首帧冒充原动画。压缩失败/仍超限不入库。成功项有 compression、compression_notice、warnings，Agent 必须向用户展示压缩前后大小、格式/透明背景变化，并使用返回 url，不要报告旧源文件大小或仅说入库成功。image / tk_carousel / fb_image 单张 ≤5MB，比例允许上下 0.2 波动。同批失败项不影响其它 item。\n顶层可选 `VedioSouce`：默认 YouTube，视频文件与 UI 一样自动申请 YouTube 上传任务；仅用户明确要求不上传 YouTube 时才传 Other。传 Other 或任意非 YouTube 值时，本批视频不创建 YouTube 上传任务，也不需要选择账号。该参数不要放进 items。视频结果 material_imported 只表示入库，须检查 youtube_upload 回执；queued 不代表上传完成。失败后按原素材 ID 调 material_youtube_upload_status 查询、material_youtube_upload_ensure 补建，禁止重新入库。\n顶层 `items` 至少 1 项；文件夹 `folder_id` / `folder_name` 规则同网页。每项可传 `is_public=true` 在入库时全员公开，或 `shared_dept_id` 提前公开给指定组（互斥）；指定组立即可用，其他组仍按现有预览及 28 天保护期规则访问。服务端按最终设计师归属严格校验当前认证飞书用户，管理员除外。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=submit · risk=write",
+        "new": "普通入库默认保持原流程。仅显式传 publication_scope=AI_组名才按 AI 素材入库；不要求 requirement_id、idempotency_key 或 external_source，不能为通过校验擅自补 AI 范围。AI 来源可选；AI 幂等键省略时自动生成并返回，普通入库不使用此键去重。上传不绑定需求，关联请另调 requirement_bind_ai_materials。\nMCP 入库自动带 source=MCP；button 在 UI/API/MCP 入库时统一验证真实文件，超过 150KB 的 JPG/PNG 自动保持尺寸压缩后入库。\n设计师和创作类型不可人工指定：图片/文件素材优先解析入库 `name` 末尾的 `_D288` / `_D288+D299`，原创追加 `_$`，二创追加 `_#`；未在 `name` 标注时兼容解析原始 `file_name` / `file_names`。视频 URL 如需声明归属，必须以 `?_D288` / `?_D288+D299_$` / `?_D288_#` 结尾，不兼容直接拼接或 `&_DID`，已有归属的视频可直接提交裸链接。每次调用实时查询 AuthHub 映射，只保存全部 designerIds/creationType；缺失或未知 DID 仍可入库，成功项会返回实际保存的 designers/creation_type/warnings。标注段入库前会完整剥离，不影响标题、Tag、视频 ID 与下载。YouTube 视频始终新增；若数据库已有同一视频 ID 的原创/二创素材，新素材会继承其全部 designerIds 和 creationType，覆盖本次命名归属且不依赖 DID 映射服务。此规则与 UI、第三方接口共用，兼容 watch/shorts/youtu.be、有无 www 和分享参数，排除下线资源和已删除素材。\n每个成功结果都返回 material_id；顶层同时返回精确 `check_url`（成功素材 ID 过滤）供用户跳到素材超市检查，素材多导致 GET URL 过长时拆为 `check_urls`。面向飞书/聊天最终回复时优先用 `check_link_markdown`、`feishu_post_message` 或 `feishu_card_message` 按短链接/按钮展示，不要直接贴裸长 URL。YouTube 链接成功入库且尚无 R2 原视频时，还会在顶层 `youtube_original_download_items` 返回已配好的 `material_id` + `youtube_url`，调用方不得猜测或另行搜索素材 ID。每项可选两种链路：\n1) **远端 URL（默认）**：服务端下载后再写入 R2 —— `url` 单张 / `urls` 组图 / `video_url` 外链视频。YouTube 未传 name 时自动查询并使用视频标题作为素材名，标题不可用时回退为 youtube-{videoId}；默认只保存链接和 R2 缩略图。用户明确选择同时保存原视频时，先用 `material_youtube_original_lookup` 查询。找到时把 `video_r2_url` 一起传入；缺失时先创建链接素材，再把返回的 `youtube_original_download_items` 直接交给 `material_youtube_original_download` 后台自动回填（每批最多 5 条，超过 5 条分批）。大按钮单张须传 `type: \"button\"`。\n2) **R2 已直传**：**网页**走 **`POST /api/upload/r2/presign-batch`** → PUT → **`already_in_r2: true`** + **publicUrl**（+ **resource_id** / **resource_ids**）；**MCP Agent** 可先 **`material_r2_upload_from_bytes`** 拿 publicUrl/resourceId 再登记。服务端会私有读取真实图片；超限 button 写入新的压缩对象，保留原文件。\n普通视频文件（非 YouTube）先入库，再在当前进程异步生成封面；返回 thumbnail_status、thumbnail_job_id 和 thumbnail 回执，queued 不代表完成。远端文件复用上传字节，R2 已直传文件通过私有存储读取，不再次公网下载。按原素材 ID 用 material_thumbnail_status 查询，用户要求补封面时用 material_thumbnail_retry；重启后状态可能 unknown，禁止为补封面重新入库。封面处理不新建或重试 YouTube 上传任务。\nbutton 每项只用 url 传一张 GIF/JPG/PNG，必须匹配固定尺寸；150KB=153600 字节。超限 JPG/PNG 自动压缩，可能降低画质或转 JPG 白底；超限 GIF 不支持动画压缩，返回失败，禁止截取首帧冒充原动画。压缩失败/仍超限不入库。成功项有 compression、compression_notice、warnings，Agent 必须向用户展示压缩前后大小、格式/透明背景变化，并使用返回 url，不要报告旧源文件大小或仅说入库成功。image / tk_carousel / fb_image 单张 ≤5MB，比例允许上下 0.2 波动。同批失败项不影响其它 item。\n顶层可选 `VedioSouce`：默认 YouTube，视频文件与 UI 一样自动申请 YouTube 上传任务；仅用户明确要求不上传 YouTube 时才传 Other。传 Other 或任意非 YouTube 值时，本批视频不创建 YouTube 上传任务，也不需要选择账号。该参数不要放进 items。视频结果 material_imported 只表示入库，须检查 youtube_upload 回执；queued 不代表上传完成。失败后按原素材 ID 调 material_youtube_upload_status 查询、material_youtube_upload_ensure 补建，禁止重新入库。\n顶层 `items` 至少 1 项；文件夹 `folder_id` / `folder_name` 规则同网页。每项可传 `is_public=true` 在入库时全员公开，或 `shared_dept_id` 提前公开给指定组（互斥）；指定组立即可用，其他组仍按现有预览及 28 天保护期规则访问。服务端按最终设计师归属严格校验当前认证飞书用户，管理员除外。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=submit · risk=write"
+      },
+      "catalog_version": {
+        "old": "90c41d84889415d8ff3a010e16c19c54dd6061664a4403b38a48dd721cade6cb",
+        "new": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed"
+      },
+      "schema_version": {
+        "old": "0b0801b7a94fb12931b5c07c21d7140cef156b35a9476a7cdb0aa75852041c56",
+        "new": "a7c40f99263dc7116c965fb66f303f69f1620f03d7f3e75f44d6883d424b0c35"
+      }
+    }
+  },
+  {
+    "tool": "material_attribution_update",
+    "different_fields": {
+      "observedAt": {
+        "old": "2026-11-03T10:02:05.555Z",
+        "new": null
+      },
+      "catalog_version": {
+        "old": "90c41d84889415d8ff3a010e16c19c54dd6061664a4403b38a48dd721cade6cb",
+        "new": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed"
+      }
+    }
+  },
+  {
+    "tool": "material_sharing_departments",
+    "different_fields": {
+      "observedAt": {
+        "old": "2026-11-03T10:02:06.040Z",
+        "new": null
+      },
+      "catalog_version": {
+        "old": "90c41d84889415d8ff3a010e16c19c54dd6061664a4403b38a48dd721cade6cb",
+        "new": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed"
+      }
+    }
+  },
+  {
+    "tool": "requirement_field_options_query",
+    "different_fields": {
+      "observedAt": {
+        "old": "2026-11-03T10:02:07.403Z",
+        "new": null
+      },
+      "catalog_version": {
+        "old": "90c41d84889415d8ff3a010e16c19c54dd6061664a4403b38a48dd721cade6cb",
+        "new": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed"
+      }
+    }
+  },
+  {
+    "tool": "requirement_bind_materials",
+    "different_fields": {
+      "observedAt": {
+        "old": "2026-11-03T10:02:06.953Z",
+        "new": null
+      },
+      "catalog_version": {
+        "old": "90c41d84889415d8ff3a010e16c19c54dd6061664a4403b38a48dd721cade6cb",
+        "new": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed"
+      }
+    }
+  }
+]

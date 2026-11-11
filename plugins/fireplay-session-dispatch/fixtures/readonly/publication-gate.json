@@ -1,0 +1,40 @@
+{
+  "requirement_id": "01a1a029-042d-7377-b95e-633a7e0568e4",
+  "passed": true,
+  "reviewed_by": "session-56902ff5-f7d3-4ce7-a6bb-0e8e57842fb4",
+  "evidence": "reviewed-output-inventory.json and each bound review/check-current.stdout.json; actual native and2x composite/text-layer inspection",
+  "outputs": [
+    {
+      "path": "source0-render-v1/en/translated.png",
+      "sha256": "37276cd979a755dca0582aa9693f69e4e558b98411dee8763a00ec9799903cdf"
+    },
+    {
+      "path": "source0-render-v1/de/translated.png",
+      "sha256": "f6c85df583ac9991c1188aee07b31cbc719ff13cfec2dfd8895b3b162d56ae69"
+    },
+    {
+      "path": "source0-render-v2/ja/translated.png",
+      "sha256": "7d5a6d7cdca11688fe072438b4801b959499ef185a4a40eed6dbf8ba422b9d9c"
+    },
+    {
+      "path": "source0-render-v1/ko/translated.png",
+      "sha256": "818ba84f53d29eb1abf6ec41c978c87085dfe16ab8d97566e2be244eb07d93c8"
+    },
+    {
+      "path": "source1-render-v1/en/translated.png",
+      "sha256": "875f9d6b5e143e16df226d423a95ff169acbc06c8087bdc59f2ad7840341e50f"
+    },
+    {
+      "path": "source1-render-v2/de/translated.png",
+      "sha256": "4cfa06c6143cb817e22ae7dfdfb366f6b960757b2ffc32735b6c58736a0ba046"
+    },
+    {
+      "path": "source1-render-v2/ja/translated.png",
+      "sha256": "e812fcd568035244a73ea64be832d5d3470821184eae0f04f6d77b871f36d017"
+    },
+    {
+      "path": "source1-render-v1/ko/translated.png",
+      "sha256": "525791c42e1dd424083e85cbcc276f8f49d48f928689f5820e40abd4baf0ea6b"
+    }
+  ]
+}

@@ -1,0 +1,542 @@
+[
+  {
+    "catalog_version": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed",
+    "name": "material_r2_upload_from_bytes",
+    "title": "Agent 传 base64 → 服务端写入 R2（返回公网 URL）",
+    "summary": "Agent 传 base64 → 服务端写入 R2（返回公网 URL）",
+    "category": "material.ingest",
+    "operation_class": "write",
+    "invoke_via": "tool_write",
+    "inputSchema": {
+      "type": "object",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "feishu_user_id": {
+          "description": "JWT 已注入时可省略",
+          "type": "string"
+        },
+        "file_base64": {
+          "type": "string",
+          "minLength": 1,
+          "description": "文件内容的 base64；可为 `data:image/png;base64,...`"
+        },
+        "content_type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "MIME，须与内容一致，如 image/png、image/jpeg、video/mp4"
+        },
+        "ext": {
+          "type": "string",
+          "minLength": 1,
+          "description": "扩展名不带点，如 png、jpg、mp4"
+        },
+        "file_name": {
+          "description": "原始文件名；返回给下一步 material_upload_from_url 作为 name/file_name",
+          "type": "string"
+        },
+        "filename": {
+          "description": "兼容字段：原始文件名",
+          "type": "string"
+        }
+      },
+      "required": [
+        "file_base64",
+        "content_type",
+        "ext"
+      ]
+    },
+    "schema_version": "35c5fbcb2302f23a4234308b03666a5f4840b267cc8295685a148096550c6470",
+    "description": "**一步上传**：参数传入 **file_base64**（纯 base64 或 data URL），服务端写入 R2，返回 **publicUrl**、**resourceId**（与预签名链路相同的 `materials/{id}.{ext}`）。**不**自动写入素材库；需要 `material_id` 时请再调 **material_upload_from_url**：`already_in_r2: true` + `url`=本工具返回的 publicUrl + `resource_id`=resourceId。\n若是视频，下一步入库默认省略 VedioSouce，按 UI 自动上传 YouTube；只有用户明确不要上传 YouTube 时才传 Other；`material_upload_from_url` 先入库，再异步生成封面。用原素材 ID 调 material_thumbnail_status 查询，用户要求补封面时用 material_thumbnail_retry；不要重新入库。\n单文件 ≤ 50 MB；需 Bearer 登录。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=submit · risk=write",
+    "annotations": {},
+    "authorization": "Tool visibility does not authorize an object. Original handlers recheck current role, department, owner and object permissions."
+  },
+  {
+    "catalog_version": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed",
+    "name": "material_upload_from_url",
+    "title": "通过 URL 上传素材到素材库（支持批量）",
+    "summary": "通过 URL 上传素材到素材库（支持批量）",
+    "category": "material.ingest",
+    "operation_class": "write",
+    "invoke_via": "material_upload_from_url",
+    "inputSchema": {
+      "type": "object",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "feishu_user_id": {
+          "description": "上传者的飞书 user_id（已登录时可省略，自动从 token 读取）",
+          "type": "string"
+        },
+        "items": {
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "publication_scope": {
+                "description": "可选：管理员显式指定 AI_组名才按 AI 素材入库；不传则保持普通入库，不要求关联需求",
+                "type": "string",
+                "maxLength": 205,
+                "pattern": "^AI_\\S(?:.*\\S)?$"
+              },
+              "requirement_id": {
+                "description": "兼容旧调用，仅识别旧幂等回执；不校验、不绑定需求。绑定请单独调用 requirement_bind_ai_materials",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "idempotency_key": {
+                "description": "可选的 AI 入库重试键；省略时生成并返回。单独传入不会启用 AI 入库；普通入库不使用此键去重",
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "external_source": {
+                "description": "可选的 AI 来源信息，如实提供已知来源；省略不阻止入库，单独传入不改变素材类别",
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "model": {
+                    "type": "string",
+                    "maxLength": 120
+                  },
+                  "reference": {
+                    "type": "string",
+                    "maxLength": 256
+                  },
+                  "task_id": {
+                    "type": "string",
+                    "maxLength": 128
+                  },
+                  "item_id": {
+                    "type": "string",
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "provider"
+                ],
+                "additionalProperties": false
+              },
+              "url": {
+                "description": "单张：文件 URL。默认会由服务端下载后再写入 R2；若已在 R2，请设 **already_in_r2: true** 并填本字段为 **publicUrl**（网页预签名 PUT 后或 **material_r2_upload_from_bytes** 返回）",
+                "type": "string"
+              },
+              "urls": {
+                "description": "组图：多张 R2 publicUrl 或远端 URL。未设 already_in_r2 时服务端会逐张下载转存；已直传则设 **already_in_r2: true**",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "video_url": {
+                "description": "YouTube 页面 URL 原文（与 url、urls 互斥）。归属标注必须放在结尾并使用 ?_DID；共创用 +，原创追加 _$，二创追加 _#。入库时完整移除标注，只保存干净 YouTube URL。未传 name 时自动查询并使用 YouTube 标题作为素材名；查询不到标题时回退为 youtube-{videoId}。默认只保存链接和缩略图；仅当用户明确选择同时保存原视频时，再配合 video_r2_url。",
+                "type": "string"
+              },
+              "video_r2_url": {
+                "description": "可选的 R2 原视频地址，仅与 video_url 一起使用。通常来自 material_youtube_original_lookup；若查询缺失，应先按链接创建素材，再调用后台下载工具自动回填。",
+                "type": "string"
+              },
+              "video_resource_id": {
+                "description": "仅用于调用方已预先上传到 R2 的新原视频：传对应 resource_id，使 R2 对象与新资源记录对齐。复用已有 R2 地址时不要传旧资源 ID。",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "video_mime_type": {
+                "description": "原视频 MIME，如 video/mp4；已知时传入",
+                "type": "string"
+              },
+              "video_file_size": {
+                "description": "原视频字节数；已知时传入",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "video_md5": {
+                "description": "原视频 MD5；已知时传入",
+                "type": "string"
+              },
+              "video_duration": {
+                "description": "原视频时长（秒）；有返回值时透传，不能短于 5 秒",
+                "type": "number",
+                "minimum": 5
+              },
+              "already_in_r2": {
+                "description": "**已在 R2**：服务端读取真实图片元数据，超限 JPG/PNG 大按钮会生成新的压缩对象，保留原文件；其它文件不重复上传。请传 **resource_id / resource_ids**（与上传返回的 resourceId 对齐）。",
+                "type": "boolean"
+              },
+              "resource_id": {
+                "description": "单张已在 R2：**resourceId**（`presign-batch` 或 **material_r2_upload_from_bytes**）",
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "resource_ids": {
+                "description": "组图直传：与 **urls** 等长的 resourceId 数组，顺序一一对应",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                }
+              },
+              "mime_type": {
+                "description": "MIME（建议与预签名时 contentType 一致；不传则从 URL 扩展名推测）",
+                "type": "string"
+              },
+              "file_size": {
+                "description": "字节大小（可选，便于列表展示）",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "md5": {
+                "description": "文件 MD5（可选）",
+                "type": "string"
+              },
+              "width": {
+                "description": "宽度 px（可选，仅作元数据提示；服务端会读取真实图片宽高并按素材类型校验）",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "height": {
+                "description": "高度 px（可选，仅作元数据提示；服务端会读取真实图片宽高并按素材类型校验）",
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "source": {
+                "description": "调用来源标记；MCP 入库请保持 source=MCP，用于启用服务端图片严格校验",
+                "type": "string",
+                "const": "MCP"
+              },
+              "type": {
+                "description": "显式素材类型。**大按钮图请传 button**；**TK轮播图请传 tk_carousel**；**FB图片请传 fb_image**，每套只能 1 张且支持 1.91:1、1:1、4:5、9:16；不传则只靠 MIME 推断",
+                "type": "string",
+                "enum": [
+                  "image",
+                  "button",
+                  "video",
+                  "tk_carousel",
+                  "fb_image"
+                ]
+              },
+              "name": {
+                "description": "入库素材名称，也是图片/文件归属识别的第一优先级来源；支持带或不带文件扩展名，如 `name_D288_$`、`name_D288_$.png`。共创使用 `_D288+D299`，原创追加 `_$`，二创追加 `_#`；落库前自动剥离归属后缀及其后的扩展名。不填则从原始文件名自动提取",
+                "type": "string"
+              },
+              "file_name": {
+                "description": "原始文件名；name 未传时用它生成素材名称",
+                "type": "string"
+              },
+              "filename": {
+                "description": "兼容字段：原始文件名",
+                "type": "string"
+              },
+              "fileName": {
+                "description": "兼容字段：原始文件名",
+                "type": "string"
+              },
+              "file_names": {
+                "description": "组图原始文件名列表；name 未传时使用第一项生成素材名称",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "filenames": {
+                "description": "兼容字段：组图原始文件名列表",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "tags": {
+                "description": "素材标签列表",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "folder_id": {
+                "description": "目标文件夹 ID（与 folder_name 二选一）",
+                "type": "string"
+              },
+              "folder_name": {
+                "description": "目标文件夹名称（不存在时自动创建）",
+                "type": "string"
+              },
+              "shared_dept_id": {
+                "description": "提前公开给指定组的部门 ID；用 material_sharing_departments 查询。不能与 is_public=true 同时设置。",
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "is_public": {
+                "description": "是否在入库时主动公开。设为 true 后所有人可使用；仅允许最终 designerIds 包含当前飞书用户的素材，管理员除外。",
+                "type": "boolean"
+              }
+            }
+          },
+          "description": "上传任务；每项：url / urls / video_url 三选一（或与 already_in_r2 组合）。YouTube 原视频为可选：仅用户明确要求时给 video_url 补 video_r2_url。R2 直传见工具说明中的 **already_in_r2** + **resource_id(s)**"
+        },
+        "VedioSouce": {
+          "description": "批量视频来源，放在顶层，不放进 items。默认 YouTube，视频文件与 UI 一样自动申请 YouTube 上传任务；仅用户明确要求不上传 YouTube 时才传 Other。传 Other 或任意非 YouTube 值时，本批视频不创建 YouTube 上传任务，也不需要选择账号。",
+          "type": "string"
+        },
+        "confirmed": {
+          "default": true,
+          "description": "默认为 true。**显式传 false** 时跳过本次写入并返回 skipped；用户或对话已确认后再 true 或省略。",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "schema_version": "a7c40f99263dc7116c965fb66f303f69f1620f03d7f3e75f44d6883d424b0c35",
+    "description": "普通入库默认保持原流程。仅显式传 publication_scope=AI_组名才按 AI 素材入库；不要求 requirement_id、idempotency_key 或 external_source，不能为通过校验擅自补 AI 范围。AI 来源可选；AI 幂等键省略时自动生成并返回，普通入库不使用此键去重。上传不绑定需求，关联请另调 requirement_bind_ai_materials。\nMCP 入库自动带 source=MCP；button 在 UI/API/MCP 入库时统一验证真实文件，超过 150KB 的 JPG/PNG 自动保持尺寸压缩后入库。\n设计师和创作类型不可人工指定：图片/文件素材优先解析入库 `name` 末尾的 `_D288` / `_D288+D299`，原创追加 `_$`，二创追加 `_#`；未在 `name` 标注时兼容解析原始 `file_name` / `file_names`。视频 URL 如需声明归属，必须以 `?_D288` / `?_D288+D299_$` / `?_D288_#` 结尾，不兼容直接拼接或 `&_DID`，已有归属的视频可直接提交裸链接。每次调用实时查询 AuthHub 映射，只保存全部 designerIds/creationType；缺失或未知 DID 仍可入库，成功项会返回实际保存的 designers/creation_type/warnings。标注段入库前会完整剥离，不影响标题、Tag、视频 ID 与下载。YouTube 视频始终新增；若数据库已有同一视频 ID 的原创/二创素材，新素材会继承其全部 designerIds 和 creationType，覆盖本次命名归属且不依赖 DID 映射服务。此规则与 UI、第三方接口共用，兼容 watch/shorts/youtu.be、有无 www 和分享参数，排除下线资源和已删除素材。\n每个成功结果都返回 material_id；顶层同时返回精确 `check_url`（成功素材 ID 过滤）供用户跳到素材超市检查，素材多导致 GET URL 过长时拆为 `check_urls`。面向飞书/聊天最终回复时优先用 `check_link_markdown`、`feishu_post_message` 或 `feishu_card_message` 按短链接/按钮展示，不要直接贴裸长 URL。YouTube 链接成功入库且尚无 R2 原视频时，还会在顶层 `youtube_original_download_items` 返回已配好的 `material_id` + `youtube_url`，调用方不得猜测或另行搜索素材 ID。每项可选两种链路：\n1) **远端 URL（默认）**：服务端下载后再写入 R2 —— `url` 单张 / `urls` 组图 / `video_url` 外链视频。YouTube 未传 name 时自动查询并使用视频标题作为素材名，标题不可用时回退为 youtube-{videoId}；默认只保存链接和 R2 缩略图。用户明确选择同时保存原视频时，先用 `material_youtube_original_lookup` 查询。找到时把 `video_r2_url` 一起传入；缺失时先创建链接素材，再把返回的 `youtube_original_download_items` 直接交给 `material_youtube_original_download` 后台自动回填（每批最多 5 条，超过 5 条分批）。大按钮单张须传 `type: \"button\"`。\n2) **R2 已直传**：**网页**走 **`POST /api/upload/r2/presign-batch`** → PUT → **`already_in_r2: true`** + **publicUrl**（+ **resource_id** / **resource_ids**）；**MCP Agent** 可先 **`material_r2_upload_from_bytes`** 拿 publicUrl/resourceId 再登记。服务端会私有读取真实图片；超限 button 写入新的压缩对象，保留原文件。\n普通视频文件（非 YouTube）先入库，再在当前进程异步生成封面；返回 thumbnail_status、thumbnail_job_id 和 thumbnail 回执，queued 不代表完成。远端文件复用上传字节，R2 已直传文件通过私有存储读取，不再次公网下载。按原素材 ID 用 material_thumbnail_status 查询，用户要求补封面时用 material_thumbnail_retry；重启后状态可能 unknown，禁止为补封面重新入库。封面处理不新建或重试 YouTube 上传任务。\nbutton 每项只用 url 传一张 GIF/JPG/PNG，必须匹配固定尺寸；150KB=153600 字节。超限 JPG/PNG 自动压缩，可能降低画质或转 JPG 白底；超限 GIF 不支持动画压缩，返回失败，禁止截取首帧冒充原动画。压缩失败/仍超限不入库。成功项有 compression、compression_notice、warnings，Agent 必须向用户展示压缩前后大小、格式/透明背景变化，并使用返回 url，不要报告旧源文件大小或仅说入库成功。image / tk_carousel / fb_image 单张 ≤5MB，比例允许上下 0.2 波动。同批失败项不影响其它 item。\n顶层可选 `VedioSouce`：默认 YouTube，视频文件与 UI 一样自动申请 YouTube 上传任务；仅用户明确要求不上传 YouTube 时才传 Other。传 Other 或任意非 YouTube 值时，本批视频不创建 YouTube 上传任务，也不需要选择账号。该参数不要放进 items。视频结果 material_imported 只表示入库，须检查 youtube_upload 回执；queued 不代表上传完成。失败后按原素材 ID 调 material_youtube_upload_status 查询、material_youtube_upload_ensure 补建，禁止重新入库。\n顶层 `items` 至少 1 项；文件夹 `folder_id` / `folder_name` 规则同网页。每项可传 `is_public=true` 在入库时全员公开，或 `shared_dept_id` 提前公开给指定组（互斥）；指定组立即可用，其他组仍按现有预览及 28 天保护期规则访问。服务端按最终设计师归属严格校验当前认证飞书用户，管理员除外。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=submit · risk=write",
+    "annotations": {},
+    "authorization": "Tool visibility does not authorize an object. Original handlers recheck current role, department, owner and object permissions."
+  },
+  {
+    "catalog_version": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed",
+    "name": "material_attribution_update",
+    "title": "修订素材设计师或创作属性",
+    "summary": "修订素材设计师或创作属性",
+    "category": "material.lifecycle",
+    "operation_class": "write",
+    "invoke_via": "tool_write",
+    "inputSchema": {
+      "type": "object",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "material_ids": {
+          "minItems": 1,
+          "maxItems": 200,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          }
+        },
+        "designer_ids": {
+          "minItems": 1,
+          "maxItems": 100,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "creation_type": {
+          "type": "string",
+          "enum": [
+            "unmarked",
+            "original",
+            "derivative"
+          ]
+        },
+        "confirmed": {
+          "default": false,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "material_ids"
+      ],
+      "additionalProperties": false
+    },
+    "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+    "description": "Dedicated existing-material attribution correction via HTTP batchUpdate, separate from ordinary metadata edit and upload naming. Designer-only collaboration retains existing readable scope; creation type requires current admin. No caller-supplied operator/admin/updated time. Does not change source files or ads. Default preview is input-only; execution preserves per-material partial results.\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=submit · risk=write",
+    "annotations": {},
+    "authorization": "Tool visibility does not authorize an object. Original handlers recheck current role, department, owner and object permissions."
+  },
+  {
+    "catalog_version": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed",
+    "name": "material_sharing_departments",
+    "title": "查询素材指定组公开候选",
+    "summary": "查询素材指定组公开候选",
+    "category": "material.organize",
+    "operation_class": "read",
+    "invoke_via": "tool_read",
+    "inputSchema": {
+      "type": "object",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {}
+    },
+    "schema_version": "dc386f4a856f065f405f6f514ec0d62db1c18661133f4c12a05f494c2d33f1a3",
+    "description": "返回可选择的部门 ID 和名称。只列出公开范围候选，不授予需求管理或其他组成员管理权限。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=resource · stage=query · risk=read",
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "authorization": "Tool visibility does not authorize an object. Original handlers recheck current role, department, owner and object permissions."
+  },
+  {
+    "catalog_version": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed",
+    "name": "requirement_field_options_query",
+    "title": "读取当前小组需求候选项",
+    "summary": "读取当前小组需求候选项",
+    "category": "requirement.options",
+    "operation_class": "read",
+    "invoke_via": "tool_read",
+    "inputSchema": {
+      "type": "object",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "dept_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "include_members": {
+          "default": false,
+          "type": "boolean"
+        },
+        "member_ids": {
+          "minItems": 1,
+          "maxItems": 100,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "member_offset": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "member_limit": {
+          "default": 100,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "additionalProperties": false
+    },
+    "schema_version": "a8952a43bda1262c99acd50e92a1bbf8a90eedf16c702784923ea41e0d1ddf20",
+    "description": "Uses existing requirement department authorization. Returns effective configured/default/historical options without initializing database defaults; existing HTTP default initialization remains unchanged. Optional include_members reads the same authorized department membership and existing synced profiles with explicit source/pagination. Missing roles remain null; jobTitle is not a team role, and observed_at is not source update time. No requirement creation, notification or config write.\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=requirement · stage=query · risk=read",
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "authorization": "Tool visibility does not authorize an object. Original handlers recheck current role, department, owner and object permissions."
+  },
+  {
+    "catalog_version": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed",
+    "name": "material_rules_list",
+    "title": "素材规则目录：各平台素材要求",
+    "summary": "素材规则目录：各平台素材要求",
+    "category": "material.lookup",
+    "operation_class": "read",
+    "invoke_via": "tool_read",
+    "inputSchema": {
+      "type": "object",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "platform": {
+          "description": "平台 ID、名称或别名，如 facebook / google / tiktok；不传则列出全部启用平台",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "materialType": {
+          "description": "该平台下的素材类型 ID、名称或别名，如 fb_image / image / button / video / tk_carousel；需同时传 platform",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "adType": {
+          "description": "投放广告类型，如 DG / FB / TT_SMART / TT_MANUAL；传了则只保留对该类型生效的规则",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      },
+      "additionalProperties": false
+    },
+    "schema_version": "1ad37f521a1cc53ec39526e5fa33be1fc3d608c469a65e25049413332688e943",
+    "description": "列出「规则管理」里线上**已激活**的素材信息规则，回答「Facebook 图片有哪些要求」「TikTok 视频和 Google 视频要求有什么不同」这类问题；可按 platform / materialType / adType 缩小范围，不传则列出全部启用平台与素材类型。每条规则给出 code、severity、message、fixSuggestion、适用范围 appliesTo（sites / adTypes，空表示不限）和校验条件 assertion（规则 DSL 原文，数值以此为准）。只读；草稿和已停用的规则不返回。要校验具体素材用 material_validate；这单能挂哪些素材类型看订单的 attachableMaterialTypes。规则可在页面随时调整，回答时以本工具当次结果为准，不要凭记忆背数值。\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=material · stage=query · risk=read",
+    "annotations": {
+      "readOnlyHint": true
+    },
+    "authorization": "Tool visibility does not authorize an object. Original handlers recheck current role, department, owner and object permissions."
+  },
+  {
+    "catalog_version": "bf497636063a665671402d38899c5571a44c506aa5577b62dbebc36868095fed",
+    "name": "requirement_bind_materials",
+    "title": "Attach uploaded materials to requirements",
+    "summary": "Attach uploaded materials to requirements",
+    "category": "requirement.basic",
+    "operation_class": "write",
+    "invoke_via": "requirement_bind_materials",
+    "inputSchema": {
+      "type": "object",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "feishu_user_id": {
+          "description": "Debug fallback only. Authenticated calls use the token user.",
+          "type": "string"
+        },
+        "items": {
+          "minItems": 1,
+          "maxItems": 100,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "requirement_id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "material_ids": {
+                "minItems": 1,
+                "maxItems": 200,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "format": "uuid",
+                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                }
+              }
+            },
+            "required": [
+              "requirement_id",
+              "material_ids"
+            ]
+          }
+        },
+        "confirmed": {
+          "default": true,
+          "description": "默认为 true。**显式传 false** 时跳过本次写入并返回 skipped；用户或对话已确认后再 true 或省略。",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "schema_version": "d36538934efdb407042aad384d706539d31d38e40359c9595cf9d1a8d4fe3c52",
+    "description": "Attach existing material-library ids to your own-group requirements or cross-group requirements assigned to you; admins retain their existing access. Use requirement_list scope=all to discover rows with canBindMaterials=true. Execution permission is rechecked under the row lock; material ownership and protection remain enforced. This does not grant status or source-material editing rights. Visible associations may be removed from readable requirements. For new files, first upload and import, then pass the returned material ids here. Requirement-panel MCP boundary: tools support listing visible departments, reading current create options, creating one confirmed requirement with existing selectable values, querying own-group rows and cross-group material-delivery candidates, read-only manager and HRBP workload analysis, attaching existing material-library ids within execution permission, removing visible associations from readable requirements, and replacing associations with execution permission for new additions. Status updates retain source-group permission. Dedicated requirement_field_option_* tools maintain selectable options under existing group/admin rules. Explicit content edits use requirement_edit_fields. Configuration and record maintenance use requirement_launch_config_* and dedicated record tools; execution is limited to existing services. These tools do not delete requirements, apply arbitrary patches, or upload attachments.\n\n━━\n治理标签（供 Agent 选路与审计，请勿向终端用户朗读）：domain=task · stage=mutate · risk=write",
+    "annotations": {},
+    "authorization": "Tool visibility does not authorize an object. Original handlers recheck current role, department, owner and object permissions."
+  }
+]

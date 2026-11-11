@@ -1,0 +1,4786 @@
+{
+  "version": "historical-artifact-evidence-v1",
+  "generated_at": "2026-11-05T04:19:53.162Z",
+  "scope": "Exactly26 reviewed static historical artifacts, not read_only, no general filename/flag exemption",
+  "contracts": [
+    {
+      "requirement_id": "01a1a028-8488-7559-9192-fc9167842cbd",
+      "code": "SHE-20261103-055",
+      "snapshot_sha256": "10df07766db900075894c8a517ff3d9131ed76a8e0375276e4b8a550abffa6b3",
+      "session_id": "session-fb53483c-2842-49ff-8080-3283b397db99",
+      "artifacts": [
+        {
+          "name": "publication-attribution-en-execute-v2.json",
+          "sha256": "31b57c0ad6ab6950668b725def4b5a8a5be7a2cbbf45927d7f846a665c0fd680",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "creation_type": {
+                    "type": "string"
+                  },
+                  "designer_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "material_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  }
+                }
+              },
+              "designer_members": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "deptNames": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "evidence": {
+                        "type": "string"
+                      },
+                      "feishuUserId": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "serialized_sha256": "f52b244c8b9116bb8efe3efd31b47f136fca0fa831894216accb5057f8a21c45",
+          "received_operation_id": "8c9e0241-78ec-4041-b511-153586912031",
+          "plan_references": []
+        },
+        {
+          "name": "publication-attribution-en-plan-v2.json",
+          "sha256": "5d6906c13db8fd126711902b18d4ad2b533726a9ffbb68db8d3d57b51fcfee2c",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "identity_proof": {
+                "type": "object",
+                "fields": {
+                  "departmentMapping": {
+                    "type": "string"
+                  },
+                  "designerMatches": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "person": {
+                            "type": "object",
+                            "fields": {
+                              "deptNames": {
+                                "type": "array",
+                                "items": [
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "username": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "person": {
+                            "type": "object",
+                            "fields": {
+                              "deptNames": {
+                                "type": "array",
+                                "items": [
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "username": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "path": {
+                            "type": "string"
+                          },
+                          "person": {
+                            "type": "object",
+                            "fields": {
+                              "deptNames": {
+                                "type": "array",
+                                "items": [
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "username": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "materialIds": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "requirementDesignAttribution": {
+                    "type": "string"
+                  },
+                  "target": {
+                    "type": "string"
+                  }
+                }
+              },
+              "material_ids": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "operations": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "confirmed": {
+                        "type": "boolean"
+                      },
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "request": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "fields": {
+                      "confirmed": {
+                        "type": "boolean"
+                      },
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "request": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "1ed3bddd116d9ffb7df583632876ef2c5c28ba3e67f1228c641f968d2b8d965c",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "89c3445f-9944-4346-95a1-41b3d371595b",
+              "request": "publication-attribution-en-preview-v2.json",
+              "request_sha256": "4dd6c89da48c6ee583190b815bcd9f0b6c2f2e6974c12bb5c3da8e2f252d2106"
+            },
+            {
+              "operation_id": "8c9e0241-78ec-4041-b511-153586912031",
+              "request": "publication-attribution-en-execute-v2.json",
+              "request_sha256": "f52b244c8b9116bb8efe3efd31b47f136fca0fa831894216accb5057f8a21c45"
+            }
+          ]
+        },
+        {
+          "name": "publication-attribution-en-preview-v2.json",
+          "sha256": "c6a16a27b055f08fc21e662d228ac91b6f3e07188fb302415406b864e87493a0",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "creation_type": {
+                    "type": "string"
+                  },
+                  "designer_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "material_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  }
+                }
+              },
+              "designer_members": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "deptNames": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "evidence": {
+                        "type": "string"
+                      },
+                      "feishuUserId": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "serialized_sha256": "4dd6c89da48c6ee583190b815bcd9f0b6c2f2e6974c12bb5c3da8e2f252d2106",
+          "received_operation_id": "89c3445f-9944-4346-95a1-41b3d371595b",
+          "plan_references": []
+        },
+        {
+          "name": "publication-attribution-es-execute-v1.json",
+          "sha256": "5c142f73e9c4a505691b44a53d9037421d305c71fc05eef864cd5ffd0559bf29",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "creation_type": {
+                    "type": "string"
+                  },
+                  "designer_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "material_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  }
+                }
+              },
+              "designer_members": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "deptNames": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "evidence": {
+                        "type": "string"
+                      },
+                      "feishuUserId": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "serialized_sha256": "fda42ff6191e26865de4e899b93f38da1758a816d15ff224ac6bd45d73ff51ea",
+          "received_operation_id": "a9f3790c-e456-4881-bbf3-560a6dfd5a67",
+          "plan_references": []
+        },
+        {
+          "name": "publication-attribution-es-plan-v1.json",
+          "sha256": "1f5d65f6a56c925e7d55c10d9d851ce636a1bc14ebde2f39dc3dcbe652f99275",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "designer": {
+                "type": "object",
+                "fields": {
+                  "deptNames": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "evidence": {
+                    "type": "string"
+                  },
+                  "feishuUserId": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              },
+              "material_ids": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "operations": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "confirmed": {
+                        "type": "boolean"
+                      },
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "request": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "fields": {
+                      "confirmed": {
+                        "type": "boolean"
+                      },
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "request": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "52c792f8f9cb771bab0361e27366b524ff05f1f98744110261536d454c1e0054",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "421a57c7-89a9-4fba-acd3-cbeab68b18c8",
+              "request": "publication-attribution-es-preview-v1.json",
+              "request_sha256": "33945a2c5b7437cf458377e90ed9c7f9fd489f6e89d56e3a83953a710b5aed66"
+            },
+            {
+              "operation_id": "a9f3790c-e456-4881-bbf3-560a6dfd5a67",
+              "request": "publication-attribution-es-execute-v1.json",
+              "request_sha256": "fda42ff6191e26865de4e899b93f38da1758a816d15ff224ac6bd45d73ff51ea"
+            }
+          ]
+        },
+        {
+          "name": "publication-attribution-es-preview-v1.json",
+          "sha256": "dbb1a024006bba9de4610a3bd2512c7b91a98960c5b9812d2d5960a0ca200e6d",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "creation_type": {
+                    "type": "string"
+                  },
+                  "designer_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "material_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  }
+                }
+              },
+              "designer_members": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "deptNames": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "evidence": {
+                        "type": "string"
+                      },
+                      "feishuUserId": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "serialized_sha256": "33945a2c5b7437cf458377e90ed9c7f9fd489f6e89d56e3a83953a710b5aed66",
+          "received_operation_id": "421a57c7-89a9-4fba-acd3-cbeab68b18c8",
+          "plan_references": []
+        },
+        {
+          "name": "publication-bind-en-plan-v2.json",
+          "sha256": "0a6b032ad27d2d12a640dcf357e6e36f83ad6ea0fe6549b3afc1860f32fc889e",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "APC_whole_department_access": {
+                "type": "string"
+              },
+              "designer": {
+                "type": "string"
+              },
+              "materials_verified": {
+                "type": "boolean"
+              },
+              "operation_id": {
+                "type": "string"
+              },
+              "partial_two_of_four": {
+                "type": "boolean"
+              },
+              "prebind_serverTime": {
+                "type": "string"
+              },
+              "request": {
+                "type": "string"
+              },
+              "sharedDeptId": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "a94696446f1190cfa2d82618a8fb2431f115e2d46fae99656c4f31e710cb4bae",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "1555790e-ad12-4df9-ae0c-1935fc836026",
+              "request": "publication-bind-en-v2.json",
+              "request_sha256": "b6362e958433c13625800b8ce867d7d4b1c127855d91fc2591d4da56ebfac94d"
+            }
+          ]
+        },
+        {
+          "name": "publication-bind-en-v2.json",
+          "sha256": "96773dd8ee22693cd8cd5a3473a42704d170b1fcd63172976941d5e292c9402d",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "material_ids": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "requirement_id": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "requirement_bind_materials",
+          "schema_version": "d36538934efdb407042aad384d706539d31d38e40359c9595cf9d1a8d4fe3c52",
+          "serialized_sha256": "b6362e958433c13625800b8ce867d7d4b1c127855d91fc2591d4da56ebfac94d",
+          "received_operation_id": "1555790e-ad12-4df9-ae0c-1935fc836026",
+          "plan_references": []
+        },
+        {
+          "name": "publication-bind-es-plan-v1.json",
+          "sha256": "14690c717a0ce79b754aaa46ac3fc42c59c30dbaf90122b79ac71126ca76c25a",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "APC_whole_department_access": {
+                "type": "string"
+              },
+              "designer": {
+                "type": "string"
+              },
+              "executed": {
+                "type": "boolean"
+              },
+              "materials_verified": {
+                "type": "boolean"
+              },
+              "new_material_ids": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "operation_id": {
+                "type": "string"
+              },
+              "prebind_serverTime": {
+                "type": "string"
+              },
+              "precheck": {
+                "type": "string"
+              },
+              "preserve_existing_material_ids": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              },
+              "request": {
+                "type": "string"
+              },
+              "sharedDeptId": {
+                "type": "string"
+              },
+              "status_change": {
+                "type": "boolean"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "471a470db396c21d34a314f45bfed66b7e267887415f561f45522994f57c0349",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "89cfc723-03d6-4d31-abe4-44da9696107e",
+              "request": "publication-bind-es-v1.json",
+              "request_sha256": "c1696691af398cb035878bb3f32987aac122e4cbe49338f2eb544ce83d6b32de"
+            }
+          ]
+        },
+        {
+          "name": "publication-bind-es-v1.json",
+          "sha256": "47fd4d9a3005c0defe6cbb560856e849a0cb108b41bff8e39bc8fcc86f99c6a6",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "material_ids": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "requirement_id": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "requirement_bind_materials",
+          "schema_version": "d36538934efdb407042aad384d706539d31d38e40359c9595cf9d1a8d4fe3c52",
+          "serialized_sha256": "c1696691af398cb035878bb3f32987aac122e4cbe49338f2eb544ce83d6b32de",
+          "received_operation_id": "89cfc723-03d6-4d31-abe4-44da9696107e",
+          "plan_references": []
+        },
+        {
+          "name": "publication-import-en-plan-v2.json",
+          "sha256": "36c2ea3ae5cf1f9745fb65a370afcf7770829426d049cfbeeac5967a59674640",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "current_live_receipt": {
+                "type": "string"
+              },
+              "designer_next_step": {
+                "type": "string"
+              },
+              "operation_id": {
+                "type": "string"
+              },
+              "request": {
+                "type": "string"
+              },
+              "sharing_next_step": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "75beadddaf28ed713af51a3bea7bbdda944c1e792dc38fd9d6e71c3e44f2b7d3",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "44509e4f-33d9-45d7-ad9d-36ec2789a43d",
+              "request": "publication-import-en-v2.json",
+              "request_sha256": "3601614e224d7665bb48ec98c7736fb57ddbcf44982977ef1c8c30e0afdd1c44"
+            }
+          ]
+        },
+        {
+          "name": "publication-import-en-v2.json",
+          "sha256": "a7052b4417ffc83e1096cc370a47d6431f1282c6ff4baba35a8aee14067458ce",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "already_in_r2": {
+                            "type": "boolean"
+                          },
+                          "file_name": {
+                            "type": "string"
+                          },
+                          "file_size": {
+                            "type": "number"
+                          },
+                          "height": {
+                            "type": "number"
+                          },
+                          "md5": {
+                            "type": "string"
+                          },
+                          "mime_type": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          },
+                          "shared_dept_id": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string"
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "width": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "already_in_r2": {
+                            "type": "boolean"
+                          },
+                          "file_name": {
+                            "type": "string"
+                          },
+                          "file_size": {
+                            "type": "number"
+                          },
+                          "height": {
+                            "type": "number"
+                          },
+                          "md5": {
+                            "type": "string"
+                          },
+                          "mime_type": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          },
+                          "shared_dept_id": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string"
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "width": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "gate_file": {
+                "type": "string"
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "upload_operation_ids": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          },
+          "tool": "material_upload_from_url",
+          "schema_version": "0b0801b7a94fb12931b5c07c21d7140cef156b35a9476a7cdb0aa75852041c56",
+          "serialized_sha256": "3601614e224d7665bb48ec98c7736fb57ddbcf44982977ef1c8c30e0afdd1c44",
+          "received_operation_id": "44509e4f-33d9-45d7-ad9d-36ec2789a43d",
+          "plan_references": []
+        },
+        {
+          "name": "publication-import-es-plan-v1.json",
+          "sha256": "a235858aca14074fffd0e1e202de44438ca97cbd4f54d15baf9ad414568e3ed9",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "next": {
+                "type": "string"
+              },
+              "operation_id": {
+                "type": "string"
+              },
+              "prepublication": {
+                "type": "string"
+              },
+              "readback": {
+                "type": "string"
+              },
+              "request": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "d375e0c67d77051a9d70ac279efebedd00f7c96066f7d58c2401203f9e488cd8",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "ee2a238e-00e1-45ab-b2cd-9360e7d6568c",
+              "request": "publication-import-es-v1.json",
+              "request_sha256": "8220a421c32a8463622d516dc7445f0551d4ccef2d7290f6a868ea59d9e23339"
+            }
+          ]
+        },
+        {
+          "name": "publication-import-es-v1.json",
+          "sha256": "280e6e191e7ed739683928da8c20c80a8034a547eb3686da1ffe248f83f1f635",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "confirmed": {
+                    "type": "boolean"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "already_in_r2": {
+                            "type": "boolean"
+                          },
+                          "file_name": {
+                            "type": "string"
+                          },
+                          "file_size": {
+                            "type": "number"
+                          },
+                          "height": {
+                            "type": "number"
+                          },
+                          "md5": {
+                            "type": "string"
+                          },
+                          "mime_type": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          },
+                          "shared_dept_id": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string"
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "width": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "already_in_r2": {
+                            "type": "boolean"
+                          },
+                          "file_name": {
+                            "type": "string"
+                          },
+                          "file_size": {
+                            "type": "number"
+                          },
+                          "height": {
+                            "type": "number"
+                          },
+                          "md5": {
+                            "type": "string"
+                          },
+                          "mime_type": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          },
+                          "shared_dept_id": {
+                            "type": "string"
+                          },
+                          "source": {
+                            "type": "string"
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "width": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              "gate_file": {
+                "type": "string"
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              },
+              "upload_operation_ids": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "string"
+                  }
+                ]
+              }
+            }
+          },
+          "tool": "material_upload_from_url",
+          "schema_version": "0b0801b7a94fb12931b5c07c21d7140cef156b35a9476a7cdb0aa75852041c56",
+          "serialized_sha256": "8220a421c32a8463622d516dc7445f0551d4ccef2d7290f6a868ea59d9e23339",
+          "received_operation_id": "ee2a238e-00e1-45ab-b2cd-9360e7d6568c",
+          "plan_references": []
+        },
+        {
+          "name": "publication-plan-v1.json",
+          "sha256": "50e9bc09faf6761f1703ed5a431fdf35654b90704c2f259bcebd162a68e7439f",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "operations": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "output_path": {
+                        "type": "string"
+                      },
+                      "request_path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "source_index": {
+                        "type": "number"
+                      },
+                      "state": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "fields": {
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "output_path": {
+                        "type": "string"
+                      },
+                      "request_path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "source_index": {
+                        "type": "number"
+                      },
+                      "state": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "requirement_id": {
+                "type": "string"
+              },
+              "scope": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "23744e8d510a57e0b29b3e7f1f28068fa12e68d548c2cd9e28da19ea3e321a93",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "87f390ac-f56d-433c-bc89-4c308461fbf4",
+              "request": "publication-upload-source01-en-v1.json",
+              "request_sha256": "65314b9af8e36e181b14e56643930ae9bdec854b405a75f2d722f6cd1289d1a7"
+            },
+            {
+              "operation_id": "1e654c1c-0895-442a-b5bb-71c9036a541a",
+              "request": "publication-upload-source02-en-v1.json",
+              "request_sha256": "82d5a5efc60b0ffc182b50ed86f025e1d4518ec553980482d8f64f88a0eb15fa"
+            }
+          ]
+        },
+        {
+          "name": "publication-readiness-v1.json",
+          "sha256": "a9b85f21c6917131e170c0069d454150203e88635e601285f46fbcd20bce3095",
+          "kind": "historical_summary",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "bind_count": {
+                "type": "number"
+              },
+              "current": {
+                "type": "object",
+                "fields": {
+                  "aiMode": {
+                    "type": "null"
+                  },
+                  "assetType": {
+                    "type": "string"
+                  },
+                  "assigneeIds": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "attachments": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "mime": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "number"
+                          },
+                          "thumb": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "mime": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "number"
+                          },
+                          "thumb": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "bizLine": {
+                    "type": "null"
+                  },
+                  "canBindMaterials": {
+                    "type": "boolean"
+                  },
+                  "canUpdateStatus": {
+                    "type": "boolean"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "channels": {
+                    "type": "array",
+                    "items": []
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "createdAt": {
+                    "type": "string"
+                  },
+                  "deptId": {
+                    "type": "string"
+                  },
+                  "deptName": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "null"
+                  },
+                  "dueDate": {
+                    "type": "null"
+                  },
+                  "folderId": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "landingUrl": {
+                    "type": "null"
+                  },
+                  "locales": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "materials": {
+                    "type": "array",
+                    "items": []
+                  },
+                  "priority": {
+                    "type": "string"
+                  },
+                  "quantity": {
+                    "type": "number"
+                  },
+                  "refText": {
+                    "type": "null"
+                  },
+                  "requestDate": {
+                    "type": "string"
+                  },
+                  "requesterIds": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": []
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": "string"
+                  }
+                }
+              },
+              "exact_matches": {
+                "type": "array",
+                "items": []
+              },
+              "exclusion_matches": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "feishuUserId": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "fields": {
+                      "feishuUserId": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "material_import_count": {
+                "type": "number"
+              },
+              "member_count": {
+                "type": "number"
+              },
+              "missing_assigned_id": {
+                "type": "string"
+              },
+              "options_receipt": {
+                "type": "string"
+              },
+              "paid_model_calls": {
+                "type": "number"
+              },
+              "publication_status": {
+                "type": "string"
+              },
+              "r2_upload_count": {
+                "type": "number"
+              },
+              "requirement_id": {
+                "type": "string"
+              },
+              "serverTime": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "a642472eb88a7162119347ea09ef32458b8bede90a5de32665f5e57c396a0ebd",
+          "received_operation_id": null,
+          "plan_references": []
+        },
+        {
+          "name": "publication-readiness-v3.json",
+          "sha256": "813d22294d2867518e817a7a61243ffebd60b43154b8e295d4b3ed9292663ac5",
+          "kind": "historical_summary",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "attribution_updates": {
+                "type": "array",
+                "items": []
+              },
+              "bindings": {
+                "type": "array",
+                "items": []
+              },
+              "blockers": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "observed": {
+                        "type": "string"
+                      },
+                      "resolution": {
+                        "type": "string"
+                      },
+                      "scope": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "fields": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "observed": {
+                        "type": "string"
+                      },
+                      "resolution": {
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "current_delivery": {
+                "type": "object",
+                "fields": {
+                  "materials": {
+                    "type": "array",
+                    "items": []
+                  },
+                  "serverTime": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "updatedAt": {
+                    "type": "string"
+                  }
+                }
+              },
+              "designer_exact_query": {
+                "type": "object",
+                "fields": {
+                  "matches": {
+                    "type": "array",
+                    "items": []
+                  },
+                  "members": {
+                    "type": "array",
+                    "items": []
+                  },
+                  "query_meta": {
+                    "type": "object",
+                    "fields": {
+                      "completeness": {
+                        "type": "string"
+                      },
+                      "filters_applied": {
+                        "type": "object",
+                        "fields": {
+                          "dept_id": {
+                            "type": "string"
+                          },
+                          "member_ids": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          }
+                        }
+                      },
+                      "limit": {
+                        "type": "number"
+                      },
+                      "membership_source": {
+                        "type": "string"
+                      },
+                      "membership_source_may_be_partial": {
+                        "type": "boolean"
+                      },
+                      "next_offset": {
+                        "type": "null"
+                      },
+                      "observed_at": {
+                        "type": "string"
+                      },
+                      "offset": {
+                        "type": "number"
+                      },
+                      "returned": {
+                        "type": "number"
+                      },
+                      "roles_inferred": {
+                        "type": "boolean"
+                      },
+                      "snapshot": {
+                        "type": "boolean"
+                      },
+                      "source_updated_at": {
+                        "type": "null"
+                      },
+                      "total": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              },
+              "material_imports": {
+                "type": "array",
+                "items": []
+              },
+              "r2_uploads": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "bytes": {
+                        "type": "number"
+                      },
+                      "matches_reviewed_output": {
+                        "type": "boolean"
+                      },
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "public_url": {
+                        "type": "string"
+                      },
+                      "readback_path": {
+                        "type": "string"
+                      },
+                      "remote_content_type": {
+                        "type": "string"
+                      },
+                      "resource_id": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "uploader": {
+                        "type": "string"
+                      },
+                      "verified_at": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "fields": {
+                      "bytes": {
+                        "type": "number"
+                      },
+                      "matches_reviewed_output": {
+                        "type": "boolean"
+                      },
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "public_url": {
+                        "type": "string"
+                      },
+                      "readback_path": {
+                        "type": "string"
+                      },
+                      "remote_content_type": {
+                        "type": "string"
+                      },
+                      "resource_id": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "success": {
+                        "type": "boolean"
+                      },
+                      "uploader": {
+                        "type": "string"
+                      },
+                      "verified_at": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "recorded_at": {
+                "type": "string"
+              },
+              "requirement_code": {
+                "type": "string"
+              },
+              "requirement_id": {
+                "type": "string"
+              },
+              "scoped_caller": {
+                "type": "object",
+                "fields": {
+                  "live_invocations": {
+                    "type": "number"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "sha256": {
+                    "type": "string"
+                  },
+                  "shared_original_sha256": {
+                    "type": "string"
+                  },
+                  "shared_original_unchanged": {
+                    "type": "boolean"
+                  },
+                  "tests": {
+                    "type": "object",
+                    "fields": {
+                      "failed": {
+                        "type": "number"
+                      },
+                      "network_calls": {
+                        "type": "number"
+                      },
+                      "passed": {
+                        "type": "number"
+                      },
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "spanish_release": {
+                "type": "object",
+                "fields": {
+                  "background_approved": {
+                    "type": "boolean"
+                  },
+                  "spanish_composite_allowed": {
+                    "type": "boolean"
+                  },
+                  "transparent_spanish_layer_allowed": {
+                    "type": "boolean"
+                  },
+                  "upload_allowed": {
+                    "type": "boolean"
+                  },
+                  "user_acceptance": {
+                    "type": "string"
+                  }
+                }
+              },
+              "status": {
+                "type": "string"
+              },
+              "whole_objective_complete": {
+                "type": "boolean"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "d0a26637a1dbf31835c59e8e16d8aeb3e63e567f6d32e8fd0d42694b2a925c4f",
+          "received_operation_id": null,
+          "plan_references": []
+        },
+        {
+          "name": "publication-readiness-v4.json",
+          "sha256": "39d9618279288bb161da5aabd44de9b691b53107348f4d1bec800cee93cddc35",
+          "kind": "historical_summary",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "english_verified_count": {
+                "type": "number"
+              },
+              "generation": {
+                "type": "object",
+                "fields": {
+                  "alternative_model": {
+                    "type": "object",
+                    "fields": {
+                      "capabilities": {
+                        "type": "object",
+                        "fields": {
+                          "aspectRatios": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "capabilityVersion": {
+                            "type": "number"
+                          },
+                          "generationTier": {
+                            "type": "string"
+                          },
+                          "maxBatch": {
+                            "type": "number"
+                          },
+                          "maxGenerationPixels": {
+                            "type": "number"
+                          },
+                          "maxReferenceAssets": {
+                            "type": "number"
+                          },
+                          "maxReferences": {
+                            "type": "number"
+                          },
+                          "mediaTypes": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "operations": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "outputMimeTypes": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "size": {
+                            "type": "object",
+                            "fields": {
+                              "kind": {
+                                "type": "string"
+                              },
+                              "ratios": {
+                                "type": "array",
+                                "items": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              }
+                            }
+                          },
+                          "supportsMask": {
+                            "type": "boolean"
+                          }
+                        }
+                      },
+                      "configVersion": {
+                        "type": "number"
+                      },
+                      "enabled": {
+                        "type": "boolean"
+                      },
+                      "isDefault": {
+                        "type": "boolean"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "modelId": {
+                        "type": "string"
+                      },
+                      "provider": {
+                        "type": "string"
+                      },
+                      "queryId": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "paid_runs": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "local_review": {
+                            "type": "string"
+                          },
+                          "run_id": {
+                            "type": "string"
+                          },
+                          "source_index": {
+                            "type": "number"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "visual_review": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "model": {
+                            "type": "string"
+                          },
+                          "review": {
+                            "type": "string"
+                          },
+                          "run_id": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "visual_review": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "model": {
+                            "type": "string"
+                          },
+                          "review": {
+                            "type": "string"
+                          },
+                          "run_id": {
+                            "type": "string"
+                          },
+                          "source_index": {
+                            "type": "number"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "visual_review": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "candidates": {
+                            "type": "string"
+                          },
+                          "model": {
+                            "type": "string"
+                          },
+                          "normalization": {
+                            "type": "string"
+                          },
+                          "run_id": {
+                            "type": "string"
+                          },
+                          "source_index": {
+                            "type": "number"
+                          },
+                          "state": {
+                            "type": "string"
+                          },
+                          "visual_review": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "quota_snapshot": {
+                    "type": "object",
+                    "fields": {
+                      "imagePrices": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "object",
+                            "fields": {
+                              "apiPlatform": {
+                                "type": "string"
+                              },
+                              "billingMode": {
+                                "type": "string"
+                              },
+                              "estimateNote": {
+                                "type": "string"
+                              },
+                              "estimatedHdkPerImage": {
+                                "type": "number"
+                              },
+                              "inputImageHdk": {
+                                "type": "number"
+                              },
+                              "modelId": {
+                                "type": "string"
+                              },
+                              "outputImageHdk": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "apiPlatform": {
+                                "type": "string"
+                              },
+                              "billingMode": {
+                                "type": "string"
+                              },
+                              "estimateNote": {
+                                "type": "string"
+                              },
+                              "estimateSampleCount": {
+                                "type": "number"
+                              },
+                              "estimatedHdkPerImage": {
+                                "type": "number"
+                              },
+                              "modelId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "apiPlatform": {
+                                "type": "string"
+                              },
+                              "billingMode": {
+                                "type": "string"
+                              },
+                              "estimateNote": {
+                                "type": "string"
+                              },
+                              "estimatedHdkPerImage": {
+                                "type": "number"
+                              },
+                              "modelId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "apiPlatform": {
+                                "type": "string"
+                              },
+                              "billingMode": {
+                                "type": "string"
+                              },
+                              "estimateNote": {
+                                "type": "string"
+                              },
+                              "estimatedHdkPerImage": {
+                                "type": "number"
+                              },
+                              "modelId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "apiPlatform": {
+                                "type": "string"
+                              },
+                              "billingMode": {
+                                "type": "string"
+                              },
+                              "estimateNote": {
+                                "type": "string"
+                              },
+                              "estimatedHdkPerImage": {
+                                "type": "number"
+                              },
+                              "modelId": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "apiPlatform": {
+                                "type": "string"
+                              },
+                              "billingMode": {
+                                "type": "string"
+                              },
+                              "estimateNote": {
+                                "type": "string"
+                              },
+                              "estimateSampleCount": {
+                                "type": "number"
+                              },
+                              "estimatedHdkPerImage": {
+                                "type": "number"
+                              },
+                              "modelId": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "month": {
+                        "type": "string"
+                      },
+                      "overQuota": {
+                        "type": "boolean"
+                      },
+                      "quotaHdk": {
+                        "type": "number"
+                      },
+                      "remainingHdk": {
+                        "type": "number"
+                      },
+                      "usedHdk": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "reference_asset_ids": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "source02_gpt2_executed": {
+                    "type": "boolean"
+                  },
+                  "source02_nano2_executed": {
+                    "type": "boolean"
+                  },
+                  "source02_qwen_executed": {
+                    "type": "boolean"
+                  },
+                  "total_paid_images_cap": {
+                    "type": "number"
+                  },
+                  "unknown_outcomes": {
+                    "type": "array",
+                    "items": []
+                  },
+                  "workspace_id": {
+                    "type": "string"
+                  }
+                }
+              },
+              "prepared_spanish": {
+                "type": "object",
+                "fields": {
+                  "source1": {
+                    "type": "object",
+                    "fields": {
+                      "body_background": {
+                        "type": "string"
+                      },
+                      "composed_background": {
+                        "type": "string"
+                      },
+                      "job": {
+                        "type": "string"
+                      },
+                      "prepared": {
+                        "type": "string"
+                      },
+                      "producer_agent": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "source2": {
+                    "type": "object",
+                    "fields": {
+                      "parameters": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "publication": {
+                "type": "object",
+                "fields": {
+                  "APC_department_access": {
+                    "type": "string"
+                  },
+                  "attribution_updates": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "actual_material_detail_verified": {
+                            "type": "boolean"
+                          },
+                          "creation_type": {
+                            "type": "string"
+                          },
+                          "designer_ids": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "operation_id": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "bindings": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "actual_delivery_verified": {
+                            "type": "boolean"
+                          },
+                          "material_ids": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "operation_id": {
+                            "type": "string"
+                          },
+                          "requirement_id": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "compatible_caller": {
+                    "type": "object",
+                    "fields": {
+                      "live_invocations": {
+                        "type": "number"
+                      },
+                      "path": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "shared_original_sha256": {
+                        "type": "string"
+                      },
+                      "shared_original_unchanged": {
+                        "type": "boolean"
+                      },
+                      "tests": {
+                        "type": "object",
+                        "fields": {
+                          "failed": {
+                            "type": "number"
+                          },
+                          "network_calls": {
+                            "type": "number"
+                          },
+                          "passed": {
+                            "type": "number"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "current_shared_dept_id": {
+                    "type": "string"
+                  },
+                  "delivery_readback_performed": {
+                    "type": "boolean"
+                  },
+                  "delivery_readback_scope": {
+                    "type": "string"
+                  },
+                  "folder_target": {
+                    "type": "object",
+                    "fields": {
+                      "actual_material_folder_id": {
+                        "type": "null"
+                      },
+                      "actual_official_folder_lookup": {
+                        "type": "string"
+                      },
+                      "evidence": {
+                        "type": "string"
+                      },
+                      "move_performed": {
+                        "type": "boolean"
+                      },
+                      "namespace_identity_not_assumed": {
+                        "type": "boolean"
+                      },
+                      "requirement_folder_id": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "latest_live_read_receipt": {
+                    "type": "string"
+                  },
+                  "material_imports": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "material_ids": {
+                            "type": "array",
+                            "items": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "operation_id": {
+                            "type": "string"
+                          },
+                          "success": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "paid_model_calls": {
+                    "type": "number"
+                  },
+                  "r2_uploads": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "bytes": {
+                            "type": "number"
+                          },
+                          "matches_reviewed_output": {
+                            "type": "boolean"
+                          },
+                          "operation_id": {
+                            "type": "string"
+                          },
+                          "public_url": {
+                            "type": "string"
+                          },
+                          "readback_path": {
+                            "type": "string"
+                          },
+                          "remote_content_type": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "type": "string"
+                          },
+                          "success": {
+                            "type": "boolean"
+                          },
+                          "uploader": {
+                            "type": "string"
+                          },
+                          "verified_at": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "bytes": {
+                            "type": "number"
+                          },
+                          "matches_reviewed_output": {
+                            "type": "boolean"
+                          },
+                          "operation_id": {
+                            "type": "string"
+                          },
+                          "public_url": {
+                            "type": "string"
+                          },
+                          "readback_path": {
+                            "type": "string"
+                          },
+                          "remote_content_type": {
+                            "type": "string"
+                          },
+                          "resource_id": {
+                            "type": "string"
+                          },
+                          "sha256": {
+                            "type": "string"
+                          },
+                          "success": {
+                            "type": "boolean"
+                          },
+                          "uploader": {
+                            "type": "string"
+                          },
+                          "verified_at": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "readiness_receipt": {
+                    "type": "string"
+                  },
+                  "status": {
+                    "type": "string"
+                  },
+                  "status_mutations": {
+                    "type": "number"
+                  },
+                  "whole_objective_complete": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "spanish_final_verified_count": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "whole_objective_complete": {
+                "type": "boolean"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "fa11f465b91519f6c6b0ae2e97f97a6dd4b241469af7afc64f08979016219198",
+          "received_operation_id": null,
+          "plan_references": []
+        },
+        {
+          "name": "publication-upload-es-plan-v1.json",
+          "sha256": "b78f9ac1f53dbe1dda0b2dc6bd702a4b32979ef5e5154c9f69066e8d8aa19ad8",
+          "kind": "historical_plan",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "gate": {
+                "type": "string"
+              },
+              "no_remote_call_started": {
+                "type": "boolean"
+              },
+              "operations": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "object",
+                    "fields": {
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "request": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "source_index": {
+                        "type": "number"
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "fields": {
+                      "operation_id": {
+                        "type": "string"
+                      },
+                      "request": {
+                        "type": "string"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      },
+                      "source_index": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                ]
+              },
+              "serial_only": {
+                "type": "boolean"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "f55e0dd481b088e572fd224e8d4fcb60fe965de7ced493633356d08a90410676",
+          "received_operation_id": null,
+          "plan_references": [
+            {
+              "operation_id": "60aa4c01-1721-4ad0-9328-9466dcdeea44",
+              "request": "publication-upload-source01-es-v1.json",
+              "request_sha256": "2061ff46b3a07ed7d4362c5eef4b4462396ddf593aef2500bf8e9b21a67e609d"
+            },
+            {
+              "operation_id": "23ce72b2-b485-4cb8-aa38-2c9e15754619",
+              "request": "publication-upload-source02-es-v1.json",
+              "request_sha256": "35842538dc76ae4cd6138d3b85bb0272e6511e294fcc75a0a0a464b0c13aa577"
+            }
+          ]
+        },
+        {
+          "name": "publication-upload-source01-en-v1.json",
+          "sha256": "45391ca918b8465033396bf6576bfa5bffc3becad9a7239aed30ac0406ffffc9",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "content_type": {
+                    "type": "string"
+                  },
+                  "ext": {
+                    "type": "string"
+                  },
+                  "file_name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "gate_file": {
+                "type": "string"
+              },
+              "output_sha256": {
+                "type": "string"
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "serialized_sha256": "65314b9af8e36e181b14e56643930ae9bdec854b405a75f2d722f6cd1289d1a7",
+          "received_operation_id": "87f390ac-f56d-433c-bc89-4c308461fbf4",
+          "plan_references": []
+        },
+        {
+          "name": "publication-upload-source01-es-v1.json",
+          "sha256": "9117ff60c271dcc9b5a576d8f7565b0bb7518f46dfdd297d31a3d7341ca7bdae",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "content_type": {
+                    "type": "string"
+                  },
+                  "ext": {
+                    "type": "string"
+                  },
+                  "file_name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "gate_file": {
+                "type": "string"
+              },
+              "output_sha256": {
+                "type": "string"
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "serialized_sha256": "2061ff46b3a07ed7d4362c5eef4b4462396ddf593aef2500bf8e9b21a67e609d",
+          "received_operation_id": "60aa4c01-1721-4ad0-9328-9466dcdeea44",
+          "plan_references": []
+        },
+        {
+          "name": "publication-upload-source02-en-v1.json",
+          "sha256": "a8f0d431016dcd16db0f66c165ec93aedfa129324014ff4c517a3f39313d5849",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "content_type": {
+                    "type": "string"
+                  },
+                  "ext": {
+                    "type": "string"
+                  },
+                  "file_name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "gate_file": {
+                "type": "string"
+              },
+              "output_sha256": {
+                "type": "string"
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "serialized_sha256": "82d5a5efc60b0ffc182b50ed86f025e1d4518ec553980482d8f64f88a0eb15fa",
+          "received_operation_id": "1e654c1c-0895-442a-b5bb-71c9036a541a",
+          "plan_references": []
+        },
+        {
+          "name": "publication-upload-source02-es-v1.json",
+          "sha256": "cf97c4fe8b0893bac1786751ad75d13d57603df560940e5b771d9aa9b8f7e28c",
+          "kind": "received_request_copy",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "arguments": {
+                "type": "object",
+                "fields": {
+                  "content_type": {
+                    "type": "string"
+                  },
+                  "ext": {
+                    "type": "string"
+                  },
+                  "file_name": {
+                    "type": "string"
+                  }
+                }
+              },
+              "gate_file": {
+                "type": "string"
+              },
+              "output_sha256": {
+                "type": "string"
+              },
+              "schema_version": {
+                "type": "string"
+              },
+              "tool": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "serialized_sha256": "35842538dc76ae4cd6138d3b85bb0272e6511e294fcc75a0a0a464b0c13aa577",
+          "received_operation_id": "23ce72b2-b485-4cb8-aa38-2c9e15754619",
+          "plan_references": []
+        }
+      ],
+      "witnesses": [
+        {
+          "name": "publication-journal.jsonl",
+          "sha256": "ab8f31775d863218fdd1c541f8d0a543aac60a7b47bd636295cd608a1a3a1d41",
+          "kind": "journal"
+        },
+        {
+          "name": "publication-87f390ac-f56d-433c-bc89-4c308461fbf4.json",
+          "sha256": "cafa332dd8087ada37a7ecc26dfec83208eca3b65d10c02a293941a607250c10",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-1e654c1c-0895-442a-b5bb-71c9036a541a.json",
+          "sha256": "57c42a9fae8a09a9e21a5c9a8994d1acb1dbe99449c0314fadd64bc774c22688",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-44509e4f-33d9-45d7-ad9d-36ec2789a43d.json",
+          "sha256": "9ab0f6d7ea8b9d354faef09a7aee7de866e2ddc77e34c53e64e61e2a8667d523",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-89c3445f-9944-4346-95a1-41b3d371595b.json",
+          "sha256": "a0ff3aa7bb607896e39635e114342ad4016d8a90494c4f380a9d2985f6b454cc",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-8c9e0241-78ec-4041-b511-153586912031.json",
+          "sha256": "3f12e8f3a947a543ea11ee61cb430ee2d4cc41dd8741cd5557c2cd1d4bbabda9",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-1555790e-ad12-4df9-ae0c-1935fc836026.json",
+          "sha256": "f92bdf71918b13fb8ff867de9920891d2fb97a6088430ce0ea6f3bd33efdefe2",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-60aa4c01-1721-4ad0-9328-9466dcdeea44.json",
+          "sha256": "dbde72ea22151bd87343b47da8765b05a3d53472c835c047a86a3af7d57185f3",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-23ce72b2-b485-4cb8-aa38-2c9e15754619.json",
+          "sha256": "e689be91cba55d60cda40841b217d9c236018dbc7dd4868710b597390c789b75",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-ee2a238e-00e1-45ab-b2cd-9360e7d6568c.json",
+          "sha256": "d12adc26927fa145d9b69d21668269982b5cabe27359d299c88323a18ed70415",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-421a57c7-89a9-4fba-acd3-cbeab68b18c8.json",
+          "sha256": "59940c28a63e9d9bfca003fcb214c9d4c87f921852ae1ea07534070e9aef5402",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-a9f3790c-e456-4881-bbf3-560a6dfd5a67.json",
+          "sha256": "01fc48151904b524af3ad923434a16dd3ecd47d76ae96176e5befdfcf25b0d89",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-89cfc723-03d6-4d31-abe4-44da9696107e.json",
+          "sha256": "9602324fefb50b61c6fbc483bf2d2e55d0c33b26e64632cf0e134b064e96660e",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "generation-journal.jsonl",
+          "sha256": "a6676986f77d106e038de40d8825364452f0ebc46a0ff0b93594c11bb7879f28",
+          "kind": "journal"
+        }
+      ],
+      "received_outcomes": [
+        {
+          "operation_id": "87f390ac-f56d-433c-bc89-4c308461fbf4",
+          "name": "publication-87f390ac-f56d-433c-bc89-4c308461fbf4.json",
+          "sha256": "cafa332dd8087ada37a7ecc26dfec83208eca3b65d10c02a293941a607250c10",
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "request_sha256": "65314b9af8e36e181b14e56643930ae9bdec854b405a75f2d722f6cd1289d1a7",
+          "response_sha256": "d2284a494adcfef9540371d86cf45fea1fb12d775f9ee2b021efca3a20978fb7"
+        },
+        {
+          "operation_id": "1e654c1c-0895-442a-b5bb-71c9036a541a",
+          "name": "publication-1e654c1c-0895-442a-b5bb-71c9036a541a.json",
+          "sha256": "57c42a9fae8a09a9e21a5c9a8994d1acb1dbe99449c0314fadd64bc774c22688",
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "request_sha256": "82d5a5efc60b0ffc182b50ed86f025e1d4518ec553980482d8f64f88a0eb15fa",
+          "response_sha256": "137575e6dd7a77e27fd533044e3c33f11675765102215b23a7e72f4690475d0e"
+        },
+        {
+          "operation_id": "44509e4f-33d9-45d7-ad9d-36ec2789a43d",
+          "name": "publication-44509e4f-33d9-45d7-ad9d-36ec2789a43d.json",
+          "sha256": "9ab0f6d7ea8b9d354faef09a7aee7de866e2ddc77e34c53e64e61e2a8667d523",
+          "tool": "material_upload_from_url",
+          "schema_version": "0b0801b7a94fb12931b5c07c21d7140cef156b35a9476a7cdb0aa75852041c56",
+          "request_sha256": "3601614e224d7665bb48ec98c7736fb57ddbcf44982977ef1c8c30e0afdd1c44",
+          "response_sha256": "832a9ecd04449365eee617578751c7756011754bcdad397cc86d025132f46b3e"
+        },
+        {
+          "operation_id": "89c3445f-9944-4346-95a1-41b3d371595b",
+          "name": "publication-89c3445f-9944-4346-95a1-41b3d371595b.json",
+          "sha256": "a0ff3aa7bb607896e39635e114342ad4016d8a90494c4f380a9d2985f6b454cc",
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "request_sha256": "4dd6c89da48c6ee583190b815bcd9f0b6c2f2e6974c12bb5c3da8e2f252d2106",
+          "response_sha256": "1a8ff99b9105b2f5ca48c5fca74cc76fa17209668bd9ec92f5be4eb5a88ba04d"
+        },
+        {
+          "operation_id": "8c9e0241-78ec-4041-b511-153586912031",
+          "name": "publication-8c9e0241-78ec-4041-b511-153586912031.json",
+          "sha256": "3f12e8f3a947a543ea11ee61cb430ee2d4cc41dd8741cd5557c2cd1d4bbabda9",
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "request_sha256": "f52b244c8b9116bb8efe3efd31b47f136fca0fa831894216accb5057f8a21c45",
+          "response_sha256": "df248c65b7eb8cbe43021a0966b93bcf5901c2f301e096d8d77c25c1496002c1"
+        },
+        {
+          "operation_id": "1555790e-ad12-4df9-ae0c-1935fc836026",
+          "name": "publication-1555790e-ad12-4df9-ae0c-1935fc836026.json",
+          "sha256": "f92bdf71918b13fb8ff867de9920891d2fb97a6088430ce0ea6f3bd33efdefe2",
+          "tool": "requirement_bind_materials",
+          "schema_version": "d36538934efdb407042aad384d706539d31d38e40359c9595cf9d1a8d4fe3c52",
+          "request_sha256": "b6362e958433c13625800b8ce867d7d4b1c127855d91fc2591d4da56ebfac94d",
+          "response_sha256": "e0336f70aa1b070170bee7ff8b2bd0eb4a506aba0d1216c0068107fecada437d"
+        },
+        {
+          "operation_id": "60aa4c01-1721-4ad0-9328-9466dcdeea44",
+          "name": "publication-60aa4c01-1721-4ad0-9328-9466dcdeea44.json",
+          "sha256": "dbde72ea22151bd87343b47da8765b05a3d53472c835c047a86a3af7d57185f3",
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "request_sha256": "2061ff46b3a07ed7d4362c5eef4b4462396ddf593aef2500bf8e9b21a67e609d",
+          "response_sha256": "daa302db7cd7bd1d9c0361bb467cf14723f8cf0844394d8e23d9b87731ba6997"
+        },
+        {
+          "operation_id": "23ce72b2-b485-4cb8-aa38-2c9e15754619",
+          "name": "publication-23ce72b2-b485-4cb8-aa38-2c9e15754619.json",
+          "sha256": "e689be91cba55d60cda40841b217d9c236018dbc7dd4868710b597390c789b75",
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "dd522976e3919c8bc593cb6d4df361f2faebf440f9dc2bf397554234e02105e3",
+          "request_sha256": "35842538dc76ae4cd6138d3b85bb0272e6511e294fcc75a0a0a464b0c13aa577",
+          "response_sha256": "82c191a239bb8ebb5a03316f88fe7a5abe85dfcb4d0cbb3e532be21d816d6e55"
+        },
+        {
+          "operation_id": "ee2a238e-00e1-45ab-b2cd-9360e7d6568c",
+          "name": "publication-ee2a238e-00e1-45ab-b2cd-9360e7d6568c.json",
+          "sha256": "d12adc26927fa145d9b69d21668269982b5cabe27359d299c88323a18ed70415",
+          "tool": "material_upload_from_url",
+          "schema_version": "0b0801b7a94fb12931b5c07c21d7140cef156b35a9476a7cdb0aa75852041c56",
+          "request_sha256": "8220a421c32a8463622d516dc7445f0551d4ccef2d7290f6a868ea59d9e23339",
+          "response_sha256": "464f8cc27602357824001bd6ddfea0d718049c733dddafd07821c2893157f0db"
+        },
+        {
+          "operation_id": "421a57c7-89a9-4fba-acd3-cbeab68b18c8",
+          "name": "publication-421a57c7-89a9-4fba-acd3-cbeab68b18c8.json",
+          "sha256": "59940c28a63e9d9bfca003fcb214c9d4c87f921852ae1ea07534070e9aef5402",
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "request_sha256": "33945a2c5b7437cf458377e90ed9c7f9fd489f6e89d56e3a83953a710b5aed66",
+          "response_sha256": "1a8ff99b9105b2f5ca48c5fca74cc76fa17209668bd9ec92f5be4eb5a88ba04d"
+        },
+        {
+          "operation_id": "a9f3790c-e456-4881-bbf3-560a6dfd5a67",
+          "name": "publication-a9f3790c-e456-4881-bbf3-560a6dfd5a67.json",
+          "sha256": "01fc48151904b524af3ad923434a16dd3ecd47d76ae96176e5befdfcf25b0d89",
+          "tool": "material_attribution_update",
+          "schema_version": "a2bd624be8fcc42f1de3db163a8ba660873e8e6f780d8e72f9e72b0c676d721c",
+          "request_sha256": "fda42ff6191e26865de4e899b93f38da1758a816d15ff224ac6bd45d73ff51ea",
+          "response_sha256": "33f1e6d81517c889723f1e0464e0bfe9d4ed413f255726a5ad2adc96ef952508"
+        },
+        {
+          "operation_id": "89cfc723-03d6-4d31-abe4-44da9696107e",
+          "name": "publication-89cfc723-03d6-4d31-abe4-44da9696107e.json",
+          "sha256": "9602324fefb50b61c6fbc483bf2d2e55d0c33b26e64632cf0e134b064e96660e",
+          "tool": "requirement_bind_materials",
+          "schema_version": "d36538934efdb407042aad384d706539d31d38e40359c9595cf9d1a8d4fe3c52",
+          "request_sha256": "c1696691af398cb035878bb3f32987aac122e4cbe49338f2eb544ce83d6b32de",
+          "response_sha256": "ac2d98390dac84b5829ee4722f360102bca9abdfff6b77b840152dd75c047cee"
+        }
+      ]
+    },
+    {
+      "requirement_id": "d59186b7-2f6c-57bc-abb5-2b7dd545a0d6",
+      "code": "APC-20261023-008",
+      "snapshot_sha256": "3b8028aa1cf80165a5f87ef46e40435c0811c478bb7c55552902fcc69a4a1443",
+      "session_id": "session-ae3cc41e-50a1-4b4d-9cb1-a1392637cea0",
+      "artifacts": [
+        {
+          "name": "publication-contract-drift-review.json",
+          "sha256": "e078b380353f49b391fe654b6ad4065ab13ae7037b76a2b121f864ed6d098f74",
+          "kind": "historical_summary",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "at": {
+                "type": "string"
+              },
+              "current_definitions": {
+                "type": "string"
+              },
+              "decision": {
+                "type": "string"
+              },
+              "effects": {
+                "type": "string"
+              },
+              "error": {
+                "type": "string"
+              },
+              "local_sha256": {
+                "type": "string"
+              },
+              "previous_attempt": {
+                "type": "string"
+              },
+              "schema_comparison": {
+                "type": "string"
+              },
+              "source_sha256": {
+                "type": "string"
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "dc2ae56d73f4c7663b8947c80862154f2698982d08b6bdd73336dc7a3f47242f",
+          "received_operation_id": null,
+          "plan_references": []
+        },
+        {
+          "name": "publication-definitions-current.json",
+          "sha256": "b99f103f5a1ddbb4d279758f1d8e32fb602946ed6e277fc115b174ea834b533f",
+          "kind": "catalog_snapshot",
+          "exact_shape": {
+            "type": "array",
+            "items": [
+              {
+                "type": "object",
+                "fields": {
+                  "annotations": {
+                    "type": "object",
+                    "fields": {}
+                  },
+                  "authorization": {
+                    "type": "string"
+                  },
+                  "catalog_version": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "inputSchema": {
+                    "type": "object",
+                    "fields": {
+                      "$schema": {
+                        "type": "string"
+                      },
+                      "properties": {
+                        "type": "object",
+                        "fields": {
+                          "content_type": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "minLength": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "ext": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "minLength": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "feishu_user_id": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "file_base64": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "minLength": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "file_name": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "filename": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "invoke_via": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "operation_class": {
+                    "type": "string"
+                  },
+                  "schema_version": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "fields": {
+                  "annotations": {
+                    "type": "object",
+                    "fields": {}
+                  },
+                  "authorization": {
+                    "type": "string"
+                  },
+                  "catalog_version": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "inputSchema": {
+                    "type": "object",
+                    "fields": {
+                      "$schema": {
+                        "type": "string"
+                      },
+                      "properties": {
+                        "type": "object",
+                        "fields": {
+                          "VedioSouce": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "confirmed": {
+                            "type": "object",
+                            "fields": {
+                              "default": {
+                                "type": "boolean"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "feishu_user_id": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "items": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "items": {
+                                "type": "object",
+                                "fields": {
+                                  "properties": {
+                                    "type": "object",
+                                    "fields": {
+                                      "already_in_r2": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "external_source": {
+                                        "type": "object",
+                                        "fields": {
+                                          "additionalProperties": {
+                                            "type": "boolean"
+                                          },
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "properties": {
+                                            "type": "object",
+                                            "fields": {
+                                              "item_id": {
+                                                "type": "object",
+                                                "fields": {
+                                                  "maxLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "type": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              },
+                                              "model": {
+                                                "type": "object",
+                                                "fields": {
+                                                  "maxLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "type": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              },
+                                              "provider": {
+                                                "type": "object",
+                                                "fields": {
+                                                  "maxLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "minLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "type": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              },
+                                              "reference": {
+                                                "type": "object",
+                                                "fields": {
+                                                  "maxLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "type": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              },
+                                              "task_id": {
+                                                "type": "object",
+                                                "fields": {
+                                                  "maxLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "type": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          },
+                                          "required": {
+                                            "type": "array",
+                                            "items": [
+                                              {
+                                                "type": "string"
+                                              }
+                                            ]
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "fileName": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "file_name": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "file_names": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "items": {
+                                            "type": "object",
+                                            "fields": {
+                                              "type": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "file_size": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "exclusiveMinimum": {
+                                            "type": "number"
+                                          },
+                                          "maximum": {
+                                            "type": "number"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "filename": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "filenames": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "items": {
+                                            "type": "object",
+                                            "fields": {
+                                              "type": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "folder_id": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "folder_name": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "height": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "exclusiveMinimum": {
+                                            "type": "number"
+                                          },
+                                          "maximum": {
+                                            "type": "number"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "idempotency_key": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "maxLength": {
+                                            "type": "number"
+                                          },
+                                          "minLength": {
+                                            "type": "number"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "is_public": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "md5": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "mime_type": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "name": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "publication_scope": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "maxLength": {
+                                            "type": "number"
+                                          },
+                                          "pattern": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "requirement_id": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "format": {
+                                            "type": "string"
+                                          },
+                                          "pattern": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "resource_id": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "format": {
+                                            "type": "string"
+                                          },
+                                          "pattern": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "resource_ids": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "items": {
+                                            "type": "object",
+                                            "fields": {
+                                              "format": {
+                                                "type": "string"
+                                              },
+                                              "pattern": {
+                                                "type": "string"
+                                              },
+                                              "type": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "shared_dept_id": {
+                                        "type": "object",
+                                        "fields": {
+                                          "anyOf": {
+                                            "type": "array",
+                                            "items": [
+                                              {
+                                                "type": "object",
+                                                "fields": {
+                                                  "maxLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "minLength": {
+                                                    "type": "number"
+                                                  },
+                                                  "type": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              },
+                                              {
+                                                "type": "object",
+                                                "fields": {
+                                                  "type": {
+                                                    "type": "string"
+                                                  }
+                                                }
+                                              }
+                                            ]
+                                          },
+                                          "description": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "source": {
+                                        "type": "object",
+                                        "fields": {
+                                          "const": {
+                                            "type": "string"
+                                          },
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "tags": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "items": {
+                                            "type": "object",
+                                            "fields": {
+                                              "type": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "type": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "enum": {
+                                            "type": "array",
+                                            "items": [
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "string"
+                                              },
+                                              {
+                                                "type": "string"
+                                              }
+                                            ]
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "url": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "urls": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "items": {
+                                            "type": "object",
+                                            "fields": {
+                                              "type": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "video_duration": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "minimum": {
+                                            "type": "number"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "video_file_size": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "exclusiveMinimum": {
+                                            "type": "number"
+                                          },
+                                          "maximum": {
+                                            "type": "number"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "video_md5": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "video_mime_type": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "video_r2_url": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "video_resource_id": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "format": {
+                                            "type": "string"
+                                          },
+                                          "pattern": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "video_url": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "width": {
+                                        "type": "object",
+                                        "fields": {
+                                          "description": {
+                                            "type": "string"
+                                          },
+                                          "exclusiveMinimum": {
+                                            "type": "number"
+                                          },
+                                          "maximum": {
+                                            "type": "number"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "type": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "minItems": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "invoke_via": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "operation_class": {
+                    "type": "string"
+                  },
+                  "schema_version": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "fields": {
+                  "annotations": {
+                    "type": "object",
+                    "fields": {}
+                  },
+                  "authorization": {
+                    "type": "string"
+                  },
+                  "catalog_version": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "inputSchema": {
+                    "type": "object",
+                    "fields": {
+                      "$schema": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "boolean"
+                      },
+                      "properties": {
+                        "type": "object",
+                        "fields": {
+                          "confirmed": {
+                            "type": "object",
+                            "fields": {
+                              "default": {
+                                "type": "boolean"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "creation_type": {
+                            "type": "object",
+                            "fields": {
+                              "enum": {
+                                "type": "array",
+                                "items": [
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  },
+                                  {
+                                    "type": "string"
+                                  }
+                                ]
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "designer_ids": {
+                            "type": "object",
+                            "fields": {
+                              "items": {
+                                "type": "object",
+                                "fields": {
+                                  "maxLength": {
+                                    "type": "number"
+                                  },
+                                  "minLength": {
+                                    "type": "number"
+                                  },
+                                  "type": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "maxItems": {
+                                "type": "number"
+                              },
+                              "minItems": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "material_ids": {
+                            "type": "object",
+                            "fields": {
+                              "items": {
+                                "type": "object",
+                                "fields": {
+                                  "format": {
+                                    "type": "string"
+                                  },
+                                  "pattern": {
+                                    "type": "string"
+                                  },
+                                  "type": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "maxItems": {
+                                "type": "number"
+                              },
+                              "minItems": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "invoke_via": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "operation_class": {
+                    "type": "string"
+                  },
+                  "schema_version": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "fields": {
+                  "annotations": {
+                    "type": "object",
+                    "fields": {}
+                  },
+                  "authorization": {
+                    "type": "string"
+                  },
+                  "catalog_version": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "inputSchema": {
+                    "type": "object",
+                    "fields": {
+                      "$schema": {
+                        "type": "string"
+                      },
+                      "properties": {
+                        "type": "object",
+                        "fields": {
+                          "confirmed": {
+                            "type": "object",
+                            "fields": {
+                              "default": {
+                                "type": "boolean"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "feishu_user_id": {
+                            "type": "object",
+                            "fields": {
+                              "description": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "items": {
+                            "type": "object",
+                            "fields": {
+                              "items": {
+                                "type": "object",
+                                "fields": {
+                                  "properties": {
+                                    "type": "object",
+                                    "fields": {
+                                      "material_ids": {
+                                        "type": "object",
+                                        "fields": {
+                                          "items": {
+                                            "type": "object",
+                                            "fields": {
+                                              "format": {
+                                                "type": "string"
+                                              },
+                                              "pattern": {
+                                                "type": "string"
+                                              },
+                                              "type": {
+                                                "type": "string"
+                                              }
+                                            }
+                                          },
+                                          "maxItems": {
+                                            "type": "number"
+                                          },
+                                          "minItems": {
+                                            "type": "number"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      },
+                                      "requirement_id": {
+                                        "type": "object",
+                                        "fields": {
+                                          "format": {
+                                            "type": "string"
+                                          },
+                                          "pattern": {
+                                            "type": "string"
+                                          },
+                                          "type": {
+                                            "type": "string"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "required": {
+                                    "type": "array",
+                                    "items": [
+                                      {
+                                        "type": "string"
+                                      },
+                                      {
+                                        "type": "string"
+                                      }
+                                    ]
+                                  },
+                                  "type": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "maxItems": {
+                                "type": "number"
+                              },
+                              "minItems": {
+                                "type": "number"
+                              },
+                              "type": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "required": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "invoke_via": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "operation_class": {
+                    "type": "string"
+                  },
+                  "schema_version": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "dc9fcdf11de3b33c698ecee23299a25aff6e85140fa938a2db8df3241c290c77",
+          "received_operation_id": null,
+          "plan_references": []
+        },
+        {
+          "name": "publication-discovery-current.json",
+          "sha256": "09f9c625d174a6ec56eac7317b4372a2e8213b6bc5cee9078e8c7f7ff93fe126",
+          "kind": "catalog_snapshot",
+          "exact_shape": {
+            "type": "object",
+            "fields": {
+              "data": {
+                "type": "object",
+                "fields": {
+                  "catalog_version": {
+                    "type": "string"
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "fields": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "tool_count": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "total_tools": {
+                    "type": "number"
+                  }
+                }
+              },
+              "observedAt": {
+                "type": "string"
+              },
+              "raw": {
+                "type": "object",
+                "fields": {
+                  "content": {
+                    "type": "array",
+                    "items": [
+                      {
+                        "type": "object",
+                        "fields": {
+                          "text": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "structuredContent": {
+                    "type": "object",
+                    "fields": {
+                      "catalog_version": {
+                        "type": "string"
+                      },
+                      "categories": {
+                        "type": "array",
+                        "items": [
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "fields": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "tool_count": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      "total_tools": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "tool": null,
+          "schema_version": null,
+          "serialized_sha256": "490a7b657f7df5c58b11a6ec31454987b5bf618a54e41f0c9595fb2fb78b4320",
+          "received_operation_id": null,
+          "plan_references": []
+        }
+      ],
+      "witnesses": [
+        {
+          "name": "publication-journal.jsonl",
+          "sha256": "8a212cdae40e7d7a6c2c29d5158ed66235201ce9f90f7f7d960c053c0044d39d",
+          "kind": "journal"
+        },
+        {
+          "name": "publication-bb99f0a1-22f3-4011-9cb5-8e0502541c6e.json",
+          "sha256": "c1391db9c3ad4a18ef55b8c923ffecea929a55fbc5ee4be5adee37f047031ced",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-ff120afd-d9da-4ad1-9338-6362391edaf8.json",
+          "sha256": "99516200e2a731987a8dec8c9f5b029542d379674fe583cf18289905216efb36",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "publication-1abc9daa-bd49-46ec-9e20-7cfe5971332a.json",
+          "sha256": "558bcfb1d23b4a07d3fd2e1a6df943b9e8b17fc62495bdc3ddd71158891eddec",
+          "kind": "received_rpc_receipt"
+        },
+        {
+          "name": "correction-journal.jsonl",
+          "sha256": "f0e2257b1f813f4f034b447446b424731bcee607f2b4d162aac90d6a9c409522",
+          "kind": "journal"
+        }
+      ],
+      "received_outcomes": [
+        {
+          "operation_id": "bb99f0a1-22f3-4011-9cb5-8e0502541c6e",
+          "name": "publication-bb99f0a1-22f3-4011-9cb5-8e0502541c6e.json",
+          "sha256": "c1391db9c3ad4a18ef55b8c923ffecea929a55fbc5ee4be5adee37f047031ced",
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "35c5fbcb2302f23a4234308b03666a5f4840b267cc8295685a148096550c6470",
+          "request_sha256": "e4e9f9d4a113ea86bf4602cf9664769ae920f72feb6708e4992635c69a5897f2",
+          "response_sha256": "4ea15713d349b59c94a5f3cd9a43a1691169122cfdd44d9f33be66787c9eb778"
+        },
+        {
+          "operation_id": "ff120afd-d9da-4ad1-9338-6362391edaf8",
+          "name": "publication-ff120afd-d9da-4ad1-9338-6362391edaf8.json",
+          "sha256": "99516200e2a731987a8dec8c9f5b029542d379674fe583cf18289905216efb36",
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "35c5fbcb2302f23a4234308b03666a5f4840b267cc8295685a148096550c6470",
+          "request_sha256": "2bb1d9977c65afaff365083362e7bdef92393315e76182d0883b3840362fbf2d",
+          "response_sha256": "5a15eceee7e87440ef604e5822691d99a7b04ab0f6924f00e8b96525cb75b02c"
+        },
+        {
+          "operation_id": "1abc9daa-bd49-46ec-9e20-7cfe5971332a",
+          "name": "publication-1abc9daa-bd49-46ec-9e20-7cfe5971332a.json",
+          "sha256": "558bcfb1d23b4a07d3fd2e1a6df943b9e8b17fc62495bdc3ddd71158891eddec",
+          "tool": "material_r2_upload_from_bytes",
+          "schema_version": "35c5fbcb2302f23a4234308b03666a5f4840b267cc8295685a148096550c6470",
+          "request_sha256": "0fafd122491cb3117feff771887a77f0b7103d3789925ca3f39726791999acee",
+          "response_sha256": "02a5d778f1d703e1f813232efb2084e4f507a09f9a7d01899b9346ada6a4f42b"
+        }
+      ]
+    }
+  ]
+}

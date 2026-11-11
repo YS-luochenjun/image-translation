@@ -1,0 +1,2 @@
+*.json -text whitespace=cr-at-eol
+readonly/*.json -text whitespace=cr-at-eol

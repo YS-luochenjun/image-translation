@@ -1,0 +1,734 @@
+{
+  "authorization": "User authorized processing each requirement in independent exactly titled session and MCP publication; no long-term polling",
+  "source_server_time": "2026-11-03T10:00:12.749Z",
+  "records": [
+    {
+      "code": "SHE-20261103-068",
+      "id": "01a1a03c-932e-7d85-bf9f-0355899440c1",
+      "title": "翻译",
+      "session_title": "翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "kr",
+        "in",
+        "fr",
+        "ru",
+        "nl",
+        "pt"
+      ],
+      "quantity": 1,
+      "attachment_count": 5,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-068\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-064",
+      "id": "01a1a029-30a4-7d3c-bb9e-9f6c1773f219",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "en",
+        "de",
+        "jp",
+        "ko"
+      ],
+      "quantity": 4,
+      "attachment_count": 1,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-064\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-063",
+      "id": "01a1a029-2406-71e4-a44f-8e685ceeaa48",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "en",
+        "de",
+        "jp",
+        "ko"
+      ],
+      "quantity": 4,
+      "attachment_count": 1,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-063\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-062",
+      "id": "01a1a029-17d6-7e40-b58c-9e243817b6dd",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "en",
+        "de",
+        "jp",
+        "ko"
+      ],
+      "quantity": 20,
+      "attachment_count": 5,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-062\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-061",
+      "id": "01a1a029-0e56-7625-bba5-a3550d391dea",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "en",
+        "de",
+        "jp",
+        "ko"
+      ],
+      "quantity": 20,
+      "attachment_count": 5,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-061\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-060",
+      "id": "01a1a029-042d-7377-b95e-633a7e0568e4",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "en",
+        "de",
+        "jp",
+        "ko"
+      ],
+      "quantity": 12,
+      "attachment_count": 3,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-060\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-059",
+      "id": "01a1a028-fad7-7dab-8cf6-176229ab6b64",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "en",
+        "de",
+        "jp",
+        "ko"
+      ],
+      "quantity": 12,
+      "attachment_count": 3,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-059\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-058",
+      "id": "01a1a028-f0d5-7b4e-a535-cbd39630cdd1",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "en",
+        "es"
+      ],
+      "quantity": 6,
+      "attachment_count": 3,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-058\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-057",
+      "id": "01a1a028-e6d3-7e6d-be4f-23be555b2798",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "en",
+        "es"
+      ],
+      "quantity": 6,
+      "attachment_count": 3,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-057\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-056",
+      "id": "01a1a028-dd9f-7e58-ae30-cf407a1820ab",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "en",
+        "es"
+      ],
+      "quantity": 4,
+      "attachment_count": 2,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-056\\handoff.txt"
+    },
+    {
+      "code": "SHE-20261103-055",
+      "id": "01a1a028-8488-7559-9192-fc9167842cbd",
+      "title": "app图片翻译",
+      "session_title": "app图片翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "en",
+        "es"
+      ],
+      "quantity": 4,
+      "attachment_count": 2,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20261103-055\\handoff.txt"
+    },
+    {
+      "code": "MOG-20261102-016",
+      "id": "01a19a11-9e5a-7774-a225-3f599725da45",
+      "title": "",
+      "session_title": "",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [],
+      "quantity": 1,
+      "attachment_count": 0,
+      "existing_material_count": 0,
+      "blockers": [
+        "platform_title_empty_no_invented_session_name",
+        "structured_locales_empty_review_actual_brief",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\MOG-20261102-016\\handoff.txt"
+    },
+    {
+      "code": "APC-20261023-008",
+      "id": "d59186b7-2f6c-57bc-abb5-2b7dd545a0d6",
+      "title": "trueself翻译",
+      "session_title": "trueself翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "es",
+        "pt",
+        "de",
+        "fr",
+        "it",
+        "nl"
+      ],
+      "quantity": 6,
+      "attachment_count": 1,
+      "existing_material_count": 6,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\APC-20261023-008\\handoff.txt"
+    },
+    {
+      "code": "MOG-20261021-048",
+      "id": "01a15d94-e605-705f-8907-98149d8caacb",
+      "title": "",
+      "session_title": "",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [],
+      "quantity": 1,
+      "attachment_count": 0,
+      "existing_material_count": 0,
+      "blockers": [
+        "platform_title_empty_no_invented_session_name",
+        "structured_locales_empty_review_actual_brief",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\MOG-20261021-048\\handoff.txt"
+    },
+    {
+      "code": "MOG-20261021-042",
+      "id": "01a15d70-a17f-784b-ad04-e785b27130a1",
+      "title": "",
+      "session_title": "",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [],
+      "quantity": 1,
+      "attachment_count": 0,
+      "existing_material_count": 0,
+      "blockers": [
+        "platform_title_empty_no_invented_session_name",
+        "structured_locales_empty_review_actual_brief",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\MOG-20261021-042\\handoff.txt"
+    },
+    {
+      "code": "WOW-20261014-027",
+      "id": "01a13870-e1ef-7d64-a88c-b372ea25da4c",
+      "title": "Vinted",
+      "session_title": "Vinted",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "pl"
+      ],
+      "quantity": 2,
+      "attachment_count": 0,
+      "existing_material_count": 2,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20261014-027\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260921-019",
+      "id": "01a0c1e8-4858-7593-957d-62574f8f84b5",
+      "title": "deme",
+      "session_title": "deme",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "de",
+        "fr",
+        "nl"
+      ],
+      "quantity": 8,
+      "attachment_count": 3,
+      "existing_material_count": 24,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260921-019\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260915-037",
+      "id": "01a0a41c-28c2-7a79-bc3e-580d25ad47c3",
+      "title": "找不同",
+      "session_title": "找不同",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "en"
+      ],
+      "quantity": 3,
+      "attachment_count": 3,
+      "existing_material_count": 4,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260915-037\\handoff.txt"
+    },
+    {
+      "code": "SHE-20260908-040",
+      "id": "01a07f37-e540-7cbd-b8a8-72cff91b8548",
+      "title": "demenz",
+      "session_title": "demenz",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "de"
+      ],
+      "quantity": 1,
+      "attachment_count": 7,
+      "existing_material_count": 15,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\SHE-20260908-040\\handoff.txt"
+    },
+    {
+      "code": "APC-20260903-032",
+      "id": "01a06618-dd93-7d61-b799-0d639031cdf5",
+      "title": "chicken翻译",
+      "session_title": "chicken翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "jp",
+        "kr",
+        "tw",
+        "es",
+        "de"
+      ],
+      "quantity": 1,
+      "attachment_count": 1,
+      "existing_material_count": 5,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\APC-20260903-032\\handoff.txt"
+    },
+    {
+      "code": "APC-20260903-029",
+      "id": "01a065ed-3fad-79aa-81b5-06b3cf01e986",
+      "title": "翻译",
+      "session_title": "翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "jp"
+      ],
+      "quantity": 1,
+      "attachment_count": 1,
+      "existing_material_count": 1,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\APC-20260903-029\\handoff.txt"
+    },
+    {
+      "code": "MOG-20260828-021",
+      "id": "01a047a5-051e-7172-ab1a-0d500c869a0f",
+      "title": "",
+      "session_title": "",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [],
+      "quantity": 1,
+      "attachment_count": 0,
+      "existing_material_count": 0,
+      "blockers": [
+        "platform_title_empty_no_invented_session_name",
+        "structured_locales_empty_review_actual_brief",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\MOG-20260828-021\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260825-018",
+      "id": "01a036d7-6ff3-7539-91aa-6c7fcba7c7e0",
+      "title": "ring",
+      "session_title": "ring",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "en"
+      ],
+      "quantity": 6,
+      "attachment_count": 3,
+      "existing_material_count": 6,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260825-018\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260813-032",
+      "id": "019ff954-5c90-7d02-9f85-ba383809536a",
+      "title": "麦当劳【TH】",
+      "session_title": "麦当劳【TH】",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [],
+      "quantity": 5,
+      "attachment_count": 0,
+      "existing_material_count": 5,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "structured_locales_empty_review_actual_brief",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260813-032\\handoff.txt"
+    },
+    {
+      "code": "SHE-20260812-056",
+      "id": "019ff510-78d6-70de-92ab-0be522ce0119",
+      "title": "frog",
+      "session_title": "frog",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "buzz"
+      ],
+      "quantity": 1,
+      "attachment_count": 0,
+      "existing_material_count": 0,
+      "blockers": [],
+      "handoff": "work\\fireplay-production\\SHE-20260812-056\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260811-032",
+      "id": "019feee4-deb6-7377-8880-a4d079c90942",
+      "title": "麦当劳-TH【大按钮】",
+      "session_title": "麦当劳-TH【大按钮】",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "button",
+      "locales": [
+        "th"
+      ],
+      "quantity": 6,
+      "attachment_count": 0,
+      "existing_material_count": 6,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260811-032\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260804-038",
+      "id": "019fcb82-5f97-7ab0-baef-3864c7b6a43d",
+      "title": "放大镜翻译",
+      "session_title": "放大镜翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "tw"
+      ],
+      "quantity": 5,
+      "attachment_count": 0,
+      "existing_material_count": 5,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260804-038\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260804-037",
+      "id": "019fcb79-e8a8-7153-945c-f87a90cc0505",
+      "title": "日历翻译",
+      "session_title": "日历翻译",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "tw"
+      ],
+      "quantity": 5,
+      "attachment_count": 7,
+      "existing_material_count": 5,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260804-037\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260727-034",
+      "id": "019fa235-cfc0-7bd7-96bc-115ca3603e01",
+      "title": "gmail",
+      "session_title": "gmail",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "jp"
+      ],
+      "quantity": 6,
+      "attachment_count": 0,
+      "existing_material_count": 12,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260727-034\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260724-006",
+      "id": "019f9204-40cd-7773-ae83-d2a33d48ca5e",
+      "title": "youtube",
+      "session_title": "youtube",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "tw"
+      ],
+      "quantity": 6,
+      "attachment_count": 0,
+      "existing_material_count": 6,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260724-006\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260716-029",
+      "id": "019f6998-b298-74c6-aed1-42f657bce928",
+      "title": "map",
+      "session_title": "map",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "tw"
+      ],
+      "quantity": 4,
+      "attachment_count": 2,
+      "existing_material_count": 4,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260716-029\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260716-027",
+      "id": "019f6998-af2d-7cfa-82a1-1b4d31f863a9",
+      "title": "youtube",
+      "session_title": "youtube",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "br"
+      ],
+      "quantity": 6,
+      "attachment_count": 0,
+      "existing_material_count": 6,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260716-027\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260716-026",
+      "id": "019f6998-ad93-735e-876d-5913f046253c",
+      "title": "youtube",
+      "session_title": "youtube",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "tw"
+      ],
+      "quantity": 6,
+      "attachment_count": 0,
+      "existing_material_count": 6,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260716-026\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260715-016",
+      "id": "019f63d0-6471-7952-bdf4-13c6856cc2f3",
+      "title": "map",
+      "session_title": "map",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "tw"
+      ],
+      "quantity": 5,
+      "attachment_count": 0,
+      "existing_material_count": 5,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260715-016\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260715-014",
+      "id": "019f63ce-2bee-7895-8417-9b77d2ca9bfb",
+      "title": "youtube",
+      "session_title": "youtube",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "br"
+      ],
+      "quantity": 5,
+      "attachment_count": 0,
+      "existing_material_count": 7,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260715-014\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260715-013",
+      "id": "019f63ce-2798-70a6-acb4-bd5b23c69633",
+      "title": "youtube",
+      "session_title": "youtube",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "tw"
+      ],
+      "quantity": 5,
+      "attachment_count": 0,
+      "existing_material_count": 7,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260715-013\\handoff.txt"
+    },
+    {
+      "code": "WOW-20260715-012",
+      "id": "019f63cc-7b1c-7b6e-9e65-a09f88ad7795",
+      "title": "youtube",
+      "session_title": "youtube",
+      "session_id": null,
+      "status": "preflight_prepared",
+      "asset_type": "image",
+      "locales": [
+        "en"
+      ],
+      "quantity": 5,
+      "attachment_count": 0,
+      "existing_material_count": 7,
+      "blockers": [
+        "existing_delivery_requires_deduplication_review",
+        "source_not_yet_resolved"
+      ],
+      "handoff": "work\\fireplay-production\\WOW-20260715-012\\handoff.txt"
+    }
+  ]
+}

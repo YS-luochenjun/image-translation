@@ -1,0 +1,18 @@
+{
+  "name": "fireplay-mcp-suite",
+  "version": "0.2.0",
+  "description": "公司投放、素材、分析、站点、调控查询与日志 MCP，一次 AuthHub 登录。",
+  "author": {
+    "name": "Tanyue"
+  },
+  "interface": {
+    "displayName": "Fireplay MCP Suite",
+    "shortDescription": "9 个公司业务 MCP，共享 AuthHub 飞书登录。",
+    "longDescription": "连接 Campaigns、Site、AI Designer、Analysis、Jarvis、Google Analytics、AdRadar、Studio 和 Logging。按当前用户权限访问服务，业务写操作仍需用户授权。",
+    "developerName": "Tanyue",
+    "category": "Productivity",
+    "capabilities": [],
+    "defaultPrompt": "使用公司 MCP 帮我处理当前任务，先确认目标、对象和授权，再选择对应服务。"
+  },
+  "mcpServers": "./.mcp.json"
+}

@@ -1,0 +1,3 @@
+- insert:
+    - id: local-image-review-workbench
+      name: '@local/image-review-workbench'

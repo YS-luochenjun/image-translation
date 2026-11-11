@@ -1,0 +1,10 @@
+{
+  "name": "@local/fireplay-session-dispatch",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Dispatch the reviewed Fireplay requirement intake into ordinary DSH project sessions",
+  "exports": {".": "./index.js"},
+  "files": ["index.js", "dispatch.js", "control.js", "identity-migration.js", "ordinary-043.js", "ordinary-slot.js", "admission.js", "publication-readonly.js", "publication-historical.js", "reviewed-historical-artifact-contract-v1.json", "cordis.patch.yml", "README.md"],
+  "dsh": {"bundle": {"patch": "./cordis.patch.yml"}}
+}

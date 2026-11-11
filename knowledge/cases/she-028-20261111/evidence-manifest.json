@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "files": [
+    {
+      "path": "evidence/source-3.png",
+      "sha256": "aeb13a673ccdde8dd9242417c0462316b11beaf570033881449bc10fadbe5857",
+      "bytes": 213834,
+      "size": [
+        970,
+        250
+      ],
+      "format": "PNG"
+    },
+    {
+      "path": "evidence/background-source-3.png",
+      "sha256": "d5d3c94c1833c64048089e729e99b4f2d5c5a751396aa13761b30e927cc4a749",
+      "bytes": 156549,
+      "size": [
+        970,
+        250
+      ],
+      "format": "PNG"
+    },
+    {
+      "path": "evidence/source-3-fr-v1-rejected.jpg",
+      "sha256": "c1e6eda0afa5c1f68aa087275b26641ba849f3c73bb7e41620f5b9e161060132",
+      "bytes": 109768,
+      "size": [
+        970,
+        250
+      ],
+      "format": "JPEG"
+    },
+    {
+      "path": "evidence/source-3-fr-v2.jpg",
+      "sha256": "6b4cc3955fabbeedfde8781a9f46c264ff0ec3ff0c63a4ac30d7e6bc183a60e2",
+      "bytes": 112597,
+      "size": [
+        970,
+        250
+      ],
+      "format": "JPEG"
+    },
+    {
+      "path": "delivery-snapshot.json",
+      "sha256": "155aa0d3358b14130812fc83d4756bc65035c0fa99e98abdce5754b3aebe7dba",
+      "bytes": 21608
+    }
+  ]
+}

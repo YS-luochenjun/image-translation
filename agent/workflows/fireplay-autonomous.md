@@ -2,6 +2,14 @@
 
 2026-11-06当前通用流程。宿主Agent负责理解、看图、翻译、选路、调用连接器与真实审核；本地CLI负责矩阵、版本、评分和文件校验，不能离开宿主自行视觉生产。用户已交办的批次不逐阶段重复求许可；为用户建立本流程不等于已启动所有真实需求或获得无限付费授权。
 
+## 会话分工与调度
+
+按用户2026-11-10确认，需求面板批次每个逻辑需求对应一个独立执行会话，会话名称只用需求编号。用户已授权本项目按需求创建会话；后续交办的新编号沿用该授权。创建前核查现有会话和主控记录：同编号续用原会话；不同编号经核实为同一需求时记录重复关系并交接给唯一执行会话。
+
+主控负责查询和接入、冻结来源与语言范围、创建及派发会话、并发排队、进度跟踪、具体纠正和交付终核。执行会话负责该需求全部来源与语言的实际制作、视觉审核、合格成果上传入库绑定及fresh核验。执行会话只处理所分配需求，按本次授权连续完成，不另行创建需求执行会话。
+
+会话创建与生产启动分开：所有交办需求均建立会话并登记thread_id、exact requirement UUID、来源×语言矩阵、开工或排队状态和等待游标；生产并发遵守下文四项上限，超出的会话可先只读接入并排队。主控使用compact wait_threads及保存的游标跟踪，空出名额后调度下一项；排队会话也可按明确交接等待指定前序会话释放名额后接续，记录实际开工。创建失败或会话能力不可用时保留待派发状态并报告真实原因。只有取得会话ID及启动/排队回执才算派发完成。
+
 ## 1. 发现待办，不靠标题猜
 
 执行只读 `node scripts/fireplay-discover-translations.mjs --department DEPT_ID`。DEPT_ID用当前授权组查询结果，不能凭名称猜。命令先读当前tool_catalog和requirement_create_options，从 `fixed.aiModes` 精确匹配 enabled=true、label=图片翻译，取得value；2026-11-06官方SHE选项核实为 `image_translate_or_resize`。再以 `view=summary,scope=all,dept_id=...,asset_type=[image,button],ai_mode=实际值,pagination=cursor,offset=0` 全部翻页。maxPages耗尽返回partial及next_cursor；先交给Python fireplay-discover验证该次回执，其host_actions给出保持相同过滤的续页参数；收集续页到原summary_pages再次验证，不能把局部页重新从头计为完整。缺连接器/权限报告不可用，不报“没有需求”。status不硬编码未知本地枚举，done/cancelled/canceled不作为新生产候选，其余读正文核实。

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ai-designer": {
+      "command": "C:/Users/Echo/.dsh/dsh-runtimes/dsh-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "C:/Users/Echo/Desktop/单图片翻译/plugins/fireplay-requirements-mcp/scripts/authhub-mcp-proxy.mjs",
+        "--label", "ai-designer",
+        "--url", "https://ai-designer-api.fireplay.ai/api/mcp/catalog/v1"
+      ]
+    }
+  }
+}

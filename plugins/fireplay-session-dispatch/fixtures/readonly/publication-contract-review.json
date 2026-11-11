@@ -1,0 +1,10 @@
+{
+  "original_caller_sha256": "d2b58f0be5d2b46b604a7a083ed2a05a885d2893acf94f2e4fdd2226bf973677",
+  "local_caller_sha256": "fed5b9f666e777bf6f514e22c442836cbb4296bf1e321f700ed61933c27c81b1",
+  "contract_file": "publication-catalog-normalized-1845.json",
+  "contract_sha256": "f3739c82351cc6c6e3018416d733789b1fb3c73961178a84e01ad86d6be9c8de",
+  "reviewer": "session-56902ff5-f7d3-4ce7-a6bb-0e8e57842fb4",
+  "review": "Current upload/import inputSchema and invoke_via unchanged. Only description/schema_version/catalog_version changed, concerning asynchronous video thumbnails. This image-only request sends no video fields. All existing caller checks retained. Only module relative root and per-demand reviewed catalog path changed; shared scripts and shared pinned catalog untouched.",
+  "authorization": "User explicitly authorized per-demand end-to-end MCP upload/import/attribution/sharing/binding; no additional approval requirement inferred.",
+  "additional_review": "Actual successful upload response uses public_url/resource_id. Local caller accepts camelCase OR snake_case with exact-one checks retained; no original receipt modified. Original import attempt RPC rejection occurred during read-only live catalog before journal dispatch; subsequently same operationID dispatched once and returned explicit validation failure."
+}

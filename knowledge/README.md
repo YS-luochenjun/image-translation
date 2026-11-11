@@ -19,6 +19,7 @@
 - [336×280缎带案例](cases/ribbon-20261029/README.md)：partial，保留实际证据、旧审核范围与最新反馈。
 - [多语地图与描边字](methods/multilingual-map-lettering.md)：provisional；地图标签、同图多语、强调色迁移、描边字腔或PNG/JPEG证据混用时读取。经文字构图入口按条件到达，不把个案全文加到所有packet。
 - [韩文地图七语案例](cases/navermap-20261030/README.md)：partial；同一1200×628源图的简繁中及日英西德俄，用户认可多轮整体效果。保存精确PNG、失败稿、共享底图、独立观察及[追加反馈](cases/navermap-20261030/user-feedback.json)，不改写旧审核。
+- [970×250十语横幅案例](cases/she-028-20261111/README.md)：partial；三来源×十语30张，复用逐来源底图、保留右侧选项原像素、纠正法语CTA的“现在”遗漏；保存失败/修正JPEG和30项哈希快照。自审与交付核验完成，用户验收未记录。
 
 方法只保存可复用原则；案例只保存真实范围和证据。项目 [薄 skill](../.agents/skills/image-localization/SKILL.md) 只负责入口与按需导航，不复制方法正文。
 

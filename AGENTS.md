@@ -6,6 +6,8 @@
 
 处理需求面板批次时，入口是[自主交付流程](agent/workflows/fireplay-autonomous.md)：按官方“AI承接交付=图片翻译”的实际选项筛选长方竖图和大按钮，接入/下载细节见[需求接入](agent/workflows/fireplay-intake.md)。宿主连接器与现有发布脚本已支持查询和素材提交；Python接入仍是回执驱动，不能当作无人宿主生产守护进程。基础CLI和[分层配置工具](docs/layered-tools.md)、[原生观感任务入口](docs/native-workflow.md)负责可控排版、版本和检查；按图片需要选可用工具。
 
+需求面板任务按[会话分工与调度](agent/workflows/fireplay-autonomous.md#会话分工与调度)执行：每个逻辑需求一个独立执行会话，以需求编号命名；主控负责接入、派发、跟踪和终核，实际制作、审核和上传由执行会话完成。
+
 ## 执行顺序
 
 默认交付口径按用户2026-11-06指示为“大致相同、画面流畅、基本一致”，先读[交付评分与取舍](knowledge/methods/delivery-balanced-review.md)。允许自然补全与局部差异，达80分及底线即提交，不追完美；初稿后最多两轮针对性修正。历史固定37批次续作另读[统一执行控制](work/fireplay-production/unified-control.md)，其原会话/归档/专门授权约束不推广为未来新需求默认。MCP负责查询和发布绑定，以明确来源×语言×成员矩阵及fresh终核认定交付。

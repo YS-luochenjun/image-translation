@@ -1,0 +1,3 @@
+- insert:
+    - id: local-fireplay-session-dispatch
+      name: '@local/fireplay-session-dispatch'

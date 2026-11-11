@@ -1,0 +1,5 @@
+[
+{"name":"tool_read","arguments":{"tool":"material_sharing_departments","schema_version":"dc386f4a856f065f405f6f514ec0d62db1c18661133f4c12a05f494c2d33f1a3","arguments":{}}},
+{"name":"tool_read","arguments":{"tool":"requirement_field_options_query","schema_version":"a8952a43bda1262c99acd50e92a1bbf8a90eedf16c702784923ea41e0d1ddf20","arguments":{"dept_id":"od-354b90f636b89e8d390a37e2946f9e17","include_members":true,"member_ids":["c74b62d9","2c91dcg5","b2fbcgab"]}}},
+{"name":"tool_read","arguments":{"tool":"material_rules_list","schema_version":"1ad37f521a1cc53ec39526e5fa33be1fc3d608c469a65e25049413332688e943","arguments":{"platform":"google","materialType":"image"}}}
+]

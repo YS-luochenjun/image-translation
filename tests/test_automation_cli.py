@@ -8,9 +8,9 @@ from pathlib import Path
 
 from PIL import Image
 
-from image_localizer.fireplay import _locale
-
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'src'))
+from image_localizer.fireplay import _locale
 
 
 class AutomationCliTests(unittest.TestCase):
@@ -40,10 +40,13 @@ class AutomationCliTests(unittest.TestCase):
             self.assertEqual(before, sorted(path.name for path in base.iterdir()))
 
     def test_local_business_locale_aliases_preserve_canonical_dedup(self):
-        for raw, canonical in [('jp', 'ja'), ('kr', 'ko'), ('in', 'id'), ('tw', 'zh-TW'), ('vn', 'vi')]:
+        # Fireplay's business code "in" is Hindi; Indonesian remains "id".
+        for raw, canonical in [('jp', 'ja'), ('kr', 'ko'), ('in', 'hi'), ('id', 'id'), ('tw', 'zh-TW'), ('vn', 'vi')]:
             with self.subTest(raw=raw):
                 self.assertEqual(canonical, _locale(raw))
         self.assertEqual(1, len({_locale('jp'), _locale('ja')}))
+        self.assertEqual(1, len({_locale('in'), _locale('hi')}))
+        self.assertNotEqual(_locale('in'), _locale('id'))
         for raw in ('ejn', 'miss', '翻译剩余语言'):
             with self.subTest(raw=raw):
                 self.assertIsNone(_locale(raw))

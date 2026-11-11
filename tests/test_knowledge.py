@@ -115,6 +115,48 @@ class KnowledgeTests(unittest.TestCase):
         self.assertFalse(snapshot['live_platform_rechecked'])
         self.assertFalse(snapshot['final_outputs_user_accepted'])
 
+    def test_wide_banner_case_evidence_is_portable_and_hash_bound(self):
+        root = Path(__file__).resolve().parents[1]
+        case = root / 'knowledge/cases/she-028-20261111'
+        manifest = json.loads((case / 'evidence-manifest.json').read_text(encoding='utf-8'))
+        for item in manifest['files']:
+            path = (case / item['path']).resolve()
+            self.assertTrue(path.is_relative_to(case.resolve()))
+            self.assertEqual(item['sha256'], hashlib.sha256(path.read_bytes()).hexdigest())
+            self.assertEqual(item['bytes'], path.stat().st_size)
+            if 'size' in item:
+                with Image.open(path) as image:
+                    image.load()
+                    self.assertEqual(item['size'], list(image.size))
+                    self.assertEqual(item['format'], image.format)
+        source_hash = hashlib.sha256((case / 'evidence/source-3.png').read_bytes()).hexdigest()
+        result = load_knowledge(root, source_sha256=source_hash)
+        selected = next(item for item in result['related_cases'] if item['id'] == 'she-028-20261111')
+        self.assertEqual('partial', selected['status'])
+
+    def test_wide_banner_delivery_preserves_native_matrix_and_acceptance_boundary(self):
+        case = Path(__file__).resolve().parents[1] / 'knowledge/cases/she-028-20261111'
+        snapshot = json.loads((case / 'delivery-snapshot.json').read_text(encoding='utf-8'))
+        expected = {(f'source-{source}', language, '970x250')
+                    for source in (1, 2, 3)
+                    for language in ('zh-TW', 'es', 'pt', 'de', 'fr', 'pl', 'tr', 'ko', 'ja', 'nl')}
+        members = snapshot['members']
+        self.assertEqual(30, len(members))
+        self.assertEqual(expected, {(m['source_id'], m['language'], m['member_id']) for m in members})
+        for member in members:
+            self.assertEqual(member['reviewed_sha256'], member['downloaded_sha256'])
+            self.assertEqual((970, 250, 'JPEG'), (member['width'], member['height'], member['format']))
+            self.assertLessEqual(member['bytes'], 153600)
+            self.assertEqual('pending', member['creative_risk_status'])
+        current = next(m for m in members if (m['source_id'], m['language']) == ('source-3', 'fr'))
+        final_hash = hashlib.sha256((case / 'evidence/source-3-fr-v2.jpg').read_bytes()).hexdigest()
+        old_hash = hashlib.sha256((case / 'evidence/source-3-fr-v1-rejected.jpg').read_bytes()).hexdigest()
+        self.assertEqual(current['reviewed_sha256'], final_hash)
+        self.assertNotEqual(old_hash, final_hash)
+        self.assertEqual('self', snapshot['agent_review_type'])
+        self.assertFalse(snapshot['live_platform_rechecked'])
+        self.assertFalse(snapshot['final_outputs_user_accepted'])
+
 
 if __name__=='__main__':
     unittest.main()

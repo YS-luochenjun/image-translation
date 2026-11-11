@@ -1,0 +1,613 @@
+{
+  "version": 1,
+  "observed_date": "2026-11-11",
+  "requirement_code": "SHE-20261111-028",
+  "requirement_id": "a9ec328b-2582-5c43-a377-e88b5bd49f21",
+  "evidence_scope": "Local current outputs and original fresh downloads rehashed during curation.",
+  "live_platform_rechecked": false,
+  "final_outputs_user_accepted": false,
+  "requirement_business_status_at_delivery": "not_started",
+  "agent_review_type": "self",
+  "members": [
+    {
+      "source_id": "source-1",
+      "language": "zh-TW",
+      "member_id": "970x250",
+      "bytes": 76596,
+      "material_id": "01a1c8f1-4730-7847-bad2-a0d37957e881",
+      "resource_id": "01a1c8ef-e5d1-74e4-9030-acffd93ad94e",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "033487948725a22f37e8553d1aa22f410ad04971cb9729bfad537f128eca1a48",
+      "downloaded_sha256": "033487948725a22f37e8553d1aa22f410ad04971cb9729bfad537f128eca1a48",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "es",
+      "member_id": "970x250",
+      "bytes": 84876,
+      "material_id": "01a1c8f1-4b77-7ebb-b5d2-df606613147e",
+      "resource_id": "01a1c8ef-ed5a-7475-beb0-b92892fc706f",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "5c07e3d20aba2c63600f9930afa05e4bbdefab199bdd5f54cbcd99879b6a46cc",
+      "downloaded_sha256": "5c07e3d20aba2c63600f9930afa05e4bbdefab199bdd5f54cbcd99879b6a46cc",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "pt",
+      "member_id": "970x250",
+      "bytes": 84208,
+      "material_id": "01a1c8f1-45cd-776b-ab70-19067211271e",
+      "resource_id": "01a1c8ef-f94f-7c66-bba9-ada93d322533",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "dbf0dd9c56b4109581539d53efbd150fef5976248e7916a7b2d37a72d1ad95b9",
+      "downloaded_sha256": "dbf0dd9c56b4109581539d53efbd150fef5976248e7916a7b2d37a72d1ad95b9",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "de",
+      "member_id": "970x250",
+      "bytes": 81265,
+      "material_id": "01a1c8f1-4881-7bab-8ace-53922b641c9c",
+      "resource_id": "01a1c8f0-03c0-7b7d-826e-04bb9a3124f8",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "f0c9e294fee6607007350ba017c6ad71dbb9fc8c9931e82600fd6c71afe50ca4",
+      "downloaded_sha256": "f0c9e294fee6607007350ba017c6ad71dbb9fc8c9931e82600fd6c71afe50ca4",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "fr",
+      "member_id": "970x250",
+      "bytes": 84873,
+      "material_id": "01a1c8f1-58ee-7545-8b86-10a72f266d81",
+      "resource_id": "01a1c8f0-0ad6-71d9-9f68-feb1c464bd7e",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "1e009c2830142604d650ef390125a18b6895ebc2a23cfd9507df937d1e05b58c",
+      "downloaded_sha256": "1e009c2830142604d650ef390125a18b6895ebc2a23cfd9507df937d1e05b58c",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "pl",
+      "member_id": "970x250",
+      "bytes": 89934,
+      "material_id": "01a1c8f1-5833-7daf-9d2b-0415d05b5ddc",
+      "resource_id": "01a1c8f0-169e-7a61-910a-5b41f5ee2880",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "ffacc839412ce46b93bac4d9e84521a46426dfb27e5c02d6349613db55d524d8",
+      "downloaded_sha256": "ffacc839412ce46b93bac4d9e84521a46426dfb27e5c02d6349613db55d524d8",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "tr",
+      "member_id": "970x250",
+      "bytes": 78245,
+      "material_id": "01a1c8f1-579f-72ea-9b7a-0768fe2ecc83",
+      "resource_id": "01a1c8f0-1e03-7c6b-81e1-b4c2bc830649",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "7b637765608fb37753f3155102537f7b7ae91e826d7933fafee222db1f285ecb",
+      "downloaded_sha256": "7b637765608fb37753f3155102537f7b7ae91e826d7933fafee222db1f285ecb",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ko",
+      "member_id": "970x250",
+      "bytes": 74885,
+      "material_id": "01a1c8f1-5a2a-7b8b-8f97-78fcf0943636",
+      "resource_id": "01a1c8f0-2460-7702-8ec7-8acbb5bce1f9",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "89287c45c52a1c685b255d84c429240d397eaf8ddc440ff291d89ec0047f27f1",
+      "downloaded_sha256": "89287c45c52a1c685b255d84c429240d397eaf8ddc440ff291d89ec0047f27f1",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "ja",
+      "member_id": "970x250",
+      "bytes": 81629,
+      "material_id": "01a1c8f1-6ca8-70c9-a931-ebeda4c611fd",
+      "resource_id": "01a1c8f0-2d0f-7c34-948b-49d47b0f849a",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "b1dabb1dab006d4e616e3e6d8296a567ca4ff750d88bbfe01df611739277d500",
+      "downloaded_sha256": "b1dabb1dab006d4e616e3e6d8296a567ca4ff750d88bbfe01df611739277d500",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-1",
+      "language": "nl",
+      "member_id": "970x250",
+      "bytes": 79855,
+      "material_id": "01a1c8f1-6a1e-7fb3-9a98-1ca9e602c5ad",
+      "resource_id": "01a1c8f0-3479-77c6-b616-5e6378797fc4",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "83cebcf24550d7d9e6fbb434090036fd008918a6018136b923e0ce9109030aeb",
+      "downloaded_sha256": "83cebcf24550d7d9e6fbb434090036fd008918a6018136b923e0ce9109030aeb",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "zh-TW",
+      "member_id": "970x250",
+      "bytes": 76441,
+      "material_id": "01a1c8f1-6a3c-7d6a-a32c-cb3ee4b9896d",
+      "resource_id": "01a1c8f0-3cb7-7c03-9495-63f444ef91e9",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "1991dc420e6e578a2e8e7c0c0897853f0eff3efd390a92e0820c8efdbb47521d",
+      "downloaded_sha256": "1991dc420e6e578a2e8e7c0c0897853f0eff3efd390a92e0820c8efdbb47521d",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "es",
+      "member_id": "970x250",
+      "bytes": 81680,
+      "material_id": "01a1c8f1-6adb-7a51-821e-a2907a1a2253",
+      "resource_id": "01a1c8f0-4512-7b6d-9a3b-912d1d4e1730",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "852ed1040d3f458fee2fdd88bc489b3bec39a5441a6e10adbc01df542490bdca",
+      "downloaded_sha256": "852ed1040d3f458fee2fdd88bc489b3bec39a5441a6e10adbc01df542490bdca",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "pt",
+      "member_id": "970x250",
+      "bytes": 82787,
+      "material_id": "01a1c8f1-8277-7e51-a751-8d6e1a182172",
+      "resource_id": "01a1c8f0-4c06-7cc9-80c9-27d1c8667f28",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "73d9c011dea52b5e942491da8a606f5b48d82a02732e80eea97835dc53713edc",
+      "downloaded_sha256": "73d9c011dea52b5e942491da8a606f5b48d82a02732e80eea97835dc53713edc",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "de",
+      "member_id": "970x250",
+      "bytes": 80672,
+      "material_id": "01a1c8f1-7ed6-7ebe-bc1a-41443f898e79",
+      "resource_id": "01a1c8f0-534e-7e77-a37f-340027df1401",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "ce81c68f9287ecf3b5a7c06b2b4dd52b13c05bb1097542ced986263450c99d0c",
+      "downloaded_sha256": "ce81c68f9287ecf3b5a7c06b2b4dd52b13c05bb1097542ced986263450c99d0c",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "fr",
+      "member_id": "970x250",
+      "bytes": 81311,
+      "material_id": "01a1c8f1-8512-7fc3-9366-39952f352d99",
+      "resource_id": "01a1c8f0-5a79-73d5-8397-6d0e3da6ebcf",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "4ee4a796811d5e0fef12a00201f40f3a33e9d33379f0f1c100315169664df36f",
+      "downloaded_sha256": "4ee4a796811d5e0fef12a00201f40f3a33e9d33379f0f1c100315169664df36f",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "pl",
+      "member_id": "970x250",
+      "bytes": 86711,
+      "material_id": "01a1c8f1-7b70-737f-9859-9b914977ce9b",
+      "resource_id": "01a1c8f0-613f-714d-bc8c-b6a04f611100",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "e7590674f19acf2037f6b377e479071b55d243665a905369b9bb42d4a525c411",
+      "downloaded_sha256": "e7590674f19acf2037f6b377e479071b55d243665a905369b9bb42d4a525c411",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "tr",
+      "member_id": "970x250",
+      "bytes": 79232,
+      "material_id": "01a1c8f1-9177-7ce6-8941-94af8da3a5b7",
+      "resource_id": "01a1c8f0-6938-75c5-bf66-bf06be08ab20",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "1afcfefeb7ee1dc190a63e37b516472b671dc3fd219e330abc746811e1a2ecf2",
+      "downloaded_sha256": "1afcfefeb7ee1dc190a63e37b516472b671dc3fd219e330abc746811e1a2ecf2",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "ko",
+      "member_id": "970x250",
+      "bytes": 74763,
+      "material_id": "01a1c8f1-937b-7e28-bc91-044f92259244",
+      "resource_id": "01a1c8f0-7170-7f2d-aa4b-3b47be50aeb9",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "aa78ecdf5678bc6e6d261a96c8fb1f1c39f2971208d8b9614063839117544e54",
+      "downloaded_sha256": "aa78ecdf5678bc6e6d261a96c8fb1f1c39f2971208d8b9614063839117544e54",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "ja",
+      "member_id": "970x250",
+      "bytes": 81371,
+      "material_id": "01a1c8f1-9489-7b7f-8e9a-7ee7973a72af",
+      "resource_id": "01a1c8f0-77ea-7a68-90c9-b1f09b45a44a",
+      "score": 91.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "51ee2af432617348dce14d3d89efa427c4c1c5c2317b63bd97798dcef1812cb7",
+      "downloaded_sha256": "51ee2af432617348dce14d3d89efa427c4c1c5c2317b63bd97798dcef1812cb7",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-2",
+      "language": "nl",
+      "member_id": "970x250",
+      "bytes": 79706,
+      "material_id": "01a1c8f1-9366-7565-9196-40a8ac0b4a21",
+      "resource_id": "01a1c8f0-7ed5-7c85-a61d-aff1b42c6df1",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "4a495ea5e509b29c722085eca480c6b0d5c09884abec2d4908e4eb076e4b37e3",
+      "downloaded_sha256": "4a495ea5e509b29c722085eca480c6b0d5c09884abec2d4908e4eb076e4b37e3",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "zh-TW",
+      "member_id": "970x250",
+      "bytes": 102187,
+      "material_id": "01a1c8f1-a45a-7a9e-874f-a8f2b2576e2e",
+      "resource_id": "01a1c8f0-85c6-7afb-a854-c127236934b2",
+      "score": 91.9,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "f9052116c14f163374dfb30a1e605068a2fa1bde1ba95f6826246a69dc6cbe63",
+      "downloaded_sha256": "f9052116c14f163374dfb30a1e605068a2fa1bde1ba95f6826246a69dc6cbe63",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "es",
+      "member_id": "970x250",
+      "bytes": 113274,
+      "material_id": "01a1c8f1-a9a6-7946-86fe-efa1c105212b",
+      "resource_id": "01a1c8f0-8e7f-7396-94f6-9edc3ddac613",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "7a136f92c459f7c90c0ebaf7932a5944f3c237e11d7cb1fa011d7ecc86502810",
+      "downloaded_sha256": "7a136f92c459f7c90c0ebaf7932a5944f3c237e11d7cb1fa011d7ecc86502810",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "pt",
+      "member_id": "970x250",
+      "bytes": 114101,
+      "material_id": "01a1c8f1-a548-705d-a7e8-dd625d3171a8",
+      "resource_id": "01a1c8f0-97a9-78a6-896d-350648c59a4d",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "dd489854d584d786af528278f17a3d85275c8e17a379543d736b8d3dab534ba7",
+      "downloaded_sha256": "dd489854d584d786af528278f17a3d85275c8e17a379543d736b8d3dab534ba7",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "de",
+      "member_id": "970x250",
+      "bytes": 107275,
+      "material_id": "01a1c8f1-ac93-736b-a98c-4ef30fe36e46",
+      "resource_id": "01a1c8f0-9f7f-7f49-bbb1-46adad948797",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "0bb53095eeb098709458d391da670ca2b0e4a03bee4a0f17a13235f7da97101f",
+      "downloaded_sha256": "0bb53095eeb098709458d391da670ca2b0e4a03bee4a0f17a13235f7da97101f",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "fr",
+      "member_id": "970x250",
+      "bytes": 112597,
+      "material_id": "01a1c8f1-ba63-75c4-95eb-827c39884e07",
+      "resource_id": "01a1c8f0-a734-7796-9118-bbcfb3dbe924",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "6b4cc3955fabbeedfde8781a9f46c264ff0ec3ff0c63a4ac30d7e6bc183a60e2",
+      "downloaded_sha256": "6b4cc3955fabbeedfde8781a9f46c264ff0ec3ff0c63a4ac30d7e6bc183a60e2",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "pl",
+      "member_id": "970x250",
+      "bytes": 116319,
+      "material_id": "01a1c8f1-ba44-7581-a139-e240881bb495",
+      "resource_id": "01a1c8f0-afe5-7742-babd-016e74521cee",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "84c96758c8d1b504f7493c6e78153eef3f22c5c9ae9a2ddc96bd2a11b89f888e",
+      "downloaded_sha256": "84c96758c8d1b504f7493c6e78153eef3f22c5c9ae9a2ddc96bd2a11b89f888e",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "tr",
+      "member_id": "970x250",
+      "bytes": 105479,
+      "material_id": "01a1c8f1-bb55-7de7-be98-45175458b4a8",
+      "resource_id": "01a1c8f0-b7db-735a-9b2a-ad715d4d18b8",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "6764c5ec191f67dfe287b17ff79660f1f3ff10be54c9934a1b0b101e7f2ba6e4",
+      "downloaded_sha256": "6764c5ec191f67dfe287b17ff79660f1f3ff10be54c9934a1b0b101e7f2ba6e4",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "ko",
+      "member_id": "970x250",
+      "bytes": 98048,
+      "material_id": "01a1c8f1-c20f-734f-9599-65a0cf9a1bf5",
+      "resource_id": "01a1c8f0-bfc9-72ea-8c72-f7d7867421a1",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "409bfaf1bf99f7d1125504859214708d7e57cb78eed0c641f0ea6e89bc433f44",
+      "downloaded_sha256": "409bfaf1bf99f7d1125504859214708d7e57cb78eed0c641f0ea6e89bc433f44",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "ja",
+      "member_id": "970x250",
+      "bytes": 105468,
+      "material_id": "01a1c8f1-ce65-712d-ab15-b5b0eaeb67b7",
+      "resource_id": "01a1c8f0-c83c-7f95-a5e5-02ef5496245f",
+      "score": 91.9,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "18f046488842d6830353182b33353d4797f077d80992544480290a71eb4a1fdc",
+      "downloaded_sha256": "18f046488842d6830353182b33353d4797f077d80992544480290a71eb4a1fdc",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    },
+    {
+      "source_id": "source-3",
+      "language": "nl",
+      "member_id": "970x250",
+      "bytes": 105275,
+      "material_id": "01a1c8f1-cfd0-7b62-addd-6488a9216e40",
+      "resource_id": "01a1c8f0-d13d-70df-ae1b-fe52961da76d",
+      "score": 93.4,
+      "designer_ids": [
+        "2c91dcg5"
+      ],
+      "creation_type": "derivative",
+      "shared_dept_id": "354b90f636b89e8d390a37e2946f9e17",
+      "creative_risk_status": "pending",
+      "reviewed_sha256": "bc91373e20edcc1a1d017c41597870b2308d3cc809df7c879d5f36f04d628042",
+      "downloaded_sha256": "bc91373e20edcc1a1d017c41597870b2308d3cc809df7c879d5f36f04d628042",
+      "width": 970,
+      "height": 250,
+      "format": "JPEG"
+    }
+  ]
+}

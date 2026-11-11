@@ -1,0 +1,878 @@
+[
+  {
+    "departments": [
+      {
+        "deptId": "0",
+        "deptName": "0"
+      },
+      {
+        "deptId": "6bae9c02a7eae03cc88d476504f4c38f",
+        "deptName": "产品设计组"
+      },
+      {
+        "deptId": "fb45986e648014f7ba1333ea4d6ae38c",
+        "deptName": "产品研发组"
+      },
+      {
+        "deptId": "bb489bc1bd9adb66373180c2a6b4c416",
+        "deptName": "创新研发组"
+      },
+      {
+        "deptId": "44eee0bb729f663b8d7dec0f0310041e",
+        "deptName": "顾问"
+      },
+      {
+        "deptId": "bf4521e06b5b4ed47eb5d3b66a9b3dd4",
+        "deptName": "培训"
+      },
+      {
+        "deptId": "c32ba8e88b3ffe881a99af4e4e70cfd7",
+        "deptName": "视频创意小组"
+      },
+      {
+        "deptId": "4f4a5bb38e01082b21c9ea96277606d2",
+        "deptName": "素材策划"
+      },
+      {
+        "deptId": "4c6b21952a7b1fbc2697cd7ce8fb38c2",
+        "deptName": "素材策划"
+      },
+      {
+        "deptId": "a0dcf0da153f9950aa1b220bca3cd9de",
+        "deptName": "行政"
+      },
+      {
+        "deptId": "70b9a696b60c52e81b509f23b972f8e8",
+        "deptName": "行政"
+      },
+      {
+        "deptId": "74b5acbec67440545aff85ec010011e8",
+        "deptName": "招聘"
+      },
+      {
+        "deptId": "e12ac3502cc3686788bd6720ec6b36c4",
+        "deptName": "政委"
+      },
+      {
+        "deptId": "68847b64782dbef4dd3e7d6e5c8c2aec",
+        "deptName": "account"
+      },
+      {
+        "deptId": "0c253097d9ca0434d718a041f9609861",
+        "deptName": "APC"
+      },
+      {
+        "deptId": "codex-smoke-dept",
+        "deptName": "Codex测试组"
+      },
+      {
+        "deptId": "766bdf06c373aa04802a1a614111249b",
+        "deptName": "FIN"
+      },
+      {
+        "deptId": "d42ffe8db7ad60d14bfe5f096470d885",
+        "deptName": "Finance"
+      },
+      {
+        "deptId": "befd2a457362107394c7aa88b8dbf746",
+        "deptName": "HIT"
+      },
+      {
+        "deptId": "dcc5ac3a8c17887b0565fa39ca292873",
+        "deptName": "HR"
+      },
+      {
+        "deptId": "99ecc1dff8b342440e4e89a85b1f2efa",
+        "deptName": "KEY"
+      },
+      {
+        "deptId": "3c95a900ccb58759b611c563d87adef1",
+        "deptName": "MOG"
+      },
+      {
+        "deptId": "62975f04c78fddecf78bb0e6d3d15d31",
+        "deptName": "New Channel"
+      },
+      {
+        "deptId": "d7e01393b96c2b0ff68a422bca226183",
+        "deptName": "OP（运营）"
+      },
+      {
+        "deptId": "5e11bc1bf42a676f128a4c3a10585cf4",
+        "deptName": "Operation"
+      },
+      {
+        "deptId": "189efa51b7464fbc05729045d525827a",
+        "deptName": "OS（支持）"
+      },
+      {
+        "deptId": "169c822c540fa83471897b962e954ad1",
+        "deptName": "RD（产研）"
+      },
+      {
+        "deptId": "354b90f636b89e8d390a37e2946f9e17",
+        "deptName": "SHE"
+      },
+      {
+        "deptId": "9040f8cb17e16c910ec6591743ad964d",
+        "deptName": "SSC"
+      },
+      {
+        "deptId": "fcd576bc27b278d5dfe7459cfe39a461",
+        "deptName": "WOW"
+      },
+      {
+        "deptId": "d6b0879c3c81fcca2c4de596adad3a98",
+        "deptName": "WYL"
+      }
+    ]
+  },
+  {
+    "deptId": "od-354b90f636b89e8d390a37e2946f9e17",
+    "revision": "2026-11-04T08:50:49.274Z",
+    "fields": {
+      "status": {
+        "fieldKey": "status",
+        "options": [
+          "not_started",
+          "in_progress",
+          "pending_upload",
+          "done",
+          "已读"
+        ],
+        "nonDeletableOptions": [
+          "done"
+        ],
+        "optionStyles": {
+          "已读": {
+            "backgroundColor": "#f3edff",
+            "textColor": "#92400e"
+          }
+        },
+        "updatedAt": "2026-07-22T11:48:37.472Z"
+      },
+      "tags": {
+        "fieldKey": "tags",
+        "options": [
+          "guga",
+          "PK",
+          "KK",
+          "lion",
+          "设计测新",
+          "Ear Cleaning",
+          "en",
+          "2026国庆",
+          "fish",
+          "Wobbly",
+          "time"
+        ],
+        "nonDeletableOptions": [],
+        "optionStyles": {},
+        "updatedAt": "2026-10-15T06:26:35.646Z"
+      },
+      "bizLine": {
+        "fieldKey": "bizLine",
+        "options": [
+          "app",
+          "buzz",
+          "game",
+          "coupon",
+          "kids",
+          "roblox",
+          "tiktok",
+          "web",
+          "地上播",
+          "depression",
+          "Privacy",
+          "Princess"
+        ],
+        "nonDeletableOptions": [],
+        "optionStyles": {},
+        "updatedAt": "2026-10-28T04:05:33.888Z"
+      },
+      "category": {
+        "fieldKey": "category",
+        "options": [
+          "tree",
+          "guga",
+          "cut",
+          "paint",
+          "nail",
+          "toca-cha",
+          "draw",
+          "letter",
+          "bff",
+          "real-love",
+          "facezoom",
+          "NHK",
+          "我推",
+          "battery",
+          "angel",
+          "name flag",
+          "zodiac",
+          "hate",
+          "TV",
+          "地上波",
+          "two",
+          "eye",
+          "cartoon-cha",
+          "zoon",
+          "shot fx",
+          "crush",
+          "cute",
+          "card&crush",
+          "S-line",
+          "face",
+          "balloon",
+          "meccha",
+          "rose",
+          "face-country",
+          "kpop cha",
+          "soccer star",
+          "teeth",
+          "muscle",
+          "miss",
+          "name-anime",
+          "name house",
+          "soccer",
+          "love",
+          "allergic",
+          "iq",
+          "Allergy",
+          "skin",
+          "hospital",
+          "soulmate",
+          "fifa",
+          "Gmod",
+          "whats",
+          "name album",
+          "fox",
+          "nail woman",
+          "Torima",
+          "flower",
+          "fdj",
+          "player",
+          "jsq",
+          "stone",
+          "radiko",
+          "lily",
+          "deme",
+          "anxiety",
+          "chicken",
+          "kpop call",
+          "gorilla",
+          "mini",
+          "积分",
+          "air horn",
+          "spiderman",
+          "dementia",
+          "birth-celebrity",
+          "pomini",
+          "rarename",
+          "I AM CAT",
+          "impossible",
+          "paint-cola",
+          "pomni",
+          "superpower",
+          "face puzzle",
+          "see you",
+          "crush name",
+          "ghost",
+          "toca",
+          "Palmistry",
+          "period",
+          "emoji",
+          "depression",
+          "Privacy Display",
+          "offee",
+          "coffee",
+          "photo",
+          "Spatial",
+          "red-bo",
+          "bo",
+          "ai character",
+          "gaode",
+          "road",
+          "麦当劳",
+          "tureself",
+          "trueself",
+          "luckycolor",
+          "ZipperLock",
+          "uber",
+          "皇冠",
+          "面具",
+          "remoto",
+          "lip",
+          "face-celebrity",
+          "hide",
+          "gmail",
+          "gemini",
+          "youtube",
+          "map",
+          "Shift at midnight",
+          "Mobile privacy screen app",
+          "Infinity Battery charger",
+          "wolf",
+          "motion soccer",
+          "trash day",
+          "昭和",
+          "Short Drama",
+          "poppy look",
+          "spider character",
+          "bonelab",
+          "remote",
+          "birth-stone",
+          "calendar",
+          "录音",
+          "IQ TEST",
+          "hair",
+          "Hairstyles",
+          "zepeto",
+          "boy-attract",
+          "who-love",
+          "Verity Mod",
+          "telegram",
+          "facebook",
+          "minecraft",
+          "gender change",
+          "mini me",
+          "99 nights",
+          "palyer",
+          "pet",
+          "Dola",
+          "zoonomaly",
+          "parrot",
+          "rare-birth",
+          "美空",
+          "Blossom",
+          "dear",
+          "Ear Cleaning",
+          "Board",
+          "challenge-fruit",
+          "amsr",
+          "real&AI",
+          "snapchat",
+          "tubi",
+          "天气",
+          "lion",
+          "Disco Demo",
+          "frog",
+          "past life",
+          "VerityMod",
+          "jealous",
+          "memory",
+          "Garry’s",
+          "car",
+          "chick",
+          "peacock",
+          "kpop",
+          "fruit",
+          "radko",
+          "girl",
+          "realself",
+          "anime",
+          "cup",
+          "apple",
+          "高德",
+          "tver",
+          "abema",
+          "圣母",
+          "icon",
+          "eye color",
+          "birthstone",
+          "shopee",
+          "paint-fruit",
+          "paint-food",
+          "ring",
+          "zangi",
+          "zodiac-think",
+          "rope",
+          "Voicer",
+          "Choicer",
+          "voice",
+          "ROBUX",
+          "capcut",
+          "Sprunki",
+          "amazon-video",
+          "prime",
+          "Hulu",
+          "die",
+          "圣经",
+          "life",
+          "birth",
+          "诽谤",
+          "长方竖",
+          "Paint_Parkour",
+          "who-past",
+          "spider",
+          "netflix",
+          "Newton",
+          "disco",
+          "laugh",
+          "car for sale",
+          "pocket",
+          "lock",
+          "butterfly",
+          "animal",
+          "view",
+          "bible",
+          "fubo",
+          "nfl",
+          "angela",
+          "Bear",
+          "egg",
+          "iq type",
+          "fish",
+          "dark-side",
+          "love-language",
+          "partner",
+          "zoom",
+          "maturity",
+          "Wobbly",
+          "PEAK",
+          "reddit",
+          "pinterest",
+          "twitter",
+          "signal",
+          "dramabox",
+          "汉字",
+          "动漫",
+          "Scarlet",
+          "Princess",
+          "age",
+          "elemental",
+          "run",
+          "paint-parking",
+          "paint-line",
+          "number",
+          "crush-letter",
+          "crush-miss",
+          "call",
+          "paw call",
+          "partner-face",
+          "level devil",
+          "SlimeLab",
+          "Dumb",
+          "Build",
+          "WENDY",
+          "BK",
+          "kk",
+          "赛百味",
+          "DD",
+          "摩斯汉堡",
+          "寿司郎",
+          "skin-roblox",
+          "subway",
+          "Choicer Voicer",
+          "Square",
+          "Mimic Party",
+          "Mimic",
+          "partner\\",
+          "Architect",
+          "burger king",
+          "hand",
+          "711",
+          "全家",
+          "吉野家",
+          "sukiya",
+          "KFC",
+          "wendys",
+          "Romance Club",
+          "chrome",
+          "shortmax",
+          "dramawave",
+          "reelshort",
+          "Fortnite",
+          "face-self",
+          "mlv",
+          "filter",
+          "萨莉亚",
+          "wingstop",
+          "Crush-Initial",
+          "thinking",
+          "2026kiss",
+          "Blacksmith",
+          "dead",
+          "clips",
+          "walmart",
+          "Amazon",
+          "santa list",
+          "santa-mini-me",
+          "thanksgiving food",
+          "santa-thinking",
+          "christmas-letter",
+          "memory actor",
+          "HOT",
+          "ticket",
+          "familytree",
+          "Memory Test",
+          "How Tall Will You Be?",
+          "tall",
+          "krispykreme",
+          "test",
+          "Santa-call",
+          "tall-child",
+          "Santa Tracker",
+          "汉堡王",
+          "pinedram",
+          "pinedrama",
+          "time",
+          "clean",
+          "Defilade",
+          "Birthday",
+          "Deadlock",
+          "kitten",
+          "Dogs",
+          "WARDOGS",
+          "开发",
+          "mister",
+          "mdl",
+          "Reel",
+          "aura-color",
+          "santa-look",
+          "tile survive",
+          "bu z z",
+          "HW2",
+          "Wife",
+          "spotify",
+          "passionate",
+          "vinted",
+          "AI friend",
+          "jersey",
+          "firehouse",
+          "Komeda's Coffee",
+          "Bikkuri Donkey",
+          "BeamNG",
+          "nba",
+          "ESPN",
+          "lazy test",
+          "apple music",
+          "Crush_AI",
+          "jmmy",
+          "look-like",
+          "chinese zodiac",
+          "revenge",
+          "impossible challenge",
+          "aura",
+          "real drama",
+          "Quarium",
+          "Future life",
+          "jimmyjohns",
+          "Sim",
+          "periog",
+          "daddy",
+          "Bru",
+          "AI Auto",
+          "cat",
+          "eyetest",
+          "typegirl",
+          "name rare",
+          "god",
+          "pokemon",
+          "perfect partner",
+          "nation lip",
+          "animal face",
+          "crush no.",
+          "drawquarium",
+          "spider change"
+        ],
+        "nonDeletableOptions": [],
+        "optionStyles": {},
+        "updatedAt": "2026-11-04T08:50:49.274Z"
+      },
+      "locales": {
+        "fieldKey": "locales",
+        "options": [
+          "en",
+          "tw",
+          "es",
+          "pt",
+          "de",
+          "fr",
+          "id",
+          "th",
+          "pl",
+          "tr",
+          "hi",
+          "ar",
+          "it",
+          "vi",
+          "ko",
+          "ja",
+          "nl",
+          "jp",
+          "vn",
+          "ru",
+          "in",
+          "ejn",
+          "翻译剩余语言",
+          "miss",
+          "kr"
+        ],
+        "nonDeletableOptions": [],
+        "optionStyles": {},
+        "updatedAt": "2026-11-03T03:17:04.444Z"
+      },
+      "channels": {
+        "fieldKey": "channels",
+        "options": [
+          "google",
+          "facebook",
+          "tiktok",
+          "youtube",
+          "applovin",
+          "unity",
+          "moloco"
+        ],
+        "nonDeletableOptions": [],
+        "optionStyles": {},
+        "updatedAt": "2026-07-08T09:36:27.603Z"
+      }
+    },
+    "defaults_persisted_by_query": false,
+    "member_directory": {
+      "deptId": "od-354b90f636b89e8d390a37e2946f9e17",
+      "deptName": "SHE",
+      "members": [],
+      "query_meta": {
+        "membership_source": "authhub",
+        "observed_at": "2026-11-04T10:51:34.882Z",
+        "source_updated_at": null,
+        "total": 0,
+        "returned": 0,
+        "offset": 0,
+        "limit": 100,
+        "filters_applied": {
+          "dept_id": "od-354b90f636b89e8d390a37e2946f9e17",
+          "member_ids": [
+            "c74b62d9",
+            "2c91dcg5",
+            "b2fbcgab"
+          ]
+        },
+        "next_offset": null,
+        "snapshot": false,
+        "roles_inferred": false,
+        "completeness": "resolved_membership_only",
+        "membership_source_may_be_partial": true
+      }
+    }
+  },
+  {
+    "filters": {
+      "platform": "google",
+      "materialType": "image",
+      "adType": null
+    },
+    "ruleCount": 6,
+    "platforms": [
+      {
+        "id": "google",
+        "name": "Google",
+        "aliases": [
+          "Google Ads",
+          "谷歌"
+        ],
+        "materialTypes": [
+          {
+            "id": "image",
+            "name": "通用图片",
+            "mediaKind": "image",
+            "aliases": [
+              "图片",
+              "image",
+              "carousel",
+              "Google Carousel"
+            ],
+            "description": "Google 通用图片素材。",
+            "rules": [
+              {
+                "id": "google.image.dimensions-min",
+                "name": "Google 图片按版位满足比例与最低尺寸",
+                "code": "GOOGLE_IMAGE_SLOT_CONSTRAINT_INVALID",
+                "severity": "error",
+                "message": "Google 图片的版位类型、宽高比或最低尺寸不匹配。",
+                "fixSuggestion": "请按 long 1.91:1/600×314、square 1:1/300×300、vertical 4:5 或 9:16（至少 480×600）重新导出并标记图片。",
+                "phases": [
+                  "preflight"
+                ],
+                "appliesTo": {},
+                "assertion": {
+                  "type": "dimensions_by_resource_type",
+                  "minimums": {
+                    "long": {
+                      "width": 600,
+                      "height": 314
+                    },
+                    "square": {
+                      "width": 300,
+                      "height": 300
+                    },
+                    "vertical": {
+                      "width": 480,
+                      "height": 600
+                    }
+                  },
+                  "selector": {
+                    "roles": [
+                      "image"
+                    ]
+                  },
+                  "aspectRatios": {
+                    "long": "1.91:1",
+                    "square": "1:1",
+                    "vertical": [
+                      "4:5",
+                      "9:16"
+                    ]
+                  },
+                  "whenUnknownType": "fail",
+                  "aspectRatioTolerance": 0.1
+                },
+                "updatedAt": "2026-10-20T11:40:53.808Z"
+              },
+              {
+                "id": "google.image.square-count",
+                "name": "Google 方图至少一张",
+                "code": "GOOGLE_IMAGE_SQUARE_SLOT_REQUIRED",
+                "severity": "error",
+                "message": "Google 图片素材至少需要一张标记为 square 的方图。",
+                "fixSuggestion": "请至少提供一张 square 版位图片。",
+                "phases": [
+                  "preflight"
+                ],
+                "appliesTo": {},
+                "assertion": {
+                  "type": "count",
+                  "maximum": null,
+                  "minimum": 1,
+                  "selector": {
+                    "roles": [
+                      "image"
+                    ],
+                    "resourceTypes": [
+                      "square"
+                    ]
+                  }
+                },
+                "updatedAt": "2026-10-20T11:40:53.808Z"
+              },
+              {
+                "id": "google.image.landscape-count",
+                "name": "Google 至少一张 long 版位图片",
+                "code": "GOOGLE_IMAGE_LONG_SLOT_REQUIRED",
+                "severity": "error",
+                "message": "Google 图片素材至少需要一张标记为 long 的长图。",
+                "fixSuggestion": "请至少提供一张 long 版位图片。",
+                "phases": [
+                  "preflight"
+                ],
+                "appliesTo": {},
+                "assertion": {
+                  "type": "count",
+                  "maximum": null,
+                  "minimum": 1,
+                  "selector": {
+                    "roles": [
+                      "image"
+                    ],
+                    "resourceTypes": [
+                      "long"
+                    ]
+                  }
+                },
+                "updatedAt": "2026-10-20T11:40:53.808Z"
+              },
+              {
+                "id": "google.image.file-size",
+                "name": "单张图片不超过 5MB",
+                "code": "IMAGE_FILE_TOO_LARGE",
+                "severity": "error",
+                "message": "单张图片超过 5MB。",
+                "fixSuggestion": "请压缩图片至 5MB 以内。",
+                "phases": [
+                  "preflight"
+                ],
+                "appliesTo": {},
+                "assertion": {
+                  "type": "resource",
+                  "selector": {
+                    "roles": [
+                      "image"
+                    ]
+                  },
+                  "predicate": {
+                    "field": "verified.fileSizeBytes",
+                    "value": 5242880,
+                    "operator": "lte"
+                  },
+                  "quantifier": "all"
+                },
+                "updatedAt": "2026-10-20T11:40:53.808Z"
+              },
+              {
+                "id": "google.image.mime-type",
+                "name": "图片格式为 PNG、JPEG 或 GIF",
+                "code": "IMAGE_MIME_TYPE_INVALID",
+                "severity": "error",
+                "message": "图片格式不受支持。",
+                "fixSuggestion": "请转换为 PNG、JPG、JPEG 或 GIF 格式。",
+                "phases": [
+                  "preflight"
+                ],
+                "appliesTo": {},
+                "assertion": {
+                  "type": "resource",
+                  "selector": {
+                    "roles": [
+                      "image"
+                    ]
+                  },
+                  "predicate": {
+                    "field": "verified.mimeType",
+                    "value": [
+                      "image/png",
+                      "image/jpeg",
+                      "image/jpg",
+                      "image/gif"
+                    ],
+                    "operator": "in"
+                  },
+                  "quantifier": "all"
+                },
+                "updatedAt": "2026-10-20T11:40:53.808Z"
+              },
+              {
+                "id": "google.image.media-type",
+                "name": "资源必须是图片",
+                "code": "IMAGE_MEDIA_TYPE_INVALID",
+                "severity": "error",
+                "message": "资源不是图片文件。",
+                "fixSuggestion": "请上传图片资源。",
+                "phases": [
+                  "preflight"
+                ],
+                "appliesTo": {},
+                "assertion": {
+                  "type": "resource",
+                  "selector": {
+                    "roles": [
+                      "image"
+                    ]
+                  },
+                  "predicate": {
+                    "field": "verified.mediaType",
+                    "value": "image",
+                    "operator": "eq"
+                  },
+                  "quantifier": "all"
+                },
+                "updatedAt": "2026-10-20T11:40:53.808Z"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

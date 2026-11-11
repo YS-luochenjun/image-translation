@@ -1,0 +1,9 @@
+[
+{"name":"tool_catalog","arguments":{"tool":"material_r2_upload_from_bytes"}},
+{"name":"tool_catalog","arguments":{"tool":"material_upload_from_url"}},
+{"name":"tool_catalog","arguments":{"tool":"material_attribution_update"}},
+{"name":"tool_catalog","arguments":{"tool":"material_sharing_departments"}},
+{"name":"tool_catalog","arguments":{"tool":"requirement_field_options_query"}},
+{"name":"tool_catalog","arguments":{"tool":"material_rules_list"}},
+{"name":"tool_catalog","arguments":{"tool":"requirement_bind_materials"}}
+]

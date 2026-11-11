@@ -1,0 +1,3 @@
+- insert:
+    - id: local-image-review-ui
+      name: '@local/image-review-ui/runtime-v5-2-1'
