@@ -28,11 +28,11 @@
 
 总分 `Σ(单项分/5×权重)` ≥80，且全部底线、真实尺寸/字节/格式、内容硬检查通过，立即进入发布。**80～89是合格交付，不为追90/100继续返工或再问用户是否接受minor。** 源图SHA、当前输出SHA、真实reviewer/self身份、各维观察和minor差异必填；评分是人工视觉判断，脚本仅核算与校验证据，不能声称自动识图评分。
 
-运行 `python bin/it.py delivery-score REVIEW.json` 验证当前文件并返回 ready_for_submission/rework/blocked/needs_review。返回status是提交门禁，next_action才是续作动作：错数字/接缝等gate=blocked不代表立即放弃；若已知正确事实、有修复路线且不足两轮，next_action=rework。`unresolved_facts`填写真正缺失的原文事实/身份依据，非空必须blocked且不可猜；未看图/过期SHA先review。JSON合同见 `src/image_localizer/delivery_quality.py` 的模块说明和测试；不把新评分字段强塞旧manifest/review。旧 quality/分层检查中的style/restoration依据本口径填写：容许的自然差异记true+具体minor，已观察的实质缺陷仍false。技术门禁不能被本评分绕过。
+运行 `python bin/it.py delivery-score REVIEW.json` 验证当前文件并返回 ready_for_submission/rework/blocked/needs_review。返回status是提交门禁，next_action才是续作动作：错数字/接缝等gate=blocked不代表立即放弃；若已知正确事实、有修复路线，next_action=rework。`unresolved_facts`填写真正缺失的原文事实/身份依据，非空必须blocked且不可猜；未看图/过期SHA先review。JSON合同见 `src/image_localizer/delivery_quality.py` 的模块说明和测试；不把新评分字段强塞旧manifest/review。旧 quality/分层检查中的style/restoration依据本口径填写：容许的自然差异记true+具体minor，已观察的实质缺陷仍false。技术门禁不能被本评分绕过。
 
 ## 有限返工与范围隔离
 
-初稿后最多两轮针对性修正。通过即停止；第一轮只改最影响交付的局部，第二轮换实际可用路线或简化非核心细节。不能在无新依据时重复同一路线。80以下或底线未过且仍有改进路线才返工；两轮后仍不达标，保留最佳候选，说明具体缺陷及唯一需要的人类决定/外部能力，挂起这个成员或共用源组，继续其他独立成员。时间/次数耗尽不自动pass，不把缺成员宣布整项完成。
+不设固定返工次数。通过即停止；优先修复最影响交付的局部，同一方法无改善时换实际可用路线或简化非核心细节，不能无新依据重复。80以下或底线未过且有改进路线就继续返工；确无可行路线或存在实际外部阻塞时，保留最佳候选并说明具体限制，挂起这个成员或共用源组，继续其他独立成员。时间/次数耗尽不自动pass，不把缺成员宣布整项完成。
 
 只在未知原文事实/范围互相冲突、不可替代身份素材缺失、未授权收费、平台未知写结果/权限等情况下集中问一次。已确认问题复用当前确认范围，定稿和可接受minor不重复问。新版本必须新SHA审查；旧pass只在相同字节及相同规则下复用，不重复制作合格成员。
 

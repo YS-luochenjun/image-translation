@@ -45,11 +45,11 @@ python bin/it.py delivery-gate state.json
 
 - semantic_accuracy、visual_continuity、overall_similarity、readability、composition。
 
-checks每项{checked:布尔,notes:具体依据}，九项必须齐全：amounts_numbers、claims、translation_complete、protected_identity、protected_type、subject_integrity、no_visible_seams、text_not_clipped、copy_edits_preserve_facts。requirements为非空[{id,checked,notes}]，描述本任务特有要求，ID不可重复。spec含width、height、max_bytes、formats（Pillow实际格式，如["PNG","JPEG"]）。blocking_issues、minor_differences为具体字符串数组；targeted_reworks为0/1/2；可选unresolved_facts为真正缺依据的事实数组。
+checks每项{checked:布尔,notes:具体依据}，九项必须齐全：amounts_numbers、claims、translation_complete、protected_identity、protected_type、subject_integrity、no_visible_seams、text_not_clipped、copy_edits_preserve_facts。requirements为非空[{id,checked,notes}]，描述本任务特有要求，ID不可重复。spec含width、height、max_bytes、formats（Pillow实际格式，如["PNG","JPEG"]）。blocking_issues、minor_differences为具体字符串数组；targeted_reworks为非负整数；可选unresolved_facts为真正缺依据的事实数组。
 
 没有源文字或身份依据记unresolved_facts，不能以空数组蒙混；有正确文案但排错字属于可修问题，不需要再问用户。合格翻译可忠实本地化并用已确认补写，不要求逐字照搬。SHA只绑定审过的字节，不证明看图；宿主真实看图后才能填这些输入。
 
-返回status是提交门禁：ready_for_submission/rework/blocked/needs_review；next_action独立为submit/rework/blocked/review。gate blocked仍可能有两轮可用局部返工；未知事实/两轮耗尽挂起。80分且底线通过立即submit，保留minor说明，不反复追100。评分合同与边界回归见[评分实现](../src/image_localizer/delivery_quality.py)、[测试](../tests/test_delivery_quality.py)。
+返回status是提交门禁：ready_for_submission/rework/blocked/needs_review；next_action独立为submit/rework/blocked/review。gate blocked仍可能需要继续局部返工；未知事实或确无可行路线时挂起。80分且底线通过立即submit，保留minor说明，不反复追100。评分合同与边界回归见[评分实现](../src/image_localizer/delivery_quality.py)、[测试](../tests/test_delivery_quality.py)。
 
 ## 续作状态
 
@@ -71,12 +71,12 @@ checks每项{checked:布尔,notes:具体依据}，九项必须齐全：amounts_n
 
 size_spec、member输出/审核、fresh下载路径相对state；审核内部source/artifact路径相对review文件。没有输出/审核的member可省略并返回make；已输出但无review返回review。证据损坏或过期仅退回该member，不拖其他独立成员。矩阵身份冲突、重复构图文件等整包冲突先纠正再规划。
 
-publication每阶段由宿主写真实已核回执：upload_receipt、material_id、resource_id、attribution_receipt、binding_receipt、fresh_verification。若字段缺失，依次输出upload/import/attribute/bind/verify。回执字段的存在只驱动下一步，不能证明平台成功。fresh_verification必须含requirement_id/source_id/language/member_id/material_id/resource_id、designer_ids与shared_dept_ids非空字符串数组、creation_type=derivative、sha256、带时区observed_at、实际下载的downloaded_path。当前版本限30分钟内；未来时间不接受。资源下载字节必须与已审输出一致，下载路径不能直接指原输出。
+publication每阶段由宿主写真实已核回执：upload_receipt、material_id、resource_id、attribution_receipt、binding_receipt、fresh_verification。若字段缺失，依次输出upload/import/attribute/bind/verify。回执字段的存在只驱动下一步，不能证明平台成功。fresh_verification必须含requirement_id/source_id/language/member_id/material_id/resource_id、designer_ids和非空shared_dept_ids字符串数组、creation_type=derivative、sha256、带时区observed_at、实际下载的downloaded_path。设计师排除罗晨钧和邹彬；设计师可以留空，requirement和fresh的designer_ids均为空数组即可，不要求额外证明文件。当前版本限30分钟内；未来时间不接受。资源下载字节必须与已审输出一致，下载路径不能直接指原输出。
 
-已审输出和当前spec必须一致且格式为PNG/JPEG；未知上传按旧发布器整需求阻断外部写，不阻本地制作或其他需求。评分通过不代表实际授权，平台仍须fresh核角色/权限/归属/共享。material_id是记录，不等于图片资源数。整个明确矩阵全部delivery_verified才complete=true，27/28仍不完整。模型自报和手填JSON无法认证平台，宿主必须实际读回。
+已审输出和当前spec必须一致且格式为PNG/JPEG。R2已有相同对象或素材库已有相同图片，本身不构成上传、入库或绑定的阻断，以需求面板正确完整为准。结果未知的写操作保留原操作ID并对账。未知上传可以在明确要求继续独立成员时隔离到不重叠的输出路径和SHA，未知入库、绑定或来源重叠的写操作仍阻断对应后续动作。评分通过不代表平台操作已成功，仍须fresh核角色、权限、归属、共享。material_id是记录，不等于图片资源数。整个明确矩阵全部delivery_verified才complete=true，13/14仍不完整。模型自报和手填JSON无法认证平台，宿主必须实际读回。
 
 ## 对接现有发布器
 
 delivery-gate重新评估当前state，输出旧发布器可消费的requirement_id/passed/reviewed_by/evidence/outputs(path,sha256)。将此JSON通过文件工具保存到对应需求目录，并把相对gate路径交给现有发布请求gate_file；未知写、未审/过期或未达标项不入gate。部分合格可以发布，但requirement_complete仍false。每次旧发布器仍核实际SHA、原operation_id、当前tool_catalog与原journal，不重放未知写。
 
-本轮没有重写历史[scripts/fireplay-mcp-publication.mjs](../scripts/fireplay-mcp-publication.mjs)及旧生产账本。它有历史人名排除与本地intake权限快照，当前普通需求的设计师不能机械套排除规则，宿主按当前正式MCP/权限证据选择符合范围的提交路径。不能把本轮知识升级描述为完成全部历史需求，也不能说这是离开宿主仍能运行的图像生产守护程序。
+发布器仍使用本地intake权限快照和真实官方合同；按当前用户规则排除罗晨钧和邹彬，其他设计师仅在身份可确认时填写，也可留空。不能把规则更新描述为全部历史需求已经完成，也不能说这是离开宿主仍能运行的图像生产守护程序。

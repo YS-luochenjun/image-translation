@@ -1,0 +1,122 @@
+{
+  "schema_version": 2,
+  "project_root": "/Users/yanshan/Desktop/image-translation",
+  "project_id": "8cb983fc-3791-4abd-a5dd-1a7928f90752",
+  "workflow": "agent/workflows/fireplay-monitor.md",
+  "state_file": "work/fireplay-monitor/controller.json",
+  "discovery_interval_minutes": 30,
+  "followup_interval_minutes": 20,
+  "followup_mode": "same_controller_when_work_exists",
+  "followup_automation_status": "PAUSED",
+  "resume_followup_automatically": false,
+  "discovery_state_file": "work/fireplay-monitor/discovery-state.json",
+  "monitor_command": "scripts/fireplay-monitor-plan.mjs",
+  "receipt_max_age_minutes": 30,
+  "create_threads_only_for_new_requirements": true,
+  "max_active_requirements": null,
+  "concurrency_mode": "unlimited",
+  "execution_session": {
+    "model": "host_default",
+    "reasoning_effort": "host_default",
+    "authorization": "用户最新指示以后新开需求会话不指定模型或推理等级。",
+    "creation": "调用 create_thread 时省略 model 与 thinking；现有会话沿用原负责人。"
+  },
+  "discovery": {
+    "scope": "all",
+    "asset_type": [
+      "image",
+      "button"
+    ],
+    "ai_mode_label": "图片翻译",
+    "pagination": "cursor",
+    "status": [
+      "not_started",
+      "in_progress"
+    ],
+    "limit": 40,
+    "offset": 0,
+    "resolve_ai_mode_from_current_options": true,
+    "filter_department": false,
+    "filter_date": false,
+    "filter_keyword": false
+  },
+  "full_reconciliation": {
+    "interval_hours": 24,
+    "status_filter": false,
+    "limit": 10,
+    "catch_up_after_offline": true
+  },
+  "tracked_reconciliation": {
+    "exact_uuid_batch_size": 40,
+    "page_size": 7,
+    "status_filter": false,
+    "ai_mode_filter": false,
+    "skip_closed_without_owner_or_unresolved_work": true,
+    "skip_chat_poll_when_empty": true
+  },
+  "quality": {
+    "minimum_score": 80,
+    "all_dimension_floors_required": true
+  },
+  "paid_generation": {
+    "default_authorized_for_assigned_image_requirements": true,
+    "authorization": "用户明确允许已交办图片需求使用付费内容与工具，包括 KIE 和 GPT ImageGen。",
+    "follow_actual_tool_contract_and_host_approval": true,
+    "record_actual_cost": true,
+    "inherit_video_budget": false,
+    "complex_image_route": {
+      "preferred": [
+        "codex_gpt_imagegen_reference_edit",
+        "kie_reference_image_edit"
+      ],
+      "fallback": [
+        "verified_local_source_reconstruction",
+        "solid_or_small_auxiliary_opencv_only"
+      ],
+      "local_lama_or_opencv_default": false,
+      "local_lama_or_opencv_allowed_only_for": [
+        "verified_flat_color_small_region",
+        "auxiliary_mask",
+        "deterministic_composite"
+      ],
+      "quality_failure_action": "switch_route_and_continue",
+      "missing_clean_plate_action": "make_and_review_from_existing_source"
+    },
+    "submitted_material_policy": {
+      "freeze_after": [
+        "official_upload"
+      ],
+      "freeze_scope": "individual_member",
+      "post_upload_actions": [
+        "material_import",
+        "attribution",
+        "sharing",
+        "requirement_binding",
+        "fresh_verification",
+        "read_only_reconciliation"
+      ],
+      "imagegen_agnostic": true,
+      "automatic_rework": false,
+      "automatic_replacement": false,
+      "automatic_reupload": false,
+      "rework_requires": [
+        "explicit_user_request",
+        "official_correction_request"
+      ]
+    }
+  },
+  "notifications": [
+    "new_assignment",
+    "verified_completion",
+    "important_failure",
+    "requires_human_action"
+  ],
+  "tracking_policy": {
+    "exclude_completed": true,
+    "max_age_calendar_days": 3,
+    "timezone": "America/Los_Angeles",
+    "date_source": "需求编号日期或可信需求日期",
+    "unknown_date": "保留待查，不猜测",
+    "platform_done_alone_is_not_delivery_proof": true
+  }
+}

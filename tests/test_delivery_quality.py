@@ -65,7 +65,7 @@ class DeliveryQualityTests(unittest.TestCase):
                 self.review['dimensions'][name]['score'] = below
                 self.assertEqual('rework', self.assess()['status'])
 
-    def test_70_boundary_and_two_rework_limit_affect_only_member(self):
+    def test_70_boundary_allows_further_repairs(self):
         self.scores([4, 4, 3, 3, 3])  # exactly 71
         self.assertEqual(71, self.assess()['score'])
         self.review['dimensions']['composition']['score'] = 2.5
@@ -75,7 +75,7 @@ class DeliveryQualityTests(unittest.TestCase):
             self.assertEqual('rework', self.assess()['status'])
         self.review['targeted_reworks'] = 2
         result = self.assess()
-        self.assertEqual('blocked', result['status'])
+        self.assertEqual('rework', result['status'])
         self.assertEqual('member', result['scope'])
         self.assertEqual(self.review['member_id'], result['member_id'])
         other = deepcopy(self.review)
@@ -85,14 +85,14 @@ class DeliveryQualityTests(unittest.TestCase):
         self.scores([5] * 5)
         self.assertEqual('ready_for_submission', self.assess()['status'])
 
-    def test_below_70_fails_gate_but_allows_two_targeted_repairs(self):
+    def test_below_70_fails_gate_but_allows_targeted_repairs(self):
         self.scores([2.5] * 5)
-        for rounds in (0, 1, 2):
+        for rounds in (0, 1, 2, 5):
             self.review['targeted_reworks'] = rounds
             result = self.assess()
             self.assertEqual(50, result['score'])
             self.assertEqual('blocked', result['status'])
-            self.assertEqual('blocked' if rounds == 2 else 'rework', result['next_action'])
+            self.assertEqual('rework', result['next_action'])
 
     def test_wrong_number_blocks_submission_but_can_be_corrected(self):
         self.review['checks']['amounts_numbers']['checked'] = False
@@ -102,7 +102,7 @@ class DeliveryQualityTests(unittest.TestCase):
         self.assertEqual('blocked', result['status'])
         self.assertEqual('rework', result['next_action'])
         self.review['targeted_reworks'] = 2
-        self.assertEqual('blocked', self.assess()['next_action'])
+        self.assertEqual('rework', self.assess()['next_action'])
 
     def test_photo_concealment_cannot_be_offset_by_high_readability_score(self):
         # Models still supply the observation; this checks that scoring cannot waive it.
@@ -115,7 +115,7 @@ class DeliveryQualityTests(unittest.TestCase):
         self.assertEqual('blocked', result['status'])
         self.assertEqual('rework', result['next_action'])
         self.review['targeted_reworks'] = 2
-        self.assertEqual('blocked', self.assess()['next_action'])
+        self.assertEqual('rework', self.assess()['next_action'])
 
     def test_unresolved_facts_block_without_guessing_even_at_high_score(self):
         self.review['unresolved_facts'] = ['Source price digit is illegible; cannot confirm 19 or 79.']
@@ -181,10 +181,23 @@ class DeliveryQualityTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     self.assess()
         self.scores([5] * 5)
-        for value in (True, 1.0, -1, 3, None):
+        for value in (True, 1.0, -1, None):
             self.review['targeted_reworks'] = value
             with self.assertRaises(ValueError):
                 self.assess()
+
+    def test_old_authorization_records_remain_compatible(self):
+        self.review['targeted_reworks'] = 3
+        self.assertEqual('ready_for_submission', self.assess()['status'])
+        self.review['rework_authorization'] = {'max_reworks': 3, 'user_instruction': 'Continue until uploaded'}
+        self.assertEqual('ready_for_submission', self.assess()['status'])
+        self.assertIsNone(self.assess()['reworks_remaining'])
+        self.review['checks']['amounts_numbers']['checked'] = False
+        self.assertEqual('blocked', self.assess()['status'])
+        self.assertEqual('rework', self.assess()['next_action'])
+        self.review['rework_authorization']['user_instruction'] = ' '
+        with self.assertRaises(ValueError):
+            self.assess()
 
     def test_boolean_fields_are_strict_and_observations_required(self):
         self.review['checks']['amounts_numbers']['checked'] = 1

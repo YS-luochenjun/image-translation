@@ -24,7 +24,7 @@ async function read(transport,contract,args){
  if(value?.error)fail(`Read failed: ${contract.name}`);
  return value;
 }
-function nextCursor(response){
+export function nextCursor(response){
  const own=Object.hasOwn(response,'next_cursor');
  const cursor=response.next_cursor;
  const validCursor=typeof cursor==='string'&&cursor.trim().length>0;
@@ -37,7 +37,7 @@ function nextCursor(response){
  if(!own||response.query_meta?.pagination!=='live_keyset'||(cursor!==null&&!validCursor))fail('Missing explicit live_keyset pagination cursor');
  return cursor;
 }
-function verifyPage(response,query){
+export function verifyPage(response,query){
  const meta=response?.query_meta, filters=meta?.filters_applied;
  const list=value=>value===null||value===undefined?[]:Array.isArray(value)?value:[value];
  const same=(left,right)=>JSON.stringify([...list(left)].sort())===JSON.stringify([...list(right)].sort());
@@ -55,9 +55,10 @@ function verifyPage(response,query){
  if(typeof response.serverTime!=='string'||!Number.isFinite(Date.parse(response.serverTime)))fail('Missing server time evidence');
 }
 
-export async function discoverTranslations({transport,deptId,maxPages=100,allDepartments=false}){
+export async function discoverTranslations({transport,deptId,maxPages=100,allDepartments=false,mode='full'}){
  if(typeof deptId!=='string'||!deptId.trim())fail('A visible department ID is required to resolve current AI mode options');
  if(typeof allDepartments!=='boolean')fail('allDepartments must be an explicit boolean');
+ if(!['active','full'].includes(mode))fail('mode must be active or full');
  if(!Number.isInteger(maxPages)||maxPages<1||maxPages>1000)fail('Invalid page limit');
  const optionsContract=await definition(transport,'requirement_create_options');
  const listContract=await definition(transport,'requirement_list');
@@ -70,8 +71,9 @@ export async function discoverTranslations({transport,deptId,maxPages=100,allDep
   const matches=Array.isArray(assetTypes)?assetTypes.filter(item=>item.value===value&&item.label===label):[];
   if(matches.length!==1||matches[0].enabled===false)fail(`Current type option missing or ambiguous: ${label}`);
  }
+ if(mode==='active'&&!['not_started','in_progress'].every(status=>options.configured?.status?.includes(status)))fail('Current configured active statuses are unavailable');
  // The seed department resolves official options; it only filters rows in department mode.
- const query={scope:'all',...(!allDepartments?{dept_id:deptId}:{}),view:'summary',asset_type:['image','button'],ai_mode:modes[0].value,pagination:'cursor',limit:200,offset:0};
+ const query={scope:'all',...(!allDepartments?{dept_id:deptId}:{}),view:'summary',asset_type:['image','button'],ai_mode:modes[0].value,...(mode==='active'?{status:['not_started','in_progress']}:{}),pagination:'cursor',limit:mode==='active'?40:200,offset:0};
  const summaryPages=[],seenCursors=new Set(),seenIds=new Set(),seenCodes=new Set(),rows=[];
  let cursor;
  for(let page=0;page<maxPages;page++){
@@ -86,6 +88,7 @@ export async function discoverTranslations({transport,deptId,maxPages=100,allDep
    seenIds.add(identity);seenCodes.add(row.code);
    if(typeof row.deptId!=='string'||!row.deptId.trim()||(!allDepartments&&row.deptId!==deptId)
       ||row.aiMode!==modes[0].value||!['image','button'].includes(row.assetType))fail('Response does not match exact AI/type/department filters');
+   if(mode==='active'&&!query.status.includes(row.status))fail('Response row does not match active status filters');
    rows.push(row);
   }
   cursor=nextCursor(response);
@@ -95,7 +98,7 @@ export async function discoverTranslations({transport,deptId,maxPages=100,allDep
  }
  const pending=rows.filter(row=>!['done','cancelled','canceled'].includes(row.status));
  return {schema_status:'live_contract_verified',external_write:false,complete:cursor===null,
-  state:cursor?'partial':(pending.length?'found':'empty'),query,summary_pages:summaryPages,next_cursor:cursor,
+  state:cursor?'partial':(pending.length?'found':'empty'),scan_mode:mode,query,summary_pages:summaryPages,next_cursor:cursor,
   option_evidence:{dept_id:deptId,options_revision:options.optionsRevision,ai_mode:modes[0],asset_types:assetTypes,contract_schema:optionsContract.schema_version},
   list_schema_version:listContract.schema_version,required_ai_modes:[modes[0].value],
   candidates:pending.map(row=>({id:row.id,code:row.code,asset_type:row.assetType,status:row.status,can_bind:row.canBindMaterials,updated_at:row.updatedAt,next_action:'read_exact_blind_brief'})),
@@ -103,9 +106,16 @@ export async function discoverTranslations({transport,deptId,maxPages=100,allDep
 }
 
 async function main(){
- const [flag,deptId,coverage,...extra]=process.argv.slice(2);
- if(flag!=='--department'||!deptId||(coverage!==undefined&&coverage!=='--all-departments')||extra.length)fail('Usage: node scripts/fireplay-discover-translations.mjs --department DEPT_ID [--all-departments]');
+ const [flag,deptId,...flags]=process.argv.slice(2);
+ let allDepartments=false,mode='full';
+ for(let index=0;index<flags.length;index++){
+  if(flags[index]==='--all-departments'&&!allDepartments)allDepartments=true;
+  else if(flags[index]==='--mode')mode=flags[++index];
+  else fail('Unsupported discovery flag');
+ }
+ if(flag!=='--department'||!deptId)fail('Usage: node scripts/fireplay-discover-translations.mjs --department DEPT_ID [--all-departments] [--mode active|full]');
+ if(!['active','full'].includes(mode))fail('mode must be active or full');
  const transport=await connectProxy();
- try{console.log(JSON.stringify(await discoverTranslations({transport,deptId,allDepartments:coverage==='--all-departments'}),null,2));}finally{transport.close();}
+ try{console.log(JSON.stringify(await discoverTranslations({transport,deptId,allDepartments,mode}),null,2));}finally{transport.close();}
 }
 if(process.argv[1]&&pathToFileURL(resolve(process.argv[1])).href===import.meta.url)main().catch(error=>{console.error(JSON.stringify({state:'discovery_failed',message:error.message,external_write:false}));process.exitCode=1;});

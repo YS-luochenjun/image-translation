@@ -17,7 +17,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 def sha256(path: Path) -> str:
     with path.open("rb") as stream:
-        return hashlib.file_digest(stream, "sha256").hexdigest()
+        digest = hashlib.sha256()
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+        return digest.hexdigest()
 
 
 def read_json(path: Path) -> dict:

@@ -39,12 +39,13 @@ class MaterialSizeTests(unittest.TestCase):
             self.spec['outputs'].append({'source_id': item['source_id'], 'language': item['language'],
                                          'member_id': item['member_id'], 'path': name, 'adaptation': 'recompose'})
 
-    def test_machine_policy_has_exact_23_presets_and_no_image_default(self):
+    def test_machine_policy_has_exact_23_presets_and_seven_image_members(self):
         policy = json.loads(POLICY.read_text(encoding='utf-8'))
         self.assertEqual(len(policy['types']['button']['whitelist']), 23)
         self.assertIn([240, 400], policy['types']['button']['whitelist'])
         self.assertEqual(policy['types']['button']['max_bytes'], 153600)
         self.assertIsNone(policy['types']['image']['defaults'])
+        self.assertEqual(policy['types']['image']['default_delivery_mode'], 'standard_seven_set')
         self.assertEqual(policy['types']['image']['required_roles'], [])
 
     def test_default_matrix_once_per_language_and_source_shape(self):
@@ -82,9 +83,15 @@ class MaterialSizeTests(unittest.TestCase):
         self.spec['asset_type'] = 'video'
         self.assertEqual(plan_sizes(self.save())['status'], 'unsupported')
 
-    def test_image_unresolved_scope_and_role_only_history_fail_closed(self):
+    def test_image_defaults_to_seven_without_requiring_standard_in_brief(self):
         self.spec['asset_type'] = 'image'
-        for historical in (None, {'sizes': [[1200, 628], [1200, 1200]]},
+        result = plan_sizes(self.save())
+        self.assertEqual(result['expected_resource_count'], 14)
+        self.assertTrue(all(item['delivery_mode'] == 'standard_seven_set' for item in result['items']))
+
+    def test_role_only_history_still_requires_explicit_scope(self):
+        self.spec['asset_type'] = 'image'
+        for historical in ({'sizes': [[1200, 628], [1200, 1200]]},
                            {'sizes': [[1200, 628], [1200, 1200], [960, 1200]]}):
             if historical is not None:
                 self.spec['historical_reference'] = historical
@@ -98,6 +105,7 @@ class MaterialSizeTests(unittest.TestCase):
     def test_provided_five_sources_six_languages_forms_six_complete_groups(self):
         sizes = [(500, 628), (500, 628), (1200, 628), (1200, 1200), (1200, 1200)]
         self.spec.update(asset_type='image', delivery_mode='provided_source_set',
+                         provided_set_scope='explicit_source_only',
                          scope_basis='User supplies the complete five-image set; deliver six translated groups')
         self.spec['sources'] = []
         for index, size in enumerate(sizes):
@@ -200,12 +208,98 @@ class MaterialSizeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'nonempty text'):
             plan_sizes(self.save())
 
-    def test_explicit_scope_for_one_source_does_not_resolve_other_source(self):
+    def test_single_source_standard_seven_set_expands_per_language(self):
+        self.spec.update(
+            asset_type='image',
+            delivery_mode='standard_seven_set',
+            scope_basis='User requests one long image expanded to the standard seven-member set',
+        )
+        self.spec['sources'][0]['languages'] = ['en', 'ja']
+        result = plan_sizes(self.save())
+        self.assertEqual(result['expected_resource_count'], 14)
+        self.assertEqual(len({item['member_id'] for item in result['items']}), 7)
+        self.assertEqual(
+            {(item['width'], item['height']) for item in result['items']},
+            {(1200, 628), (1200, 1200), (960, 1200)},
+        )
+
+    def test_029_nine_independent_creatives_one_language_require_sixty_three(self):
+        self.spec.update(
+            asset_type='image',
+            delivery_mode='standard_seven_set',
+            scope_basis='User confirms nine independent WOW-029 creatives each require a standard set',
+        )
+        self.spec['sources'] = [{'id': f'creative-{index}', 'path': 'source.png', 'languages': ['it']} for index in range(9)]
+        result = plan_sizes(self.save())
+        self.assertEqual(result['expected_resource_count'], 63)
+        self.assertEqual(sum(item['role'] == 'long' for item in result['items']), 9)
+        self.assertEqual(sum(item['role'] == 'square' for item in result['items']), 27)
+        self.assertEqual(sum(item['role'] == 'vertical' for item in result['items']), 27)
+        self.spec['outputs'] = []
+        checked = validate_sizes(self.save())
+        self.assertEqual(checked['status'], 'fail')
+        self.assertEqual(len(checked['missing']), 63)
+
+    def test_049_four_creatives_seven_languages_require_196(self):
+        self.spec['asset_type'] = 'image'
+        self.spec['sources'] = [{'id': f'creative-{index}', 'path': 'source.png', 'languages': ['ko', 'ja', 'es', 'pt', 'de', 'fr', 'nl']} for index in range(4)]
+        self.assertEqual(plan_sizes(self.save())['expected_resource_count'], 196)
+
+    def test_per_source_languages_do_not_cross_multiply(self):
+        self.spec['asset_type'] = 'image'
+        self.spec['sources'] = [{'id': 'first', 'path': 'source.png', 'languages': ['it']},
+                                {'id': 'second', 'path': 'source.png', 'languages': ['fr', 'de']}]
+        self.assertEqual(plan_sizes(self.save())['expected_resource_count'], 21)
+
+    def test_complete_provided_seven_are_translated_once(self):
+        self.spec.update(asset_type='image', delivery_mode='provided_source_set', scope_basis='Seven actual supplied members')
+        self.spec['sources'] = []
+        for index, size in enumerate([(1200, 628)] + [(1200, 1200)] * 3 + [(960, 1200)] * 3):
+            path = f'provided-{index}.png'
+            Image.new('RGB', size, 'white').save(self.root / path)
+            self.spec['sources'].append({'id': f'provided-{index}', 'path': path, 'languages': ['ja']})
+        self.assertEqual(plan_sizes(self.save())['expected_resource_count'], 7)
+        self.spec['sources'][-1]['languages'] = ['it']
+        with self.assertRaisesRegex(ValueError, 'Incomplete standard provided source set'):
+            plan_sizes(self.save())
+
+    def test_one_two_three_or_seven_longs_are_not_complete_provided_sets(self):
+        Image.new('RGB', (1200, 628), 'white').save(self.root / 'long.png')
+        self.spec.update(asset_type='image', delivery_mode='provided_source_set', scope_basis='Multiple attachments do not establish a complete set')
+        for count in (1, 2, 3, 7, 9):
+            self.spec['sources'] = [{'id': f'long-{index}', 'path': 'long.png', 'languages': ['it']} for index in range(count)]
+            with self.assertRaisesRegex(ValueError, 'Incomplete standard provided source set'):
+                plan_sizes(self.save())
+
+    def test_standard_one_two_three_outputs_are_partial_and_members_need_separate_files(self):
+        self.spec['asset_type'] = 'image'
+        self.spec['sources'][0]['languages'] = ['it']
+        self.write_outputs(plan_sizes(self.save()))
+        complete = list(self.spec['outputs'])
+        for count in (1, 2, 3):
+            self.spec['outputs'] = complete[:count]
+            checked = validate_sizes(self.save())
+            self.assertEqual(checked['status'], 'fail')
+            self.assertEqual(len(checked['missing']), 7 - count)
+            self.assertTrue(all('member_id' in item for item in checked['missing']))
+        self.spec['outputs'] = complete
+        self.spec['outputs'][2]['path'] = self.spec['outputs'][1]['path']
+        checked = validate_sizes(self.save())
+        self.assertEqual(checked['status'], 'fail')
+        self.assertTrue(any('separate output files' in item['reason'] for item in checked['errors']))
+
+    def test_seven_reference_longs_do_not_satisfy_standard_roles(self):
+        members = self.seven_scope()
+        for member in members:
+            member.update(width=1200, height=628)
+        with self.assertRaisesRegex(ValueError, '1 long, 3 square, 3 vertical'):
+            plan_sizes(self.save())
+
+    def test_explicit_scope_for_one_source_keeps_other_source_standard(self):
         self.spec['asset_type'] = 'image'
         self.spec['sources'][0].update(explicit_sizes=[[1200, 1200]], explicit_specification='User: square only for this source')
         self.spec['sources'].append({'id': 'two', 'path': 'source.png', 'languages': ['en', 'ja']})
-        with self.assertRaisesRegex(ValueError, 'scope_unresolved'):
-            plan_sizes(self.save())
+        self.assertEqual(plan_sizes(self.save())['expected_resource_count'], 16)
 
     def test_real_files_coverage_bytes_and_no_stretch(self):
         self.spec['sources'][0]['languages'] = ['en']

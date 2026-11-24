@@ -10,13 +10,13 @@ const evidence={schema_version:'b'.repeat(64),response_excerpt:{
  deptId,optionsRevision:'fixture-options-v1',fixed:{
   aiModes:[{value:mode,label:'图片翻译',enabled:true}],
   assetTypes:[{value:'image',label:'长方竖图',enabled:true},{value:'button',label:'大按钮',enabled:true}],
- },
+ },configured:{status:['not_started','in_progress','pending_upload','done']},
 }};
 const listSchema={type:'object',additionalProperties:false,
  properties:{scope:{type:'string',enum:['all']},dept_id:{type:'string',minLength:1},view:{type:'string',enum:['summary']},
   asset_type:{type:'array',items:{type:'string',enum:['image','button']}},ai_mode:{type:'string',minLength:1},
   pagination:{type:'string',enum:['cursor']},limit:{type:'integer',minimum:1,maximum:200},offset:{type:'integer',minimum:0},
-  cursor:{type:'string',minLength:1}},
+  cursor:{type:'string',minLength:1},status:{type:'array',items:{type:'string'}}},
  required:['scope','view','asset_type','ai_mode','pagination','limit','offset']};
 const clone=value=>structuredClone(value);
 const contracts={
@@ -137,6 +137,17 @@ test('maxPages retains partial proof and resumable next cursor; empty is complet
 test('completed rows remain evidence but are not actionable candidates',async()=>{
  const result=await run(fixture({pages:[page([row({status:'done'})])]}));
  assert.equal(result.state,'empty');assert.equal(result.summary_pages[0].response.items.length,1);
+});
+
+test('active discovery uses both configured work statuses and 40-row cursor pages',async()=>{
+ const response=globalPage([row({status:'in_progress'})]);
+ response.query_meta.filters_applied.status=['not_started','in_progress'];
+ const result=await run(fixture({pages:[response]}),{allDepartments:true,mode:'active'});
+ assert.deepEqual(result.query.status,['not_started','in_progress']);
+ assert.equal(result.query.limit,40);assert.equal(result.scan_mode,'active');
+ const wrong=clone(response);wrong.items[0].status='done';
+ await assert.rejects(run(fixture({pages:[wrong]}),{allDepartments:true,mode:'active'}),/status/);
+ await assert.rejects(run(fixture(),{mode:'guessed'}),/mode/);
 });
 
 test('option ambiguity, disabled/missing mode, invalid slug and wrong department reject',async()=>{

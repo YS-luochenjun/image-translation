@@ -8,7 +8,7 @@ from pathlib import Path
 from PIL import Image
 
 POLICY = Path(__file__).resolve().parents[2] / 'docs' / 'material-size-policy.json'
-SCOPE_FIELDS = ('delivery_mode', 'scope_basis', 'reference_members', 'reference_evidence_path', 'explicit_members')
+SCOPE_FIELDS = ('delivery_mode', 'scope_basis', 'reference_members', 'reference_evidence_path', 'explicit_members', 'provided_set_scope')
 
 
 def _keys(value, allowed, required=()):
@@ -80,13 +80,28 @@ def _load(path):
     return spec, path.parent, policy
 
 
-def _image_members(source, spec, base, width, height):
+def _image_members(source, spec, base, width, height, policy):
     def field(key):
         return source.get(key, spec.get(key))
 
     mode = field('delivery_mode')
     explicit = field('explicit_sizes')
     explicit_members = field('explicit_members')
+    if mode is None and explicit is None and explicit_members is None:
+        if field('historical_reference') is not None or field('reference_members') is not None or field('reference_evidence_path') is not None:
+            raise ValueError('scope_unresolved: reference evidence requires an explicit delivery_mode')
+        mode = policy['default_delivery_mode']
+    if mode == 'standard_seven_set':
+        if explicit is not None or explicit_members is not None or field('reference_members') is not None or field('reference_evidence_path') is not None:
+            raise ValueError('Conflicting standard seven-member scope')
+        basis = _text(field('scope_basis') or 'Project standard confirmed 2026-11-17: one long, three square, three vertical per independent creative and target language')
+        members = policy.get('standard_seven_members')
+        if not isinstance(members, list) or len(members) != 7:
+            raise ValueError('Missing standard seven-member policy')
+        counts = {role: sum(member.get('role') == role for member in members) for role in ('long', 'square', 'vertical')}
+        if counts != {'long': 1, 'square': 3, 'vertical': 3}:
+            raise ValueError('Invalid standard seven-member role counts')
+        return [dict(member) for member in members], 'project_standard', basis, mode
     if mode == 'explicit_members':
         if explicit is not None or field('reference_members') is not None or field('reference_evidence_path') is not None:
             raise ValueError('Conflicting explicit member scope')
@@ -110,9 +125,11 @@ def _image_members(source, spec, base, width, height):
         basis = _text(field('explicit_specification'))
         return [{'member_id': f'{w}x{h}', 'width': w, 'height': h} for w, h in _sizes(explicit)], 'explicit_requirement', basis, 'explicit_sizes'
     if mode not in ('provided_source_set', 'reference_seven_set'):
-        raise ValueError('scope_unresolved: image requires provided_source_set, evidenced reference_seven_set, or explicit_sizes with user basis; no automatic three/seven expansion')
+        raise ValueError('scope_unresolved: image requires standard_seven_set per independent creative, a complete provided_source_set, evidenced reference_seven_set, or explicit scope with user basis')
     basis = _text(field('scope_basis'))
     if mode == 'provided_source_set':
+        if field('provided_set_scope') not in (None, 'complete_standard_set', 'explicit_source_only'):
+            raise ValueError('Invalid provided_set_scope')
         if field('reference_members') is not None or field('reference_evidence_path') is not None:
             raise ValueError('Conflicting image scope: provided source set cannot use reference members')
         return [{'member_id': source['id'], 'width': width, 'height': height}], 'provided_source_set', basis, mode
@@ -131,6 +148,9 @@ def _image_members(source, spec, base, width, height):
         ids.add(identifier)
         resources.add(resource)
         _sizes([[member['width'], member['height']]])
+    roles = [_image_role([member['width'], member['height']], policy) for member in members]
+    if {role: roles.count(role) for role in ('long', 'square', 'vertical')} != {'long': 1, 'square': 3, 'vertical': 3}:
+        raise ValueError('Reference standard set requires 1 long, 3 square, 3 vertical members')
     return [dict(member, reference_evidence_path=evidence) for member in members], 'reference_seven_set', basis, mode
 
 
@@ -155,7 +175,7 @@ def plan_sizes(spec_path):
             width, height = image.size
         basis, mode = None, None
         if asset_type == 'image':
-            members, authority, basis, mode = _image_members(source, spec, base, width, height)
+            members, authority, basis, mode = _image_members(source, spec, base, width, height, rules)
         else:
             explicit = source.get('explicit_sizes', spec.get('explicit_sizes'))
             reference = source.get('historical_reference', spec.get('historical_reference'))
@@ -181,19 +201,27 @@ def plan_sizes(spec_path):
                     item['explicit_specification'] = basis
                 if asset_type == 'image':
                     item['delivery_mode'] = mode
+                    if mode == 'provided_source_set':
+                        item['provided_set_scope'] = source.get('provided_set_scope', spec.get('provided_set_scope', 'complete_standard_set'))
                     try:
                         item['role'] = _image_role([member['width'], member['height']], rules)
                         item['official_size_check'] = {'status': 'pass'}
                     except ValueError as error:
                         item['official_size_check'] = {'status': 'conflict', 'reason': str(error)}
                 items.append(item)
+    provided_languages = {item['language'] for item in items if item.get('provided_set_scope') == 'complete_standard_set'}
+    for language in provided_languages:
+        provided = [item for item in items if item['language'] == language and item.get('provided_set_scope') == 'complete_standard_set']
+        counts = {role: sum(item.get('role') == role for item in provided) for role in ('long', 'square', 'vertical')}
+        if len(provided) != 7 or counts != {'long': 1, 'square': 3, 'vertical': 3}:
+            raise ValueError(f'Incomplete standard provided source set for {language}: requires seven members (1 long, 3 square, 3 vertical); independent creatives use standard_seven_set, explicit source-only exceptions require user scope_basis and provided_set_scope=explicit_source_only')
     if rules.get('uniform_group_sizes'):
         if len({(item['width'], item['height']) for item in items}) != 1:
             raise ValueError('TK carousel cards must use one uniform group size')
     return {'status': 'planned', 'asset_type': asset_type, 'policy_version': policy['version'],
             'official_required_roles': rules.get('official_required_roles', []),
             'scope': policy['scope'], 'expected_resource_count': len(items), 'items': items,
-            'note': 'Image scope follows explicit requirement members; no automatic three/seven expansion. Platform checks do not define delivery scope.'}
+            'note': 'Standard image sets require seven members per independent creative and target language (1 long, 3 square, 3 vertical). Complete supplied sets are translated once; explicit user scope may override.'}
 
 
 def validate_sizes(spec_path):
@@ -226,7 +254,7 @@ def validate_sizes(spec_path):
             errors.append({'path': str(path), 'reason': 'unexpected or ambiguous source/language/member/dimensions; identify each same-size member'})
         elif key in found:
             errors.append({'path': str(path), 'reason': 'duplicate matrix item'})
-        elif item.get('delivery_mode') in ('reference_seven_set', 'explicit_members') and path in used_paths and used_paths[path] != (key[0], key[2]):
+        elif item.get('delivery_mode') in ('standard_seven_set', 'reference_seven_set', 'explicit_members') and path in used_paths and used_paths[path] != (key[0], key[2]):
             errors.append({'path': str(path), 'reason': 'reference members require separate output files'})
         else:
             found.add(key)
@@ -247,7 +275,7 @@ def validate_sizes(spec_path):
     missing = []
     for key in sorted(expected.keys() - found):
         entry = dict(source_id=key[0], language=key[1], width=key[3], height=key[4])
-        if expected[key].get('delivery_mode') in ('reference_seven_set', 'explicit_members'):
+        if expected[key].get('delivery_mode') in ('standard_seven_set', 'reference_seven_set', 'explicit_members'):
             entry['member_id'] = key[2]
         missing.append(entry)
     return {'status': 'pass' if not errors and not missing else 'fail', 'expected_resource_count': len(expected),

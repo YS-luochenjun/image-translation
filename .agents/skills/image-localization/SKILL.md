@@ -9,7 +9,7 @@ description: 在本项目按图片翻译需求自动接入长方竖图和大按�
 
 需求面板批次的主控与执行会话遵守自主交付流程中的[会话分工与调度](../../../agent/workflows/fireplay-autonomous.md#会话分工与调度)，接入时先核现有会话并登记派发状态。
 
-所有制图与审核先应用[交付评分](../../../knowledge/methods/delivery-balanced-review.md)：默认画面流畅、基本一致，允许局部差异和补全；≥80且底线通过即交付，不追完美。初稿后最多两轮局部返工，未通过只挂起关联成员，继续其他可执行项；原图完整集合不盲乘七，大按钮走自身规格；整组来源、跨语言成员覆盖或尺寸取舍时读[图组与尺寸规划](../../../knowledge/methods/source-set-and-size-planning.md)。
+所有制图与审核先应用[交付评分](../../../knowledge/methods/delivery-balanced-review.md)：默认画面流畅、基本一致，允许局部差异和补全；≥80且底线通过即交付，不追完美。有可行改进路线时持续局部返工，不设固定次数；确无可行路线或存在真实外部阻塞时只挂起关联成员，继续其他可执行项。标准长方竖图每套固定7张（1长3方3竖），每独立创意×该来源目标语言各一套，无需正文再写标准输出；029的9个横图×意语=63张。真实完整七成员整组翻译一次，多张横图不能当完整套；只交1、2、3张属于partial，继续补齐。仅用户明确特殊范围可例外，大按钮走自身规格。整组来源、跨语言成员覆盖或尺寸取舍时读[图组与尺寸规划](../../../knowledge/methods/source-set-and-size-planning.md)。
 
 按需查阅 [知识目录](../../../knowledge/README.md) 与 [索引](../../../knowledge/index.json)：通用阶段读 [分层流程](../../../knowledge/methods/layered-localization.md)，选技术路线读 [内容路由](../../../knowledge/methods/content-routing.md)，文字视觉设计读 [文字构图](../../../knowledge/methods/typography-composition.md)。仅在当前图条件相符时读取相关案例，并核查状态、证据和最新反馈。
 

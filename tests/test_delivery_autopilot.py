@@ -104,14 +104,14 @@ class DeliveryAutopilotTests(unittest.TestCase):
         self.assertTrue(result['complete'])
         self.assertFalse(result['external_write'])
 
-    def test_rework_then_limit_blocks_only_member(self):
+    def test_rework_continues_after_two_rounds(self):
         record, review = self.ready()
         review['dimensions']['semantic_accuracy']['score'] = 4
         self.save(record['review_path'], review)
         self.assertEqual('rework', self.action())
         review['targeted_reworks'] = 2
         self.save(record['review_path'], review)
-        self.assertEqual('blocked', self.action())
+        self.assertEqual('rework', self.action())
 
     def test_gate_failures_recommend_repair_without_submission(self):
         record, review = self.ready()
@@ -129,7 +129,7 @@ class DeliveryAutopilotTests(unittest.TestCase):
         review['unresolved_facts'] = []
         review['targeted_reworks'] = 2
         self.save(record['review_path'], review)
-        self.assertEqual('blocked', self.action())
+        self.assertEqual('rework', self.action())
 
     def test_bad_member_review_never_stops_another_ready_member(self):
         self.spec['explicit_members'].append({'member_id': 'two', 'width': 300, 'height': 300})
@@ -226,14 +226,24 @@ class DeliveryAutopilotTests(unittest.TestCase):
         fresh['material_id'] = 123
         self.assertEqual('verify', self.action())
 
-    def test_unknown_publication_blocks_all_publishable_members(self):
+    def test_empty_designer_is_allowed_and_excluded_people_are_rejected(self):
+        record, _ = self.ready()
+        fresh = self.published(record)
+        self.state['requirement']['designer_ids'] = []
+        fresh['designer_ids'] = []
+        self.assertEqual('delivery_verified', self.action())
+        self.state['requirement']['designer_ids'] = ['c74b62d9']
+        fresh['designer_ids'] = ['c74b62d9']
+        self.assertEqual('verify', self.action())
+
+    def test_unknown_publication_blocks_only_members_without_publication_evidence(self):
         self.spec['explicit_members'].append({'member_id': 'two', 'width': 300, 'height': 300})
         first, _ = self.ready('one')
         second, _ = self.ready('two')
         self.published(first)
         self.state['publication_unknown'] = ['unknown-write-operation']
         result = self.plan()
-        self.assertEqual(['await_official_result'] * 2, [row['action'] for row in result['actions']])
+        self.assertEqual(['delivery_verified', 'await_official_result'], [row['action'] for row in result['actions']])
         self.assertFalse(result['complete'])
 
     def test_duplicate_or_unexpected_member_records_are_rejected(self):

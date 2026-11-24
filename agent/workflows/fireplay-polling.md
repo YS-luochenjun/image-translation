@@ -5,8 +5,8 @@
 ## 一轮扫描的完成条件
 
 1. 核当前用户指令、派发登记和真实会话进度。持久键为exact requirement UUID；保留编号和已确认的逻辑重复关系。`seen`只表示读过，派发失败、排队、阻塞均持续保留。
-2. 从当前可见部门查询取得选项种子，执行 `fireplay-discover-translations.mjs --department DEPT_ID --all-departments`。保存query、官方选项及schema版本、全部summary_pages、serverTime和next_cursor。全可读范围仍受服务端权限限制；部分回执只能记partial。
-3. 对新增候选及已登记但可能变更的需求读取exact UUID的blind_brief和delivery。summary用于发现变化；当前生产范围必须以完整正文、全部有效附件和语言证据核定。
+2. 从当前可见部门查询取得选项种子；按[主控计划](fireplay-monitor.md#回执驱动计划与检查点)执行active或到期full。发现脚本显式用`--department DEPT_ID --all-departments --mode active`（40行、未开始及进行中）；每24小时用`--mode full`（200行、无状态限制），离线后补做。保存query、官方选项/schema、完整summary_pages、serverTime及游标，检查点分开；部分回执只能记partial。
+3. 只对新/变化的summary和未完成的详情待办读exact UUID的blind_brief/delivery。未结、缺信息、排队和unknown另按exact UUID跨状态读summary，不受发现的状态/AI模式过滤。closed且无本地owner/未结操作的历史项不轮询聊天。当前生产范围仍须以完整正文、全部有效附件和语言证据核定。
 4. 比较内容版本，冻结当前来源×规范化去重语言×成员矩阵，保存旧版及本轮差异。按原会话或新增会话派发；收到启动/排队回执后登记threadId、hostId和游标才算成功。
 5. 终核当前矩阵、最终审核SHA、正式绑定及实际下载证据。记录本轮实际变更；无新增或可行动变化时保持安静，轮询继续。
 
@@ -28,6 +28,6 @@
 
 一个成员可以有多个历史审核。选当前最终输出SHA对应的有效记录；两个不同SHA的记录是版本历史，不能把旧pass移给新字节，也不能仅因存在历史记录就认定当前审核重复。对同一当前SHA存在冲突结论时先核清。
 
-原写操作unknown、线上实际已观察到素材、素材已经绑定是三个事实。保留原operation UUID与unknown，不换key重放。SHE-024的后续绑定是用户明确授权的一次例外，详见[批次案例](../../knowledge/cases/she-batch-20261111/README.md)；不构成通用恢复能力。共享发布器的阻断规则继续适用。
+原写操作unknown、线上实际已观察到素材、素材已经绑定是三个事实，分别记录。用户已明确接受R2中出现重复对象，不能仅因可能重复而要求逐次授权或阻止正常上传和入库；以当前需求面板中的素材和绑定是否合适、完整为准。官方连接器明确禁止自动重试结果未知的写操作；保留原operation UUID和unknown，先按官方能力对账，不能把可能重复可接受理解为官方限制已取消。共享发布器目前对unknown仍有整需求阻断，记录真实限制并继续其他可执行需求。
 
 主控全量核矩阵/字节与抽查图像应分别记录。worker的逐图self审核、主控抽查、平台风险审批和用户验收各有自己的证据范围。

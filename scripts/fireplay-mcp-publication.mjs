@@ -5,11 +5,12 @@ import { createHash } from 'node:crypto';
 import { readFile, open, realpath, stat, lstat } from 'node:fs/promises';
 import { dirname, join, relative, resolve, isAbsolute } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
+import { homedir, platform } from 'node:os';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HASH = /^[0-9a-f]{64}$/;
-const TOOLS = new Set(['material_r2_upload_from_bytes', 'material_upload_from_url', 'material_attribution_update', 'requirement_bind_materials']);
+const TOOLS = new Set(['material_r2_upload_from_bytes', 'material_upload_from_url', 'material_append_images', 'material_attribution_update', 'requirement_bind_materials']);
 const fail = message => { throw new Error(message); };
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = async path => JSON.parse(await readFile(path, 'utf8'));
@@ -150,7 +151,8 @@ async function prepareArguments({ request, intake, folder, entries }) {
   if (request.tool === 'material_r2_upload_from_bytes') {
     if ('file_base64' in args) fail('Do not supply base64; caller reads reviewed output');
     const outputs = await reviewedOutputs(folder, request, intake.summary.id);
-    const output = outputs.find(item => item.sha256 === request.output_sha256);
+    const output = outputs.find(item => item.sha256 === request.output_sha256 &&
+      (request.output_path === undefined || item.path === resolve(folder, request.output_path)));
     if (!output) fail('output_sha256 must identify a reviewed output');
     const kind = imageKind(output.bytes);
     if (output.bytes.length > 50 * 1024 * 1024) fail('Upload exceeds 50MiB');
@@ -184,12 +186,24 @@ async function prepareArguments({ request, intake, folder, entries }) {
       if (item.type === 'button' && (!item.url || urls.length !== 1)) fail('Button must be single URL');
       urls.forEach((url,index) => { const match = pairs.find(pair => pair.url === url && pair.id === ids[index]); if (!match) fail('Import resource not proven by same-demand upload receipt'); used.push(match.hash); });
     }
-    if (new Set(used).size !== used.length) fail('Duplicate output in import');
-    const oldHashes = recordsFor(entries, 'material_upload_from_url').flatMap(entry => entry.outputs || []).map(output => output.sha256);
-    if (used.some(hash => oldHashes.includes(hash))) fail('Reviewed output already imported; inspect existing receipt');
     return {args,outputs:outputs.filter(output => used.includes(output.sha256)).map(({path,sha256})=>({path,sha256}))};
   }
   const materialIds = new Set(recordsFor(entries, 'material_upload_from_url').flatMap(entry => collect(decodeResult(entry.response), 'material_id')).filter(id => typeof id === 'string'));
+  if (request.tool === 'material_append_images') {
+    if (args.confirmed !== true || !materialIds.has(args.material_id) || !Array.isArray(args.images) || !args.images.length) fail('Append requires confirmed same-demand imported material');
+    const outputs = await reviewedOutputs(folder, request, intake.summary.id);
+    if (!Array.isArray(request.upload_operation_ids) || !request.upload_operation_ids.length) fail('Append requires upload_operation_ids');
+    const uploads = recordsFor(entries, 'material_r2_upload_from_bytes').filter(entry => request.upload_operation_ids.includes(entry.operation_id));
+    if (uploads.length !== new Set(request.upload_operation_ids).size) fail('Append upload provenance not found');
+    const selected = args.images.map(image => {
+      if (Object.keys(image).length !== 1 || typeof image.file_url !== 'string') fail('Append accepts only proven file_url');
+      const upload = uploads.find(entry => uploadResource(decodeResult(entry.response)).url === image.file_url);
+      const output = outputs.find(output => output.sha256 === upload?.outputs?.[0]?.sha256);
+      if (!output) fail('Append resource not proven by same-demand reviewed upload');
+      return {path:output.path,sha256:output.sha256};
+    });
+    return {args,outputs:selected};
+  }
   if (request.tool === 'material_attribution_update') {
     if (typeof args.confirmed !== 'boolean') fail('Attribution must explicitly choose preview or write');
     if (args.creation_type && args.creation_type !== 'derivative') fail('Only derivative attribution allowed');
@@ -212,9 +226,12 @@ async function prepareArguments({ request, intake, folder, entries }) {
 export async function publish({ root=ROOT, code, operationId, request, transport }) {
   if (!/^[A-Z]+-\d{8}-\d+$/.test(code || '') || !UUID.test(operationId || '')) fail('Exact requirement code and operation UUID required');
   if (!request || typeof request !== 'object' || Array.isArray(request)) fail('Request must be an object');
-  const envelopeFields = new Set(['tool','schema_version','arguments','gate_file','output_sha256','upload_operation_ids','designer_members']);
+  const envelopeFields = new Set(['tool','schema_version','arguments','gate_file','output_sha256','output_path','upload_operation_ids','designer_members','reupload_authorization_file','isolate_unknown_uploads']);
   for (const key of Object.keys(request)) if (!envelopeFields.has(key)) fail(`Unknown request control: ${key}`);
   if (!TOOLS.has(request.tool)) fail('Tool forbidden');
+  if ('output_path' in request && (typeof request.output_path !== 'string' || request.tool !== 'material_r2_upload_from_bytes')) fail('output_path must identify an image upload');
+  if ('isolate_unknown_uploads' in request && typeof request.isolate_unknown_uploads !== 'boolean') fail('isolate_unknown_uploads must be boolean');
+  if (request.isolate_unknown_uploads && request.reupload_authorization_file) fail('Choose isolation or explicit reupload authorization');
   const folder = await realpath(join(root,'work','fireplay-production',code));
   const intake = await json(join(folder,'intake.json'));
   if (intake.summary?.code !== code || !UUID.test(intake.summary?.id || '') || intake.brief?.id !== intake.summary.id || intake.delivery?.id !== intake.summary.id) fail('Intake identity mismatch');
@@ -225,8 +242,40 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     const entries = await loadJournal(journalPath);
     if (entries.some(entry => entry.operation_id === operationId)) fail('Operation ID already recorded; replay forbidden');
     const unresolved = entries.filter(entry => entry.state === 'unknown').filter(entry => !entries.some(other => other.operation_id === entry.operation_id && other.state === 'received'));
-    if (unresolved.length) fail('Unknown operation exists; inspect remote state, no automatic retry');
+    let reuploadAuthorization;
+    if (request.reupload_authorization_file) {
+      const authorizationPath = await realpath(resolve(folder, request.reupload_authorization_file));
+      if (!inside(folder, authorizationPath)) fail('Reupload authorization outside requirement folder');
+      const authorizationBytes = await readFile(authorizationPath);
+      const authorization = JSON.parse(authorizationBytes.toString('utf8'));
+      if (authorization.requirement_id !== intake.summary.id || authorization.code !== code || authorization.authorization_source !== 'explicit_current_user_message' || !authorization.user_request?.trim()) fail('Explicit same-requirement reupload authorization required');
+      if (authorization.new_operations?.[operationId] !== request.tool) fail('Operation not included in authorized reupload plan');
+      if (!Array.isArray(authorization.historical_unknown_operations) || unresolved.some(entry => !authorization.historical_unknown_operations.some(original => original.operation_id === entry.operation_id && original.request_sha256 === entry.request_sha256))) fail('Unapproved unknown operation exists');
+      reuploadAuthorization = {path:relative(root, authorizationPath),sha256:sha256(authorizationBytes),user_request:authorization.user_request};
+    } else if (unresolved.length && !request.isolate_unknown_uploads) fail('Unknown operation exists; inspect remote state, no automatic retry');
     const prepared = await prepareArguments({request,intake,folder,entries});
+    if (unresolved.length && request.isolate_unknown_uploads) {
+      const isolatedOutputs = unresolved.map(entry => {
+        const [output] = entry.outputs || [];
+        if (entry.tool !== 'material_r2_upload_from_bytes' || entry.requirement_id !== intake.summary.id || entry.outputs?.length !== 1 ||
+            typeof output?.path !== 'string' || !isAbsolute(output.path) || !inside(folder, output.path) ||
+            !HASH.test(output.sha256)) fail('Only attributable unknown R2 uploads can be isolated');
+        return output;
+      });
+      let selected = prepared.outputs;
+      if (request.tool === 'requirement_bind_materials' || request.tool === 'material_attribution_update') {
+        const ids = prepared.args.material_ids ?? prepared.args.items[0].material_ids;
+        const imports = recordsFor(entries, 'material_upload_from_url');
+        selected = ids.flatMap(id => {
+          const originating = imports.filter(entry => collect(decodeResult(entry.response), 'material_id').includes(id));
+          if (!originating.length || originating.some(entry => !entry.outputs?.length)) fail('Missing scoped import provenance');
+          return originating.flatMap(entry => entry.outputs);
+        });
+      }
+      if (!selected.length || selected.some(output => isolatedOutputs.some(unknown => unknown.path === output.path || unknown.sha256 === output.sha256))) {
+        fail('Operation overlaps an unresolved upload; original write cannot be replayed');
+      }
+    }
     const {definition, evidence:contract} = await publicationContract(root, folder, request.tool);
     if (!definition || request.schema_version !== definition.schema_version) fail('Request does not pin cached schema version');
     validateSchema(prepared.args,definition.inputSchema);
@@ -236,6 +285,14 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     const receipt = await open(receiptPath,'wx');
     try {
       const entry = {operation_id:operationId,requirement_id:intake.summary.id,code,tool:request.tool,schema_version:definition.schema_version,contract,request_sha256:sha256(JSON.stringify(request)),outputs:prepared.outputs,state:'unknown'};
+      if (reuploadAuthorization) entry.reupload_authorization = reuploadAuthorization;
+      if (request.isolate_unknown_uploads) entry.isolated_unknown_upload_ids = unresolved.map(item => item.operation_id);
+      if (request.tool === 'material_upload_from_url') {
+        entry.request_file = `publication-request-${operationId}.json`;
+        const original = await open(join(folder, entry.request_file), 'wx');
+        try { await original.writeFile(JSON.stringify(request)); await original.sync(); }
+        finally { await original.close(); }
+      }
       await appendJournal(journalPath,entry);
       const parameters = definition.invoke_via === 'tool_write' ? {tool:request.tool,schema_version:definition.schema_version,arguments:prepared.args} : prepared.args;
       const response = await transport.call(definition.invoke_via,parameters);
@@ -251,7 +308,10 @@ export async function publish({ root=ROOT, code, operationId, request, transport
 }
 
 export async function connectProxy(root=ROOT) {
-  const authPath = join(process.env.LOCALAPPDATA || '', 'Tanyue','FireplayMcpSuite','auth.dpapi');
+  const authDirectory = process.env.LOCALAPPDATA
+    ? join(process.env.LOCALAPPDATA, 'Tanyue', 'FireplayMcpSuite')
+    : join(homedir(), '.fireplay-mcp-suite');
+  const authPath = join(authDirectory, platform() === 'win32' ? 'auth.dpapi' : 'auth.json');
   await stat(authPath); // Existence only; the approved proxy owns authentication.
   const child = spawn(process.execPath,[join(root,'plugins/fireplay-requirements-mcp/scripts/authhub-mcp-proxy.mjs'),'--label','ai-designer','--url','https://ai-designer-api.fireplay.ai/api/mcp/catalog/v1'],{stdio:['pipe','pipe','pipe'],windowsHide:true});
   let buffer=''; let nextId=1; const pending=new Map();

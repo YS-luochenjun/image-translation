@@ -48,7 +48,7 @@ def next_delivery(spec_path: Path) -> dict:
         records[key] = record
     expected = {(item['source_id'], item['language'], item['member_id']) for item in plan['items']}
     unique_members = {(item['source_id'], item['language'], item['member_id']) for item in plan['items']
-                      if item.get('delivery_mode') in ('explicit_members', 'reference_seven_set')}
+                      if item.get('delivery_mode') in ('standard_seven_set', 'explicit_members', 'reference_seven_set')}
     used_paths, used_hashes = set(), set()
     for key, record in records.items():
         if key not in unique_members or not record.get('output_path'):
@@ -139,12 +139,12 @@ def _next_member(item, record, requirement, sources, base, unknown):
                       'Current member does not pass balanced delivery review', assessment=scored)
     if item.get('official_size_check', {}).get('status') == 'conflict':
         return action('resolve_spec_conflict', 'Explicit native dimensions conflict with known platform rule; do not stretch or silently resize')
-    if unknown:
-        return action('await_official_result', 'Existing publisher blocks this requirement on unknown writes; never replay or rekey')
     publication = record.get('publication', {})
     for key, name in [('upload_receipt', 'upload'), ('material_id', 'import'),
                       ('attribution_receipt', 'attribute'), ('binding_receipt', 'bind')]:
         if not publication.get(key):
+            if unknown:
+                return action('await_official_result', 'Resolve the unknown write or use verified member isolation for a disjoint operation')
             return action(name, f'Missing {key}; execute only through current official contract', assessment=scored)
     fresh = publication.get('fresh_verification')
     if not isinstance(fresh, dict):
@@ -161,11 +161,14 @@ def _next_member(item, record, requirement, sources, base, unknown):
 def _fresh(fresh, publication, requirement, identity, artifact, base, sha):
     """Bound readback claim to downloaded bytes and exact expected ownership."""
     for key in ('designer_ids', 'shared_dept_ids'):
-        _require(isinstance(requirement.get(key), list) and requirement[key]
+        _require(isinstance(requirement.get(key), list)
                  and all(isinstance(value, str) and value for value in requirement[key]), 'Expected ownership IDs required')
-        _require(isinstance(fresh.get(key), list) and fresh[key]
+        _require(isinstance(fresh.get(key), list)
                  and all(isinstance(value, str) and value for value in fresh[key]), 'Fresh ownership IDs must be arrays')
         _require(set(fresh[key]) == set(requirement[key]), 'Attribution/shared department mismatch')
+    _require(bool(requirement['shared_dept_ids']), 'Shared department required')
+    _require(not set(requirement['designer_ids']) & {'c74b62d9', 'b2fbcgab'},
+             '罗晨钧 and 邹彬 are not eligible designers')
     _require(isinstance(publication.get('material_id'), str) and bool(publication['material_id']), 'Material ID must be text')
     _require(all(fresh.get(key) == value for key, value in identity.items()), 'Fresh member identity mismatch')
     _require(fresh['requirement_id'] == requirement['id'] and fresh['material_id'] == publication['material_id']

@@ -77,10 +77,10 @@ def assess_delivery(review: dict, base: Path) -> dict:
     with {score: finite 0..5,notes}, checks keyed by CHECKS with {checked,notes},
     requirements: nonempty [{id,checked,notes}], spec {width,height,max_bytes,
     formats:[Pillow format]}, blocking_issues/minor_differences: [text], and
-    targeted_reworks: integer 0..2. Notes must describe actual observations.
+    targeted_reworks: nonnegative integer. Notes describe observations.
     Optional unresolved_facts: [text] identifies missing facts that cannot be guessed.
     status is the submission gate; next_action preserves a repair opportunity for
-    fixable drafts (even failed hard checks or scores below 70) within two rounds.
+    fixable drafts (even failed hard checks or scores below 70).
     Confirmed copy edits are allowed only while the facts check remains true.
     Tiny texture/shadow/nonidentity background differences may be recorded as
     minor differences; the host must consider these in its dimension notes.
@@ -134,11 +134,16 @@ def assess_delivery(review: dict, base: Path) -> dict:
     issues = _strings(review.get('blocking_issues'), 'blocking_issues')
     minor = _strings(review.get('minor_differences'), 'minor_differences')
     rounds = review.get('targeted_reworks')
-    _require(type(rounds) is int and 0 <= rounds <= 2, 'targeted_reworks: integer 0..2 required')
+    if 'rework_authorization' in review:
+        authorization = _object(review['rework_authorization'], 'rework_authorization')
+        old_limit = authorization.get('max_reworks')
+        _require(type(old_limit) is int and old_limit >= 2, 'rework_authorization.max_reworks: integer >=2 required')
+        _text(authorization.get('user_instruction'), 'rework_authorization.user_instruction')
+    _require(type(rounds) is int and rounds >= 0, 'targeted_reworks: nonnegative integer required')
     score = round(sum(scores[name] * weight / 5 for name, weight in WEIGHTS.items()), 6)
     result = {**identity, 'status': 'needs_review', 'score': score, 'reasons': [],
               'minor_differences': list(minor), 'targeted_reworks': rounds,
-              'reworks_remaining': 2 - rounds, 'reviewer': dict(reviewer),
+              'reworks_remaining': None, 'reviewer': dict(reviewer),
               'visual_assessment': 'host_declared', 'user_acceptance': 'not_assessed',
               'stop_refining': False, 'scope': 'member'}
     images, evidence_errors = {}, []
@@ -161,16 +166,16 @@ def assess_delivery(review: dict, base: Path) -> dict:
         result['reasons'] = evidence_errors or ['Source and candidate must actually be viewed']
     elif score >= 80 and all(scores[name] >= value for name, value in MINIMUMS.items()):
         result.update(status='ready_for_submission', stop_refining=True)
-    elif score >= 70 and rounds < 2:
+    elif score >= 70:
         result.update(status='rework', reasons=['Score or dimension floor requires targeted rework'])
     else:
-        result.update(status='blocked', reasons=['Rework limit reached' if rounds == 2 else 'Score below 70'])
+        result.update(status='blocked', reasons=['Score below 70'])
     # A failed submission gate does not mean a repairable draft must stop.
     if evidence_errors or not all(attestation[name] for name in ('source_viewed', 'candidate_viewed')):
         result['next_action'] = 'review'
     elif result['status'] == 'ready_for_submission':
         result['next_action'] = 'submit'
-    elif unresolved or rounds == 2:
+    elif unresolved:
         result['next_action'] = 'blocked'
     else:
         result['next_action'] = 'rework'
