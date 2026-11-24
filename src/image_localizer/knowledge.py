@@ -8,7 +8,8 @@ from pathlib import Path
 from .contracts import require
 
 
-def load_knowledge(root: Path, *, source_sha256: str, tags: list[str] | None = None) -> dict:
+def load_knowledge(root: Path, *, source_sha256: str, tags: list[str] | None = None,
+                   include_content: bool = True) -> dict:
     root = root.resolve()
     index_path = root / 'knowledge/index.json'
     index = json.loads(index_path.read_text(encoding='utf-8'))
@@ -31,13 +32,16 @@ def load_knowledge(root: Path, *, source_sha256: str, tags: list[str] | None = N
         require(entry.get('status') in ('active', 'provisional', 'partial'), 'Invalid knowledge status')
         entry_tags = entry.get('tags', [])
         require(isinstance(entry_tags, list) and all(isinstance(tag, str) for tag in entry_tags), 'Knowledge tags must be strings')
+        related = entry.get('source_sha256') == source_sha256 or bool(requested_tags.intersection(entry_tags))
+        if not include_content and entry['kind'] == 'case' and not related:
+            continue
         data = path.read_bytes()
         item = {**entry, 'sha256': hashlib.sha256(data).hexdigest()}
         if entry['kind'] == 'method':
-            methods.append({**item, 'content': data.decode('utf-8')})
+            methods.append({**item, 'content': data.decode('utf-8')} if include_content else item)
         else:
             available.append(item)
-            if entry.get('source_sha256') == source_sha256 or requested_tags.intersection(entry_tags):
-                cases.append({**item, 'content': data.decode('utf-8')})
+            if related:
+                cases.append({**item, 'content': data.decode('utf-8')} if include_content else item)
     return {'index': str(index_path), 'methods': methods, 'related_cases': cases, 'available_cases': available,
             'notice': 'Methods are conditional guidance, not verified capabilities. Partial cases retain unresolved feedback; current images still require actual inspection.'}

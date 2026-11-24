@@ -48,19 +48,46 @@ test('reviewed image -> own import -> own bind; journals contain no base64',asyn
   assert.equal(f.calls.length,6);
   const journal=await readFile(join(f.folder,'publication-journal.jsonl'),'utf8');
   assert.ok(!journal.includes('file_base64'));
-  assert.deepEqual(journal.trim().split('\n').map(line=>JSON.parse(line).state),['unknown','received','unknown','received','unknown','received']);
+  const entries=journal.trim().split('\n').map(JSON.parse);
+  assert.deepEqual(entries.map(entry=>entry.state),['unknown','received','unknown','received','unknown','received']);
+  assert.ok(entries.filter(entry=>entry.state==='received').every(entry=>entry.receipt_sha256&&!entry.response));
+  const receipt=join(f.folder,`publication-${uploadId}.json`);
+  assert.ok(JSON.parse(await readFile(receipt,'utf8')).response);
+  await writeFile(receipt,'{}');
+  await assert.rejects(run(f,f.upload),/receipt hash mismatch/);
 });
 
-test('a previously uploaded and imported reviewed image may be submitted again',async t=>{
+test('a previously uploaded and imported reviewed image stays frozen',async t=>{
   const f=await fixture(t);
   const firstUpload=randomUUID();
   const secondUpload=randomUUID();
   await run(f,f.upload,firstUpload);
   await run(f,importRequest(firstUpload));
-  await run(f,f.upload,secondUpload);
-  await run(f,importRequest(secondUpload));
-  assert.equal(f.calls.filter(call=>call.name==='tool_write' && call.args.tool==='material_r2_upload_from_bytes').length,2);
-  assert.equal(f.calls.filter(call=>call.name==='material_upload_from_url').length,2);
+  await assert.rejects(run(f,f.upload,secondUpload), /frozen resource/);
+  await assert.rejects(run(f,importRequest(firstUpload)), /already registered/);
+  assert.equal(f.calls.filter(call=>call.name==='tool_write' && call.args.tool==='material_r2_upload_from_bytes').length,1);
+  assert.equal(f.calls.filter(call=>call.name==='material_upload_from_url').length,1);
+});
+
+test('one upload ignores unrelated candidates and freezes the member across path and byte changes',async t=>{
+  const f=await fixture(t);
+  const identity={source_id:'source',language:'ja',member_id:'square-1'};
+  const gateFile=join(f.folder,'gate.json');
+  const gate=JSON.parse(await readFile(gateFile,'utf8'));
+  gate.outputs=[{path:'image.png',sha256:hash,...identity},{path:'unrelated-missing.png',sha256:'a'.repeat(64)}];
+  await writeFile(gateFile,JSON.stringify(gate));
+  const uploadId=randomUUID();
+  await run(f,f.upload,uploadId);
+  await rm(join(f.folder,'image.png'));
+  const revised=Buffer.concat([bytes,Buffer.from([4])]);
+  const revisedHash=createHash('sha256').update(revised).digest('hex');
+  gate.outputs=[{path:'revised.png',sha256:revisedHash,...identity}];
+  await writeFile(gateFile,JSON.stringify(gate));
+  await writeFile(join(f.folder,'revised.png'),revised);
+  await assert.rejects(run(f,{...f.upload,output_sha256:revisedHash}),/frozen resource/);
+  const request=importRequest(uploadId);
+  delete request.gate_file;
+  await run(f,request);
 });
 
 test('timeout leaves durable unknown and forbids fresh UUID replay',async t=>{
@@ -151,8 +178,16 @@ test('explicit user reupload authorization preserves original unknown and scopes
   await assert.rejects(run(fixtureData,authorizedUpload,deniedId),/Unapproved unknown/);
   authorization.historical_unknown_operations[0].request_sha256=original.request_sha256;
   await writeFile(join(fixtureData.folder,'authorization.json'),JSON.stringify(authorization));
+  const otherBytes=Buffer.concat([bytes,Buffer.from([5])]);
+  const otherHash=createHash('sha256').update(otherBytes).digest('hex');
+  await writeFile(join(fixtureData.folder,'other.png'),otherBytes);
+  const gateFile=join(fixtureData.folder,'gate.json');
+  const gate=JSON.parse(await readFile(gateFile,'utf8'));
+  gate.outputs.push({path:'other.png',sha256:otherHash});
+  await writeFile(gateFile,JSON.stringify(gate));
+  const otherUpload={...authorizedUpload,output_sha256:otherHash};
   fixtureData.transport.call=async(name,args)=>name==='tool_catalog'?originalCall(name,args):Promise.reject(new Error('new timeout'));
-  await assert.rejects(run(fixtureData,authorizedUpload,deniedId),/new timeout/);
+  await assert.rejects(run(fixtureData,otherUpload,deniedId),/new timeout/);
   fixtureData.transport.call=originalCall;
   const nextId=randomUUID();
   authorization.new_operations[nextId]='material_r2_upload_from_bytes';
@@ -265,11 +300,11 @@ test('rejects changed reviewed bytes and unsupported video import fields',async 
   assert.equal(f.calls.length,0);
 });
 
-test('operation IDs cannot replay but reviewed content can be imported again',async t=>{
+test('operation IDs and already registered resources cannot replay',async t=>{
   const f=await fixture(t); const uploadId=randomUUID();const importId=randomUUID();
   await run(f,f.upload,uploadId);await run(f,importRequest(uploadId),importId);
   await assert.rejects(run(f,importRequest(uploadId),importId),/already recorded/);
-  await run(f,importRequest(uploadId));
+  await assert.rejects(run(f,importRequest(uploadId)),/already registered/);
 });
 
 test('fully rejected validation import permits a corrected new operation using the original upload',async t=>{
@@ -291,7 +326,39 @@ test('fully rejected validation import permits a corrected new operation using t
   assert.equal(f.calls.filter(call=>call.name==='tool_write'&&call.args.tool==='material_r2_upload_from_bytes').length,1);
 });
 
-test('append permits previously imported content and requires reviewed provenance and own material',async t=>{
+test('partial import permits correction of only the rejected group',async t=>{
+  const f=await fixture(t);
+  const otherId=randomUUID(), otherResource=randomUUID();
+  const otherUrl=`https://example.invalid/materials/${otherResource}.png`;
+  const otherBytes=Buffer.concat([bytes,Buffer.from([19])]);
+  const otherHash=createHash('sha256').update(otherBytes).digest('hex');
+  const gateFile=join(f.folder,'gate.json');
+  const gate=JSON.parse(await readFile(gateFile,'utf8'));
+  gate.outputs.push({path:'other.png',sha256:otherHash});
+  await writeFile(gateFile,JSON.stringify(gate));
+  await writeFile(join(f.folder,'other.png'),otherBytes);
+  const uploadId=randomUUID();
+  await run(f,f.upload,uploadId);
+  const original=f.transport.call;
+  f.transport.call=async(name,args)=>name==='tool_write'&&args.tool===f.upload.tool
+    ? {structuredContent:{publicUrl:otherUrl,resourceId:otherResource}} : original(name,args);
+  await run(f,{...f.upload,output_sha256:otherHash},otherId);
+  const batch=importRequest(uploadId);
+  const rejected={...batch.arguments.items[0],url:otherUrl,resource_id:otherResource};
+  batch.upload_operation_ids.push(otherId);
+  batch.arguments.items.push(rejected);
+  f.transport.call=async(name,args)=>name==='material_upload_from_url'
+    ? {structuredContent:{results:[{item_index:0,success:true,material_id:materialId},{item_index:1,success:false}]}}
+    : original(name,args);
+  await run(f,batch);
+  await assert.rejects(run(f,importRequest(uploadId)),/already registered/);
+  f.transport.call=original;
+  const correction=importRequest(otherId);
+  correction.arguments.items=[rejected];
+  await run(f,correction);
+});
+
+test('append blocks previously imported content and requires reviewed provenance and own material',async t=>{
   const f=await fixture(t);const uploadId=randomUUID();
   await run(f,f.upload,uploadId);await run(f,importRequest(uploadId));
   const contract={name:'material_append_images',operation_class:'write',invoke_via:'tool_write',schema_version:'offline-append',inputSchema:{type:'object',properties:{confirmed:{type:'boolean'},material_id:{type:'string'},images:{type:'array',items:{type:'object',properties:{file_url:{type:'string'}},required:['file_url']}}},required:['confirmed','material_id','images']}};
@@ -300,7 +367,7 @@ test('append permits previously imported content and requires reviewed provenanc
   f.transport.call=async(name,args)=>name==='tool_catalog'&&args.tool===contract.name
     ? {structuredContent:contract} : original(name,args);
   const request={tool:contract.name,schema_version:contract.schema_version,gate_file:'gate.json',upload_operation_ids:[uploadId],arguments:{confirmed:true,material_id:materialId,images:[{file_url:publicUrl}]}};
-  await run(f,request);
+  await assert.rejects(run(f,request),/already registered/);
   request.arguments.material_id=randomUUID();
   await assert.rejects(run(f,request),/same-demand imported material/);
   request.arguments.material_id=materialId;request.arguments.images[0].file_url='https://example.invalid/unproven';

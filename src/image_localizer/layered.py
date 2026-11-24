@@ -10,6 +10,7 @@ import re
 
 from PIL import Image, ImageChops, ImageDraw
 
+from .artifact_copy import copy_artifact
 from .production_timing import timed_production
 from .contracts import box, require, validate_manifest
 from .visual_review import validate_visual_targets, comparison_template, check_comparisons
@@ -41,7 +42,8 @@ def load_plan(path: Path) -> tuple[dict, Image.Image, dict[str, str]]:
     require(isinstance(plan, dict), 'Layered plan must be an object')
     require(not set(plan) - PLAN_KEYS and plan.get('schema_version') == 1, 'Unknown layered plan fields/version')
     source_path = _path(path.resolve().parent, plan.get('source'))
-    require(sha256(source_path) == plan.get('source_sha256'), 'Plan source SHA256 mismatch')
+    source_sha = sha256(source_path)
+    require(source_sha == plan.get('source_sha256'), 'Plan source SHA256 mismatch')
     source = _image(source_path)
     for key in ('rows', 'assets', 'protected_regions', 'text_clear_boxes'):
         require(isinstance(plan.get(key, []), list), f'{key} must be a list')
@@ -63,7 +65,7 @@ def load_plan(path: Path) -> tuple[dict, Image.Image, dict[str, str]]:
     notes = plan.get('notes', [])
     require(isinstance(notes, list) and all(isinstance(note, str) for note in notes), 'notes must be strings')
     validate_visual_targets(plan.get('visual_targets', []), source.size)
-    inputs = {str(source_path): sha256(source_path)}
+    inputs = {str(source_path): source_sha}
     if 'semantic_manifest' in plan or 'target_language' in plan:
         manifest_path = _path(path.resolve().parent, plan.get('semantic_manifest'))
         manifest = read_json(manifest_path)
@@ -122,6 +124,18 @@ def _background_inputs(plan_path: Path, plan: dict, inputs: dict) -> dict:
     return result
 
 
+def _portable_background_key(plan_path: Path, plan: dict, inputs: dict) -> str:
+    background = deepcopy(plan.get('background', {'operations': []}))
+    for field in ('path', 'mask'):
+        if field in background:
+            background[field] = inputs[str(_path(plan_path.resolve().parent, background[field]))]
+    content = {'source': plan['source_sha256'], 'background': background,
+               'protected_regions': plan.get('protected_regions', []),
+               'implementation': [sha256(Path(__file__)), sha256(Path(__file__).with_name('layer_ops.py')),
+                                  Image.__version__]}
+    return hashlib.sha256(json.dumps(content, sort_keys=True).encode()).hexdigest()
+
+
 def _save_receipt(output: Path, stage: str, inputs: dict, started: float, extra: dict) -> dict:
     artifacts = {path.name: sha256(path) for path in output.iterdir() if path.is_file()}
     receipt = {'schema_version': 1, 'stage': stage, 'input_sha256': inputs, 'artifact_sha256': artifacts,
@@ -131,7 +145,7 @@ def _save_receipt(output: Path, stage: str, inputs: dict, started: float, extra:
 
 
 @timed_production(input_name='plan_path', output_name='output', scope='background')
-def prepare_layered(plan_path: Path, output: Path) -> dict:
+def prepare_layered(plan_path: Path, output: Path, *, reuse: Path | None = None) -> dict:
     from .layer_ops import repair_background
 
     started = perf_counter()
@@ -139,6 +153,24 @@ def prepare_layered(plan_path: Path, output: Path) -> dict:
     plan, source, source_inputs = load_plan(plan_path)
     inputs = _background_inputs(plan_path, plan, source_inputs)
     background = plan.get('background', {'operations': []})
+    portable_key = _portable_background_key(plan_path, plan, inputs)
+    if reuse is not None:
+        prior = _verify(reuse, 'background')
+        require(prior.get('portable_background_key') == portable_key,
+                'Reviewed background inputs or implementation changed; prepare a new background')
+        require(all(sha256(Path(path)) == digest for path, digest in inputs.items()), 'Input changed during preparation')
+        output.mkdir(parents=True)
+        for name in ('source.png', 'background.png', 'edit-mask.png', 'repair-layout.json'):
+            copy_artifact(reuse / name, output / name)
+            require(sha256(output / name) == prior['artifact_sha256'][name], 'Reused artifact changed while copying')
+        write_json(output / 'background-plan.json', background)
+        receipt = _save_receipt(output, 'background', inputs, started, {
+            'background_key': _background_key(plan, inputs), 'portable_background_key': portable_key,
+            'protected_changed_pixels': prior['protected_changed_pixels'],
+            'outside_mask_changed_pixels': prior['outside_mask_changed_pixels'],
+            'reused_receipt_sha256': sha256(reuse / 'receipt.json')})
+        return {'output_dir': str(output.resolve()), 'status': 'pending', 'stage': 'background',
+                'elapsed_seconds': receipt['elapsed_seconds'], 'background_reused': True}
     if 'path' in background:
         clean = _image(_path(plan_path.resolve().parent, background['path']))
         with Image.open(_path(plan_path.resolve().parent, background['mask'])) as mask_image:
@@ -161,7 +193,8 @@ def prepare_layered(plan_path: Path, output: Path) -> dict:
     write_json(output / 'background-plan.json', background)
     write_json(output / 'repair-layout.json', {'operations': reports})
     receipt = _save_receipt(output, 'background', inputs, started,
-                            {'background_key': _background_key(plan, inputs), 'protected_changed_pixels': protection,
+                            {'background_key': _background_key(plan, inputs), 'portable_background_key': portable_key,
+                             'protected_changed_pixels': protection,
                              'outside_mask_changed_pixels': outside, 'review_required': 'Actually view background before lettering'})
     return {'output_dir': str(output.resolve()), 'status': 'pending', 'stage': 'background',
             'elapsed_seconds': receipt['elapsed_seconds'], 'next': 'View background.png; then render-layered with this directory'}
@@ -244,8 +277,10 @@ def render_layered(plan_path: Path, prepared: Path, output: Path) -> dict:
     require(all(sha256(Path(path)) == digest for path, digest in inputs.items()), 'Input changed during rendering')
     _verify(prepared, 'background')
     output.mkdir(parents=True)
-    source.save(output / 'source.png')
-    clean.save(output / 'background.png')
+    for name in ('source.png', 'background.png'):
+        copy_artifact(prepared / name, output / name)
+        require(sha256(output / name) == background_receipt['artifact_sha256'][name],
+                'Prepared artifact changed while copying')
     lettering.save(output / 'text-layer.png')
     for name, component in components.items():
         require(re.fullmatch(r'[a-z][a-z0-9-]*', name), 'Invalid effect component name')

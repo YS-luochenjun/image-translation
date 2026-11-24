@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from uuid import uuid4
 
 from PIL import Image
 
@@ -245,6 +246,42 @@ class DeliveryAutopilotTests(unittest.TestCase):
         result = self.plan()
         self.assertEqual(['delivery_verified', 'await_official_result'], [row['action'] for row in result['actions']])
         self.assertFalse(result['complete'])
+
+    def test_journal_proves_frozen_member_even_after_local_candidate_and_review_disappear(self):
+        record, review = self.ready()
+        self.published(record)
+        output = {'source_id': 'source', 'language': 'ja', 'member_id': 'one',
+                  'sha256': review['artifact']['sha256'], 'path': record['output_path']}
+        operation = {'operation_id': 'upload', 'requirement_id': 'req',
+                     'tool': 'material_r2_upload_from_bytes', 'state': 'received',
+                     'outputs': [output], 'response': {'structuredContent': {'resourceId': 'one-resource'}}}
+        self.save('publication-journal.jsonl', operation)
+        (self.base / record['output_path']).unlink()
+        (self.base / record['review_path']).unlink()
+        self.assertTrue(self.plan()['complete'])
+        first_publication = record.pop('publication')
+        self.assertEqual('import', self.action())
+        operation['state'] = 'unknown'
+        self.save('publication-journal.jsonl', operation)
+        record['publication'] = first_publication
+        self.assertEqual('await_official_result', self.action())
+
+    def test_receipt_reference_preserves_freeze_and_rejects_changed_bytes(self):
+        record, review = self.ready()
+        output = {'source_id': 'source', 'language': 'ja', 'member_id': 'one',
+                  'sha256': review['artifact']['sha256'], 'path': record['output_path']}
+        operation_id = str(uuid4())
+        operation = {'operation_id': operation_id, 'requirement_id': 'req',
+                     'tool': 'material_r2_upload_from_bytes', 'state': 'received', 'outputs': [output]}
+        receipt = self.base / f'publication-{operation_id}.json'
+        receipt.write_text(json.dumps({**operation, 'response': {'structuredContent': {'resourceId': 'resource'}}}))
+        self.save('publication-journal.jsonl', {**operation,
+                  'receipt_sha256': hashlib.sha256(receipt.read_bytes()).hexdigest()})
+        (self.base / record['output_path']).unlink()
+        self.assertEqual('import', self.action())
+        receipt.write_text('{}')
+        with self.assertRaisesRegex(ValueError, 'receipt hash mismatch'):
+            self.plan()
 
     def test_duplicate_or_unexpected_member_records_are_rejected(self):
         record, _ = self.ready()

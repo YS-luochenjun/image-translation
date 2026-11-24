@@ -95,6 +95,10 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("run", type=Path)
         if name == "render":
             command.add_argument("--clean-background", type=Path)
+        if name in ("packet", "review-packet"):
+            mode = command.add_mutually_exclusive_group()
+            mode.add_argument("--full", action="store_true", help="Return the expanded packet")
+            mode.add_argument("--since", help="Checkpoint from a previously read compact packet")
     for name in ('prepare-layered', 'render-layered'):
         command = commands.add_parser(name, help='Process an explicit local layered plan; no model calls')
         command.add_argument('plan', type=Path)
@@ -112,6 +116,8 @@ def main(argv: list[str] | None = None) -> int:
         command = commands.add_parser(name)
         command.add_argument(argument, type=Path)
         command.add_argument('--output', required=True, type=Path)
+        if name == 'prepare-job':
+            command.add_argument('--reuse-background', type=Path, help='Prior prepared job with the identical reviewed background')
     job_check = commands.add_parser('check-job', help='Check all language outputs without inventing user acceptance')
     job_check.add_argument('output', type=Path)
     font_check = commands.add_parser('font-check', help='Verify Unicode glyph mappings in a real local font')
@@ -124,6 +130,14 @@ def main(argv: list[str] | None = None) -> int:
     fireplay_register = commands.add_parser('fireplay-register', help='Register exact image requirement summary and brief receipts')
     fireplay_register.add_argument('code')
     fireplay_register.add_argument('--snapshot', type=Path, required=True)
+    transition = commands.add_parser('fireplay-transition', help='Prepare or reconcile one Fireplay status change')
+    transition.add_argument('code')
+    transition.add_argument('action', choices=('start', 'finish'))
+    transition.add_argument('snapshot', type=Path)
+    transition.add_argument('--delivery-state', type=Path)
+    transition_mode = transition.add_mutually_exclusive_group()
+    transition_mode.add_argument('--prepare', action='store_true')
+    transition_mode.add_argument('--reconcile', action='store_true')
     for name in ('fireplay-accept', 'fireplay-status', 'fireplay-download', 'fireplay-job'):
         command = commands.add_parser(name, help='Manage a locally accepted image requirement and verified source')
         command.add_argument('code')
@@ -142,6 +156,15 @@ def main(argv: list[str] | None = None) -> int:
     for name in ('delivery-score', 'delivery-next', 'delivery-gate'):
         command = commands.add_parser(name, help='Read-only balanced delivery score or explicit member next actions')
         command.add_argument('spec', type=Path)
+        if name == 'delivery-next':
+            mode = command.add_mutually_exclusive_group()
+            mode.add_argument('--full', action='store_true')
+            mode.add_argument('--since', help='Checkpoint from a previously read compact delivery report')
+    for name in ('record-stage', 'stage-summary'):
+        command = commands.add_parser(name, help='Record or summarize observed stage timings and costs')
+        command.add_argument('journal', type=Path)
+        if name == 'record-stage':
+            command.add_argument('event', type=Path)
     args = parser.parse_args(argv)
     try:
         if args.command == 'review-desk':
@@ -160,6 +183,11 @@ def main(argv: list[str] | None = None) -> int:
                 result = fireplay.accept(args.code, root)
             elif args.command == 'fireplay-status':
                 result = fireplay.status(args.code, root)
+            elif args.command == 'fireplay-transition':
+                from .fireplay_status_transition import status_transition
+                result = status_transition(root, args.code, args.action, read_json(args.snapshot),
+                                           prepare=args.prepare, reconcile=args.reconcile,
+                                           delivery_state=args.delivery_state)
             else:
                 from .fireplay_download import download_source, initialize_source_job
                 result = (download_source(args.code, args.image, root)
@@ -175,6 +203,14 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command in ('delivery-next', 'delivery-gate'):
             from .delivery_autopilot import next_delivery, publication_gate
             result = (next_delivery if args.command == 'delivery-next' else publication_gate)(args.spec)
+            if args.command == 'delivery-next' and not args.full:
+                from .delivery_autopilot import compact_delivery
+                result = compact_delivery(result, args.spec, args.since)
+        elif args.command in ('record-stage', 'stage-summary'):
+            from .pipeline import read_json
+            from .stage_events import record_stage, summarize_stages
+            result = (record_stage(args.journal, read_json(args.event)) if args.command == 'record-stage'
+                      else summarize_stages(args.journal))
         elif args.command == "doctor":
             result = doctor()
         elif args.command == "init":
@@ -195,7 +231,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.command == 'init-job':
                 result = initialize_job(args.source, [value.strip() for value in args.targets.split(',')], args.output)
             elif args.command == 'prepare-job':
-                result = prepare_job(args.job, args.output)
+                result = prepare_job(args.job, args.output, reuse_background=args.reuse_background)
             elif args.command == 'render-job':
                 result = render_job(args.prepared, args.output)
             else:
@@ -208,14 +244,14 @@ def main(argv: list[str] | None = None) -> int:
             from .lettering import check_font_coverage
             result = check_font_coverage(args.font, args.text)
         elif args.command == "packet":
-            result = packet(args.run)
+            result = packet(args.run, compact=not args.full, since=args.since)
         elif args.command == "validate":
             manifest = load_run(args.run)
             result = {"status": "valid", "advisories": advisory_checks(manifest), "note": "Contract validation does not certify translation or visual quality."}
         elif args.command == "render":
             result = render(args.run, args.clean_background)
         elif args.command == "review-packet":
-            result = review_packet(args.run)
+            result = review_packet(args.run, compact=not args.full, since=args.since)
         else:
             result = quality(args.run)
         print(json.dumps(result, ensure_ascii=False, indent=2))

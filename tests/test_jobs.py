@@ -84,6 +84,25 @@ class JobTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             prepare_job(directory / 'job.json', self.root / 'unready')
 
+    def test_reuse_checked_background_keeps_bytes_and_requires_current_approvals(self):
+        self.prepare()
+        with self.assertRaisesRegex(ValueError, 'Background review is missing'):
+            prepare_job(self.path, self.root / 'no-review', reuse_background=self.prepared)
+        self.approve_background_fixture()
+        reused = self.root / 'reused'
+        result = prepare_job(self.path, reused, reuse_background=self.prepared)
+        self.assertTrue(result['background_reused'])
+        self.assertEqual(sha256(self.prepared / 'background/background.png'),
+                         sha256(reused / 'background/background.png'))
+        self.assertEqual(sha256(self.prepared / 'background-review.json'),
+                         read_json(reused / 'background-review.json')['reused_review_sha256'])
+        render_job(reused, self.output)
+        self.assertEqual('pending', check_job(self.output)['status'])
+        self.project['protected_regions'].append({'id': 'new-protection', 'bbox': [91, 0, 8, 8]})
+        write_json(self.path, self.project)
+        with self.assertRaisesRegex(ValueError, 'background inputs or implementation changed'):
+            prepare_job(self.path, self.root / 'changed', reuse_background=self.prepared)
+
     def test_safe_distinct_language_identifiers(self):
         for languages in [['../ja'], ['ja', 'JA'], [], ['zh-CN', '']]:
             with self.assertRaises(ValueError):

@@ -8,7 +8,7 @@
 
 主控负责查询和接入、冻结来源与语言范围、创建及派发会话、并发排队、进度跟踪、具体纠正和交付终核。执行会话负责该需求全部来源与语言的实际制作、视觉审核、合格成果上传入库绑定及fresh核验。执行会话只处理所分配需求，按本次授权连续完成，不另行创建需求执行会话。
 
-所有交办需求均建立会话并登记thread_id、exact requirement UUID、来源×语言矩阵、开工状态和等待游标。用户2026-11-17已取消项目生产并发上限，所有可执行需求立即派发，原排队需求沿原会话续发开工，不按活跃需求数量等待名额；`config/fireplay-monitor.json`的`max_active_requirements=null`、`concurrency_mode=unlimited`表示无项目数量上限。用户最新指示新开需求执行会话不指定模型或推理等级，使用宿主默认；已有需求沿原会话续办。主控使用compact wait_threads及保存的游标跟踪完成情况。创建失败或会话能力不可用时保留待派发状态并报告真实原因。只有取得会话ID及启动回执才算派发完成。
+优化版最多同时承接 20 个逻辑需求，按 exact requirement UUID 计数。先用 `fireplay-accept CODE` 拿名额，`queued_capacity` 表示继续排队。取得名额且 Fireplay 开工读回后，建立或续用执行会话，登记 thread_id、来源×语言矩阵、开工状态和等待游标。新会话使用宿主默认模型和推理等级。主控使用 compact wait_threads 及保存的游标跟踪完成情况。创建失败时保留待派发状态。取得会话 ID 及启动回执后登记派发成功。
 
 ## 1. 发现待办，不靠标题猜
 
@@ -20,7 +20,7 @@
 
 每个候选精确UUID读blind_brief，并读当前delivery（必要时素材详情），核对updatedAt、正文、原图、语言、assetType和执行权限。盲选接口waiting_selection返回的空materials不是无素材，遵守其实际选择流程。当前assigneeIds是设计执行人，materials.designerIds是已存归属，uploader/launcher不是设计师。部门共享ID与需求deptId可能不同，通过官方可用共享部门资源核实，不字符串替换。发布前fresh核实权限与身份，不把历史intake当永远有效。
 
-持续轮询按[主控计划](fireplay-monitor.md)：日常`--all-departments --mode active`使用当前官方未开始/进行中双状态及40行游标；每24小时`--mode full`无状态全量对账，仅对三天内且尚未实际完成的需求另按exact UUID跨状态跟踪。缓存不证明交付，空账本跳过聊天查询，历史fireplay-3保持PAUSED。已派发扩单/重复附件继续读[轮询与范围变更](fireplay-polling.md)。发现命令仅提供查询回执；派发去重、排队和版本比较由主控持久记录承担。
+日常用 `new` 查询当前官方「未开始」的图片翻译项，每24小时用 `full` 跨状态对账。已接入的三天内未完成需求按 exact UUID 跟踪，空账本跳过聊天查询。新单先确认「进行中」再派发。具体见[主控计划](fireplay-monitor.md)和[优化版运行手册](../../docs/optimization-pilot.md)。
 
 ## 2. 规格先冻结成成员矩阵
 
@@ -55,15 +55,15 @@
 1. `material-size-validate` 核已输出矩阵及技术缺项。`delivery-score`每成员ready才进上传；`delivery-next` 汇总make/review/rework/upload/import/attribute/bind/verify；`delivery-gate STATE.json`从当前已审合格成员生成兼容旧发布器的gate JSON（保存到需求目录后交给gate_file），缺成员时requirement_complete仍false。字段与示例见[自动交付合同](../../docs/delivery-automation.md)。不能靠文件数或绑定数宣布完成。
 2. 原始发布器要求已有intake、当前合同schema版本、gate_file、原操作UUID；设计师按当前用户规则排除罗晨钧和邹彬。旧37原会话归档/unknown限制由该批次控制合同承担，不是普通发现入口的候选白名单；新需求无需等待旧会话。不要为通用自动化绕过原journal或默改归属。
    合同先从当前官方`tool_catalog`读取并审查，保存完整定义到该需求目录的`contract-工具名.json`；发布器优先使用该工具的需求级快照，再与live合同逐项比对。没有需求级文件时兼容旧全局缓存；已有文件损坏、版本不符或live漂移须刷新审查，不能静默回退或复制修改发布器绕过检查。journal同时记录实际快照路径与SHA。上传回执兼容`publicUrl/resourceId`及`public_url/resource_id`，相同别名去重，值冲突或失败回执不授权入库；同需求已审SHA来源校验及unknown不重放保持有效。
-3. 图组可共用一个material多resource，button按官方单URL规则；图片数≠素材记录数。R2中相同文件出现多个对象本身不构成项目交付阻塞，已入库过相同哈希也不阻止再次入库或追加；素材入库和需求绑定以当前需求正确、完整为准，既有合格绑定保留。
+3. 图组可共用一个 material 的多个 resource，button 按官方单 URL 规则。已上传或已入库成员沿原资源或素材 ID 补登记与绑定。未入库的新成员可加入组图。
    上传Tag按[素材Tag约定](../../docs/material-tags.md)：带上当前素材对应的目标语种，需求用`ja`、`hi`等就沿用，不强制中文名称；明确要求的实际尺寸建议标注，再按需要加一两个产品/主题词及需求编号，主要便于搜索。单语素材不贴整单所有语种，单尺寸素材不贴未包含的其他尺寸。已有合理标签保留，缺项可通过官方标签追加方式补齐并读回，不增设严格标签门禁。
-4. designer_ids 排除罗晨钧（c74b62d9）和邹彬（b2fbcgab）；设计师可留空，不要求空值证明，也不猜填其他人。共享部门以官方有效ID为准。平台canBindMaterials和canUpdateStatus是独立权限，不自动改需求状态。
+4. `designer_ids` 排除罗晨钧（c74b62d9）和邹彬（b2fbcgab），可以留空。共享部门使用官方有效 ID。素材绑定和状态写回分别检查 `canBindMaterials` 与 `canUpdateStatus`。状态操作按[优化版运行手册](../../docs/optimization-pilot.md#fireplay-从开工到完成)执行。
 5. unknown超时保留原操作ID并对账。默认阻断该需求的后续写入。经明确交办继续独立成员时，可设置 `isolate_unknown_uploads`。仅限能绑定需求内单个路径和SHA的未知R2上传，发布器核对待上传文件、入库资源或绑定素材的来源不与未知项重叠。未知入库、绑定或其他未知写入仍阻断该需求。
 6. fresh终核必须记录当前exact UUID绑定、设计师（可为空）、二创、共享、真实资源全部覆盖及每个下载SHA；缺证据=verify_pending，评分达标不代表delivery_verified。
 
 ## 5. 自主续作
 
-按用户2026-11-17授权，项目不设活跃生产需求数量上限；已授权的可执行需求立即派发，不让中心逐个提示。单项缺原文/保护素材时一次集中问，其他独立任务继续。已交办图片需求可依用户授权使用付费路线；如能力不足，尝试可用路线并报告具体缺口。已确认的语义编辑写当前scope和SHA，不扩大成删人或换产品。
+有名额时按主控计划补入排队需求。已占位需求沿原会话继续，要求的原文或保护素材缺失时一次集中核对。已交办图片需求可依用户授权使用付费路线。已确认的语义编辑绑定当前范围和文件哈希。
 
 使用 `delivery-next STATE.json` 输出的实际下一动作；changed SHA退回review，不复用旧pass；平台阶段证据缺失只返回对应动作。不以旧固定37完成状态代表自动化已验收。无新证据时等待事件/人类输入，不周期重读相同文件、反复preview/catalog或重复输出“无变化”审计文件。
 

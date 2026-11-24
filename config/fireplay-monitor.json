@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "project_root": "/Users/yanshan/Desktop/image-translation",
-  "project_id": "8cb983fc-3791-4abd-a5dd-1a7928f90752",
+  "project_root": "/Users/yanshan/Desktop/图片翻译-仅程序优化",
+  "project_id": null,
   "workflow": "agent/workflows/fireplay-monitor.md",
   "state_file": "work/fireplay-monitor/controller.json",
   "discovery_interval_minutes": 30,
@@ -13,8 +13,27 @@
   "monitor_command": "scripts/fireplay-monitor-plan.mjs",
   "receipt_max_age_minutes": 30,
   "create_threads_only_for_new_requirements": true,
-  "max_active_requirements": null,
-  "concurrency_mode": "unlimited",
+  "max_active_requirements": 20,
+  "concurrency_mode": "bounded",
+  "capacity_terminal_states": [
+    "verified_complete",
+    "delivery_verified",
+    "excluded_user_instruction",
+    "excluded_closed",
+    "excluded_out_of_scope"
+  ],
+  "capacity_active_states": [
+    "accepted",
+    "starting",
+    "dispatch_pending",
+    "dispatched",
+    "dispatch_unknown",
+    "in_progress",
+    "running",
+    "partial",
+    "delivered_local",
+    "unknown"
+  ],
   "execution_session": {
     "model": "host_default",
     "reasoning_effort": "host_default",
@@ -30,8 +49,7 @@
     "ai_mode_label": "图片翻译",
     "pagination": "cursor",
     "status": [
-      "not_started",
-      "in_progress"
+      "not_started"
     ],
     "limit": 40,
     "offset": 0,

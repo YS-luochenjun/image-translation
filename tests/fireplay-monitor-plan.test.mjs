@@ -139,7 +139,7 @@ test('tracked groups are bounded and cache alone never substitutes for official 
  const verified=plan(emptyMonitorState(),{[id]:{state:'verified_complete',responsible_thread_id:'owner',delivery_verified_by_controller:true}});
  assert.deepEqual(verified.tracked_queries,[]);assert.deepEqual(verified.chat_targets,[]);
  const unknown=plan(emptyMonitorState(),{[id]:{state:'unknown',responsible_thread_id:'owner',delivery_verified_by_controller:true}});
- assert.equal(unknown.tracked_queries.length,0);
+ assert.equal(unknown.tracked_queries.length,1);
 });
 
 test('submitted material owners are tracked only for read-only reconciliation',()=>{
@@ -206,4 +206,53 @@ test('old and completed work is excluded while an incomplete done item remains t
   assert.deepEqual(result.tracked_queries,[]);assert.deepEqual(result.chat_targets,[]);assert.deepEqual(result.brief_candidates,[]);
  }
  assert.equal(plan(emptyMonitorState(),{[id]:{...recent,code:'MOG-20261108-063'}}).chat_targets.length,1);
+});
+
+test('new discovery is unstarted only and local delivery alone needs controller followup',()=>{
+ const state=accept(emptyMonitorState(),'full',[row({status:'not_started'})]);
+ const planned=plan(state);
+ assert.deepEqual(planned.discovery_query.status,['not_started']);
+ assert.deepEqual(planned.new_candidates,[id]);
+ assert.throws(()=>accept(state,'new',[row()]),/scan filters/);
+ assert.deepEqual(plan(state,{[id]:{state:'delivered_local',responsible_thread_id:'owner'}}).new_candidates,[]);
+ assert.equal(plan(state,{[id]:{state:'delivered_local',responsible_thread_id:'owner'}}).chat_targets.length,1);
+});
+
+test('admission counts unique reserved and active UUIDs and queues by priority',()=>{
+ const urgent='f3e17b15-2e91-4a5c-b5a8-a04b457d02bc';
+ const state=accept(emptyMonitorState(),'new',[
+  row({status:'not_started',priority:'P1'}),
+  row({id:urgent,code:'SHE-20261111-002',status:'not_started',priority:'P0'})
+ ]);
+ const requirements=Object.fromEntries(Array.from({length:19},(_,index)=>[
+  `f3e17b15-2e91-4a5c-b5a8-${String(index).padStart(12,'0')}`,
+  {code:`SHE-20261111-${String(index+10).padStart(3,'0')}`,state:'dispatched'}
+ ]));
+ const duplicate=Object.keys(requirements)[0];
+ const admissions={requirements:{[duplicate]:{state:'reserved'}}};
+ const result=plan(state,requirements,{admissions});
+ assert.deepEqual(result.capacity,{limit:20,active:19,available:1,queued:1});
+ assert.deepEqual(result.new_candidates,[urgent]);
+ assert.deepEqual(result.queued_candidates,[id]);
+ admissions.requirements[urgent]={state:'reserved'};
+ assert.deepEqual(plan(state,requirements,{admissions}).new_candidates,[urgent]);
+ assert.equal(plan(state,requirements,{admissions}).capacity.available,0);
+ admissions.requirements[duplicate]={state:'released'};
+ assert.equal(plan(state,requirements,{admissions}).capacity.available,1);
+ requirements[duplicate].unknown_operation='unresolved';
+ assert.equal(plan(state,requirements,{admissions}).capacity.available,0);
+});
+
+test('reserved requirements resume dispatch after opening or losing discovery state',()=>{
+ const admissions={requirements:{[id]:{state:'reserved',code:'SHE-20261111-001'}}};
+ const opened=accept(emptyMonitorState(),'full',[row()]);
+ for(const state of [opened,emptyMonitorState()]){
+  const output=plan(state,{},{admissions});
+  assert.deepEqual(output.continuation_candidates,[id]);
+  assert.deepEqual(output.tracked_queries[0].requirement_ids,[id]);
+  assert.deepEqual(output.new_candidates,[]);
+ }
+ const assigned=plan(opened,{[id]:{state:'dispatched',responsible_thread_id:'thread'}},{admissions});
+ assert.deepEqual(assigned.continuation_candidates,[]);
+ assert.equal(assigned.capacity.active,1);
 });

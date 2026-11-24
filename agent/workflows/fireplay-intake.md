@@ -8,7 +8,7 @@
 2. 将实际查询参数及原响应保存为 `summary_pages`，执行 `fireplay-discover --receipt FILE`。`complete=false` 时继续相同过滤与游标；完整空列表才是本次范围的空结果。P0 排在前面。列表标题仅提供线索，所有候选仍需读正文。
 3. 用精确编号选中真实UUID，读取blind_brief。两视图编号、UUID、updatedAt和assetType（image或button）必须一致；分别保存summary与brief再执行fireplay-register。精确aiMode符合只证明分流，正文仍应明确翻译/尺寸适配及实际来源；原创设计或标题含翻译不能自动承接。有来源decision可处理正文与结构化字段差异，不能以任意文件自称用户授权。
 4. 核对每张原图和全部目标语种。显式来源需真实正文或 `material_receipt` 中可核实的 URL；扩展名不明确的素材通过当前素材详情工具解析，不猜素材 ID。语言缺失或不支持、来源缺失、已完成或取消都保留 blocker。正文与结构化语言冲突时先核实，再用有来源的 decision 选定；注册不会推断数量的业务含义。
-5. 在用户交办范围内执行 `fireplay-accept CODE`。这是本地承接，`platform_claimed=false`；平台原子认领、执行人和状态回写仍由未来平台接口提供，不能用设计订单 accept 代替需求认领。多人同时制作的风险需从平台当前执行信息核对。
+5. 在用户交办范围内执行 `fireplay-accept CODE`，登记本地承接。新单核实唯一负责人后，用 `fireplay-transition` 准备开工写回并读回确认。步骤见[优化版运行手册](../../docs/optimization-pilot.md)。
 6. 对每张来源执行 `fireplay-download CODE --image N`。核验真实静态 PNG/JPEG/WebP、文件大小、尺寸和 SHA256；链接失效时刷新真实素材回执。下载失败保持失败，不拿 HTML/缩略图/视频代替原图。
 7. 执行 `fireplay-job CODE --image N --output runs/CODE-N`，复用已验证原图，创建所有已解析目标语言的 pending 工作包。按 [单图流程](single-image.md) 实际看图、定稿、制作和审核。多张原图分别建立工作包，完成一张不代表整个需求完成。
 

@@ -17,17 +17,17 @@
 ## 每30分钟发现
 
 1. 先核账本和当前负责聊天，合并尚未处理的变化。使用 tool_catalog 取得 requirement_dept_list 和 requirement_create_options 的当前完整合同，通过 tool_read 读取可见部门和真实选项；部门 ID 只作选项种子。精确匹配 enabled=true、label=图片翻译 的实际 value，不写死旧枚举。
-2. 日常 active 用官方 requirement_list 查询 view=summary、scope=all、asset_type=[image,button]、ai_mode=当前值、status=[not_started,in_progress]、pagination=cursor、limit=40、offset=0，沿 next_cursor 完整翻页；两状态来自当前官方选项，不以in_progress证明已有负责者。每24小时执行一次 full：相同可读范围和类型/AI模式，不带status、limit=10，以小页避免回执截断；离线后补做。不加部门、日期、关键词或视频人员筛选。active不是完整需求范围，pending_upload等其他状态通过跨状态跟踪和full补齐。每页保存实际参数、原响应、serverTime和游标；失败、坏JSON、重复身份、游标循环或缺页不推进检查点。
+2. 日常 `new` 通过 `requirement_list` 查询当前图片翻译 `not_started`，使用 summary 视图、全可读范围、图片和按钮类型、40 行游标完整分页。每24小时用 `full` 查询相同范围的所有状态，每页 10 行。已经派发的需求另按 exact UUID 跟踪。保存实际参数、原响应、serverTime 和游标，完整且校验通过的分页才能推进检查点。
 3. 当前 `scripts/fireplay-discover-translations.mjs` 的 transport 依赖 Windows LOCALAPPDATA/DPAPI；本 Mac 不复制认证文件，不读取参考项目凭证。直接通过已连接的官方 MCP 完成同等查询并保存 summary_pages，再交给 `fireplay-discover --receipt` 校验；不可把 Windows transport 缺失当作整个 MCP 不可用。
 4. 缓存以UUID、updatedAt和summary元数据指纹比较；符合三天范围且未实际完成的新/变化候选读exact UUID的blind_brief和delivery。未处理的brief保留待办，不能因先更新缓存、下次summary相同就丢掉。正文/附件/语言变化才调整制作矩阵，元数据变化不自动重做。核正文、全部有效来源、去重语言、类型及canBindMaterials；原文/语种缺失、identity_pending、unknown或已接入/排队需求写入assignments，之后每轮exact UUID每批最多40跨状态读取summary，不带status、asset_type、ai_mode或日期过滤。其模式/状态改变、查询缺失或权限变化都保留待核，不能当作完成。done/cancelled/canceled且无本地owner或未结操作的历史项只留缓存，不读详情、不进常规跟踪。not_started也不能证明未交付。
 5. 持久主键是 exact UUID，并记录需求编号。检查当前账本及已有聊天；必要时查历史/归档聊天，读真实上下文后确定唯一负责者。编号相同先核身份，图像近似不能直接判重。缺历史登记时不批量接管已有需求，先查已有绑定和负责会话，无法核实的标 identity_pending，独立新需求继续。
-6. 冻结实际来源×语言×成员及规格。按编号建独立执行会话，先取得真实 threadId/hostId 和启动回执才记派发成功。用户2026-11-17已取消项目生产并发上限，`config/fireplay-monitor.json` 的 `max_active_requirements=null`、`concurrency_mode=unlimited`表示不按活跃数量限流；所有可执行需求立即派发，原排队需求复用原owner续发开工。后续新建执行会话不指定模型或推理等级，使用宿主默认。保留 partial/blocked，seen 不等于完成。主控只接入、调度和终核，执行会话制作、看图审核并正式交付。
+6. 冻结实际来源×语言×成员及规格。每轮按 `new_candidates` 的顺序调用 `fireplay-accept`。容量 20 单，超额候选留在发现账本，计划输出 `capacity` 和 `queued_candidates`。取得名额并确认 Fireplay 开工后，用需求编号创建或续用原会话。取得 threadId/hostId 和启动回执后登记派发。新建会话使用宿主默认模型和推理等级。
 
 ## 有工作时跟踪已有需求与上传
 
 由30分钟巡检中的独立跟进阶段处理已登记会话；fireplay-3保持暂停。先运行下方计划命令，chat_targets为空时不调用read_thread/wait_threads，不为旧closed需求轮询聊天。有待办才用原会话续作，补图、补语言、补上传均不建接替聊天；当前用户要求持续跟到完成时，在本次主控任务中继续观察直到终核或真实阻塞。
 
-读取同一账本，用 compact wait_threads(timeoutMs=0) 和保存的游标核负责会话。运行中不催；idle/error 且有明确可执行下一步的，沿原聊天发送一次具体续作交接，保留 read_thread、实际发送回执和唯一信号。派发前记录意图，未知发送/创建结果先核原对象，不换 key 或新聊天重放。人类审批、事实缺失、付费未授权等阻塞不反复唤醒；可执行需求立即派发，不因项目并发名额等待，P0 只影响冲突优先级。
+读取同一账本，用 compact wait_threads(timeoutMs=0) 和保存的游标核负责会话。运行中的会话继续制作。idle/error 且有明确下一步时，沿原聊天发送一次具体续作交接，保留 read_thread、实际发送回执和唯一信号。派发前记录意图，未知发送或创建结果先核对原操作。出现空位时按优先级和时间顺序补位。
 
 每次发现负责会话已停止或有新结果，核对其最后回合、实际产物与平台回执，并及时更新 assignments 的实际阶段、阻塞原因、已完成数量和下一步；不得让过期的 dispatched 状态掩盖已停止、部分交付或真实审批拒绝。会话完成不等于交付完成，单纯发送“继续”也不能解除权限、网络、素材缺失或质量阻塞。按用户授权处理 SSE idle timeout 接替，先核原会话和未知写入，避免出现多个实际负责人。
 
@@ -59,10 +59,10 @@
 node scripts/fireplay-monitor-plan.mjs --state work/fireplay-monitor/discovery-state.json --assignments work/fireplay-monitor/assignments.json --ai-mode CURRENT_VALUE
 ```
 
-按照输出discovery_query及tracked_queries调用官方requirement_list，完整保存每个查询的`{query,summary_pages:[{arguments,response}]}`；每组游标参数严格相同。Mac继续用当前连接器，Windows transport可用时发现脚本支持 `--all-departments --mode active` 或 `--mode full`。full到期时本轮full覆盖发现，不必重复active；跟踪阶段独立执行。
+按照 `discovery_query` 及 `tracked_queries` 调用官方 `requirement_list`，完整保存每个查询的 `{query,summary_pages:[{arguments,response}]}`。未知写入沿原操作对账，开工与结案步骤见[优化版运行手册](../../docs/optimization-pilot.md)。
 
 ```sh
-node scripts/fireplay-monitor-plan.mjs --state work/fireplay-monitor/discovery-state.json --assignments work/fireplay-monitor/assignments.json --ai-mode CURRENT_VALUE --receipt SAVED_RECEIPT.json --mode active
+node scripts/fireplay-monitor-plan.mjs --state work/fireplay-monitor/discovery-state.json --assignments work/fireplay-monitor/assignments.json --ai-mode CURRENT_VALUE --receipt SAVED_RECEIPT.json --mode new
 ```
 
 full使用`--mode full`；tracked使用`--mode tracked --ids UUID,UUID`，必须和计划的原始批次一致。tracked每批保留最多40个exact UUID，每页只取7条以避免宿主响应截断；沿next_cursor保持原UUID批次和全部过滤条件，不能拆批拼造原查询回执。active/full检查点独立；tracked按exact UUID批次分别记录，缺失观察保留其他批次，部分批次完成不能称整轮全部成功。缺页/错误不写缓存或成功检查点，原回执仍保留。tracked缺失列表不授权移除原owner/unknown。新增本地巡检时效约定：每页serverTime须在本轮接收时30分钟以内、不得晚于当前时刻，updatedAt不得晚于serverTime；brief/delivery确认已读也核时效及同版本。旧回执保留原日期作历史证据，不冒充本轮查询。`--now`仅用于冻结当轮真实观察时刻或离线测试，不回拨时钟刷新旧记录。记录是live观察而非冻结快照；缓存不证明已制作或交付。
@@ -71,7 +71,7 @@ full使用`--mode full`；tracked使用`--mode tracked --ids UUID,UUID`，必须
 
 ## 终核、通知与停止
 
-逐成员核当前文件 SHA、真实尺寸/字节、评分、设计师（可留空）、二创/共享、正式 material/resource ID、当前绑定及下载核验。设计师排除罗晨钧和邹彬，可以留空，不要求空值证明；填写其他设计师时须有真实依据。执行会话的 self 审核、主控抽查和用户认可分别记录；主控不能把 worker 声明代替可核证据。ready 先交，partial/pending 不冒称整体完成；不自动设置需求业务 done 或投放广告。
+逐成员核当前文件 SHA、真实尺寸和字节、评分、设计师（可留空）、二创、共享、正式 material/resource ID、绑定和下载。执行会话的 self 审核、主控抽查和用户认可分别记录。全体成员核验通过后由主控按[优化版运行手册](../../docs/optimization-pilot.md)写回并读回「已完成」。
 
 只有新接入、已核实完成、重要失败或确需人工动作时通知。全可读范围受服务端权限限制，不称全公司全量。没有可行动变化保持安静。队列为空仍保留30分钟需求发现，跳过聊天轮询；历史20分钟盯办已按本轮用户要求暂停，不自动恢复。不得唤醒其他项目已停止的自动化。
 

@@ -73,7 +73,7 @@ size_spec、member输出/审核、fresh下载路径相对state；审核内部sou
 
 publication每阶段由宿主写真实已核回执：upload_receipt、material_id、resource_id、attribution_receipt、binding_receipt、fresh_verification。若字段缺失，依次输出upload/import/attribute/bind/verify。回执字段的存在只驱动下一步，不能证明平台成功。fresh_verification必须含requirement_id/source_id/language/member_id/material_id/resource_id、designer_ids和非空shared_dept_ids字符串数组、creation_type=derivative、sha256、带时区observed_at、实际下载的downloaded_path。设计师排除罗晨钧和邹彬；设计师可以留空，requirement和fresh的designer_ids均为空数组即可，不要求额外证明文件。当前版本限30分钟内；未来时间不接受。资源下载字节必须与已审输出一致，下载路径不能直接指原输出。
 
-已审输出和当前spec必须一致且格式为PNG/JPEG。R2已有相同对象或素材库已有相同图片，本身不构成上传、入库或绑定的阻断，以需求面板正确完整为准。结果未知的写操作保留原操作ID并对账。未知上传可以在明确要求继续独立成员时隔离到不重叠的输出路径和SHA，未知入库、绑定或来源重叠的写操作仍阻断对应后续动作。评分通过不代表平台操作已成功，仍须fresh核角色、权限、归属、共享。material_id是记录，不等于图片资源数。整个明确矩阵全部delivery_verified才complete=true，13/14仍不完整。模型自报和手填JSON无法认证平台，宿主必须实际读回。
+已审输出和当前规格必须一致，格式为 PNG 或 JPEG。按需求内的成员身份、输出 SHA 与原操作记录核对上传结果。已成功上传的成员使用原资源继续入库和绑定。结果未知时保存原操作 ID 并对账，确定不重叠的独立成员可按发布器规则继续。全部成员通过 fresh 核验后，主控才按[优化版运行手册](optimization-pilot.md)准备结案状态写回。
 
 ## 对接现有发布器
 

@@ -34,10 +34,8 @@ def write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def initialize(source: Path, target: str, run: Path) -> dict:
+def normalize_source(source: Path, destination: Path) -> tuple[dict, dict]:
     require(source.is_file(), "Source image does not exist")
-    require(bool(target.strip()), "Target language is required")
-    require(not run.exists(), "Run directory already exists; choose a new ID")
     with Image.open(source) as image:
         require(getattr(image, "n_frames", 1) == 1, "Animated/multi-page inputs are unsupported; select one frame first")
         normalized = ImageOps.exif_transpose(image)
@@ -46,18 +44,29 @@ def initialize(source: Path, target: str, run: Path) -> dict:
         normalized.load()
         require(normalized.width * normalized.height <= 50_000_000, "Image exceeds 50 megapixel local limit")
         normalized.info.clear()
-    run.mkdir(parents=True)
-    source_copy = run / "source.png"
-    normalized.save(source_copy)
-    manifest = {
+    destination.parent.mkdir(parents=True)
+    normalized.save(destination)
+    return ({"path": "source.png", "sha256": sha256(destination), "original_sha256": sha256(source)},
+            {"width": normalized.width, "height": normalized.height})
+
+
+def new_manifest(target: str, source: dict, canvas: dict) -> dict:
+    return {
         "schema_version": 1,
-        "source": {"path": "source.png", "sha256": sha256(source_copy), "original_sha256": sha256(source)},
-        "canvas": {"width": normalized.width, "height": normalized.height},
+        "source": source,
+        "canvas": canvas,
         "target_language": target,
         "analysis": {"complete": False, "observations": []},
         "regions": [], "protected_regions": [], "glossary": [],
     }
-    write_json(run / "manifest.json", manifest)
+
+
+def initialize(source: Path, target: str, run: Path) -> dict:
+    require(bool(target.strip()), "Target language is required")
+    require(not run.exists(), "Run directory already exists; choose a new ID")
+    source_copy = run / "source.png"
+    metadata, canvas = normalize_source(source, source_copy)
+    write_json(run / "manifest.json", new_manifest(target, metadata, canvas))
     return {"run": str(run.resolve()), "source": str(source_copy.resolve()), "next": "packet; view actual source; fill manifest.json"}
 
 
@@ -71,18 +80,24 @@ def load_run(run: Path, *, ready: bool = True) -> dict:
     return manifest
 
 
-def packet(run: Path) -> dict:
+def _checkpoint_directory(run: Path) -> Path:
+    job = run.parent.parent
+    return job if run.parent.name == 'languages' and (job / 'job.json').is_file() else run
+
+
+def packet(run: Path, *, compact: bool = False, since: str | None = None) -> dict:
     from .knowledge import load_knowledge
 
     manifest = load_run(run, ready=False)
     knowledge = load_knowledge(PROJECT_ROOT, source_sha256=manifest['source']['sha256'],
-                               tags=manifest['analysis'].get('content_tags'))
+                               tags=manifest['analysis'].get('content_tags'), include_content=not compact)
     prompts = [PROJECT_ROOT / "agent" / "prompts" / name for name in ("analyze.md", "translate.md", "repair.md")]
     result = {
         "stage": "analyze-and-translate", "source": str((run / "source.png").resolve()),
         "source_sha256": manifest["source"]["sha256"], "manifest": manifest,
         "coordinate_system": "EXIF-normalized source.png pixels, bbox=[x,y,width,height]",
-        "prompts": {path.name: path.read_text(encoding="utf-8") for path in prompts},
+        "prompts": {path.name: ({"path": str(path), "sha256": sha256(path)} if compact
+                                else path.read_text(encoding="utf-8")) for path in prompts},
         "knowledge": knowledge,
         "workflow_stages": [
             {"id": "analyze-style", "output": "source text, semantic constraints, style and composition plan"},
@@ -97,6 +112,22 @@ def packet(run: Path) -> dict:
                          "layered_guide": str(PROJECT_ROOT / 'docs' / 'layered-tools.md')},
         "warning": "Packet generation performs no recognition, translation, visual stage review or model call.",
     }
+    if compact:
+        result['manifest_path'] = str((run / 'manifest.json').resolve())
+        result['next'] = ('Use the source to finish analysis and verify wording.' if not manifest['analysis']['complete']
+                          else 'Read the current manifest and continue with the verified repair/lettering workflow.')
+        result['knowledge']['methods'] = [
+            {key: item[key] for key in ('id', 'path', 'sha256', 'status')} for item in knowledge['methods']]
+        result['knowledge'].pop('available_cases')
+        result['manifest'] = {key: value for key, value in manifest.items() if key != 'regions'}
+        regions = {region['id']: region for region in manifest['regions']}
+        result['region_order'] = list(regions)
+        from .incremental_output import checkpoint_output
+        return checkpoint_output(result, since, scope=f"packet:{run.resolve()}:{result['source_sha256']}",
+                                 directory=_checkpoint_directory(run), always=('stage',),
+                                 collections={'region_changes': regions},
+                                 snapshot={'manifest': manifest})
+    require(since is None, "Use a compact packet with --since")
     write_json(run / "packet.json", result)
     return result
 
@@ -166,7 +197,7 @@ def current_render(run: Path) -> tuple[Path, dict]:
     return output, receipt
 
 
-def review_packet(run: Path) -> dict:
+def review_packet(run: Path, *, compact: bool = False, since: str | None = None) -> dict:
     manifest = load_run(run)
     output, receipt = current_render(run)
     template = {
@@ -176,15 +207,26 @@ def review_packet(run: Path) -> dict:
                     "restoration": None, "style": None, "notes": ""} for item in manifest["regions"]],
         "issues": [], "global_notes": "",
     }
-    write_json(output / "review-template.json", template)
-    return {"source": str((run / "source.png").resolve()), "output": str((output / "translated.png").resolve()),
+    template_path = output / "review-template.json"
+    if not template_path.exists() or read_json(template_path) != template:
+        write_json(template_path, template)
+    instructions = PROJECT_ROOT / "agent/prompts/review.md"
+    result = {"source": str((run / "source.png").resolve()), "output": str((output / "translated.png").resolve()),
             "manifest_path": str((run / "manifest.json").resolve()),
             "receipt_path": str((output / "receipt.json").resolve()),
             "layout_path": str((output / "layout.json").resolve()),
             "comparison": str((output / "comparison.png").resolve()),
-            "instructions": (PROJECT_ROOT / "agent/prompts/review.md").read_text(encoding="utf-8"),
-            "template": str((output / "review-template.json").resolve()),
+            "instructions": ({"path": str(instructions), "sha256": sha256(instructions)}
+                             if compact else instructions.read_text(encoding="utf-8")),
+            "template": str(template_path.resolve()),
             "save_review_as": str((output / "review.json").resolve()), "advisories": receipt["advisories"]}
+    if compact:
+        from .incremental_output import checkpoint_output
+        result['output_sha256'] = receipt['output_sha256']
+        result['manifest_sha256'] = receipt['manifest_sha256']
+        return checkpoint_output(result, since, scope=f'review:{run.resolve()}',
+                                 directory=_checkpoint_directory(run))
+    return result
 
 
 def save_quality(run: Path, output: Path | None, result: dict) -> dict:

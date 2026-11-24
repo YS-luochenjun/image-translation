@@ -8,13 +8,13 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 import re
-import shutil
 
+from .artifact_copy import copy_artifact
 from .production_timing import timed_production
 from .contracts import require, validate_manifest
 from .layer_ops import _fields
 from .layered import _image, _path, _verify, prepare_layered, render_layered, check_layered
-from .pipeline import initialize, read_json, write_json, sha256
+from .pipeline import new_manifest, normalize_source, read_json, write_json, sha256
 from .visual_review import validate_visual_targets
 from .job_content import validate_region_map, merged_protections
 from .stage_review import verify_background_review
@@ -37,14 +37,16 @@ def initialize_job(source: Path, targets: list[str], output: Path) -> dict:
     languages = _languages(targets)
     require(not output.exists(), 'Job directory already exists')
     require(source.is_file(), 'Missing source image')
+    metadata, canvas = normalize_source(source, output / 'source.png')
     entries = []
     for language in languages:
         run = output / 'languages' / language
-        initialize(source, language, run)
+        run.mkdir(parents=True)
+        copy_artifact(output / 'source.png', run / 'source.png')
+        write_json(run / 'manifest.json', new_manifest(language, metadata, canvas))
         entries.append({'language': language, 'manifest': f'languages/{language}/manifest.json',
                         'rows': [], 'assets': [], 'text_clear_boxes': [], 'notes': [], 'region_map': []})
-    shutil.copyfile(output / 'languages' / languages[0] / 'source.png', output / 'source.png')
-    project = {'schema_version': 1, 'source': 'source.png', 'source_sha256': sha256(output / 'source.png'),
+    project = {'schema_version': 1, 'source': 'source.png', 'source_sha256': metadata['sha256'],
                'background': {'operations': []}, 'protected_regions': [], 'working_scale': 6,
                'view_scale': 3, 'visual_targets': [], 'targets': entries, 'support_files': [],
                'notes': ['Agent must inspect source, complete semantic manifests, choose repair and typography, and specify visual targets. No automatic translation.']}
@@ -96,20 +98,25 @@ def _plan(project: dict, target: dict) -> dict:
             'notes': [*project.get('notes', []), *target.get('notes', [])]}
 
 
-def prepare_job(job_path: Path, output: Path) -> dict:
+def prepare_job(job_path: Path, output: Path, *, reuse_background: Path | None = None) -> dict:
     require(not output.exists(), 'Prepared job already exists; choose another directory')
     project, languages = _load_job(job_path)
+    previous_review = _background_review(reuse_background) if reuse_background is not None else None
     base = job_path.resolve().parent
     output.mkdir(parents=True)
     resources = output / 'inputs'
     resources.mkdir()
     copied: dict[str, str] = {}
     originals: dict[str, str] = {}
+    snapshots: dict[Path, str] = {}
+    storage = {'clone': 0, 'copy': 0}
     total_bytes = 0
 
     def snapshot(value: str, relative_base: Path = base) -> str:
         nonlocal total_bytes
         source = _path(relative_base, value)
+        if source in snapshots:
+            return snapshots[source]
         size = source.stat().st_size
         require(size <= MAX_BUNDLE_BYTES, 'Job input exceeds256MiB budget')
         digest = sha256(source)
@@ -119,11 +126,12 @@ def prepare_job(job_path: Path, output: Path) -> dict:
         destination = output / relative
         if relative not in copied:
             require(total_bytes + size <= MAX_BUNDLE_BYTES, 'Job inputs exceed256MiB budget')
-            shutil.copyfile(source, destination)
+            storage[copy_artifact(source, destination)] += 1
             require(sha256(destination) == digest == sha256(source), 'Input changed while snapshotting')
             copied[relative] = digest
             total_bytes += size
         originals[str(source)] = digest
+        snapshots[source] = relative
         return relative
 
     frozen = deepcopy(project)
@@ -156,7 +164,8 @@ def prepare_job(job_path: Path, output: Path) -> dict:
     # Plans live beside job.json so every frozen path stays relative to this package.
     for target in frozen['targets']:
         write_json(output / f"plan-{target['language']}.json", _plan(frozen, target))
-    prepare_layered(output / f'plan-{languages[0]}.json', output / 'background')
+    prepare_layered(output / f'plan-{languages[0]}.json', output / 'background',
+                    reuse=reuse_background / 'background' if reuse_background is not None else None)
     clean = output / 'background' / 'background.png'
     template = {'schema_version': 1, 'source_sha256': frozen['source_sha256'],
                 'background_sha256': sha256(clean), 'receipt_sha256': sha256(output / 'background' / 'receipt.json'),
@@ -164,12 +173,21 @@ def prepare_job(job_path: Path, output: Path) -> dict:
                     'no_residual_text': None, 'seam_continuity': None, 'protected_content': None},
                 'observations': '', 'issues': []}
     write_json(output / 'background-review-template.json', template)
+    if previous_review is not None:
+        require(previous_review['background_sha256'] == template['background_sha256'],
+                'Reused background differs from the reviewed bytes')
+        write_json(output / 'background-review.json', {
+            **previous_review, 'receipt_sha256': template['receipt_sha256'],
+            'reused_review_sha256': sha256(reuse_background / 'background-review.json')})
     files = {str(path.relative_to(output).as_posix()): sha256(path)
-             for path in output.rglob('*') if path.is_file() and path.name != 'render-timing.json'}
+             for path in output.rglob('*') if path.is_file()
+             and path.name not in ('render-timing.json', 'background-review.json')}
     write_json(output / 'bundle.json', {'schema_version': 1, 'files': files, 'origin_inputs': originals,
                                       'notice': 'Origin paths are provenance only. Frozen job inputs do not depend on those paths. Visual review is not automated.'})
     return {'prepared': str(output.resolve()), 'status': 'pending', 'languages': languages,
-            'next': 'Actually inspect background. Copy background-review-template.json to background-review.json and record review before render-job.'}
+            'input_storage': storage, 'background_reused': previous_review is not None,
+            'next': ('Render new lettering and inspect every current candidate.' if previous_review is not None
+                     else 'Actually inspect background. Copy background-review-template.json to background-review.json and record review before render-job.')}
 
 
 def verify_bundle(prepared: Path) -> dict:

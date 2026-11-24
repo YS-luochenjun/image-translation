@@ -15,6 +15,8 @@
 
 ## Fireplay 图片翻译需求
 
+优化副本的试点入口、增量工作包和耗时记录见[优化版运行手册](docs/optimization-pilot.md)。
+
 可以让 Agent 查询 Fireplay 的图片需求、读取正文确认翻译意图，登记本地承接并下载原图，再为每张原图创建现有多语任务。入口为 `fireplay-discover`、`fireplay-register`、`fireplay-accept`、`fireplay-status`、`fireplay-download` 和 `fireplay-job`，示例和回执结构见 [接入使用说明](docs/fireplay-intake.md)。
 
 需求查询与正式提交由宿主已有连接器执行，CLI 保存实际回执并验证分页、内容版本和交付证据。本地承接与平台认领分别记录；连接器不可用时明确报告缺口。在线发现、矩阵规划、80分交付评分及发布后核验见[自主交付流程](agent/workflows/fireplay-autonomous.md)和[自动交付合同](docs/delivery-automation.md)。下载验证真实静态 PNG/JPEG/WebP 字节、尺寸和 SHA256，之后衔接下列制作流程。

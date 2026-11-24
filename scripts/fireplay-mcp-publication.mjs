@@ -80,7 +80,17 @@ async function appendJournal(path, entry) {
 async function loadJournal(path) {
   let text;
   try { text = await readFile(path, 'utf8'); } catch (error) { if (error.code === 'ENOENT') return []; throw error; }
-  return text.split('\n').filter(Boolean).map(line => JSON.parse(line));
+  return Promise.all(text.split('\n').filter(Boolean).map(async line => {
+    const entry = JSON.parse(line);
+    if (!entry.receipt_sha256) return entry;
+    if (entry.state !== 'received' || !UUID.test(entry.operation_id) || !HASH.test(entry.receipt_sha256)) fail('Invalid receipt reference');
+    const bytes = await readFile(join(dirname(path),`publication-${entry.operation_id}.json`));
+    if (sha256(bytes) !== entry.receipt_sha256) fail('Publication receipt hash mismatch');
+    const receipt = JSON.parse(bytes);
+    if (receipt.operation_id !== entry.operation_id || receipt.requirement_id !== entry.requirement_id ||
+        receipt.tool !== entry.tool || receipt.state !== 'received') fail('Publication receipt identity mismatch');
+    return {...entry,response:receipt.response};
+  }));
 }
 
 async function reviewedOutputs(folder, request, requirementId) {
@@ -93,13 +103,47 @@ async function reviewedOutputs(folder, request, requirementId) {
   const outputs = [];
   for (const output of gate.outputs) {
     if (!HASH.test(output.sha256) || typeof output.path !== 'string') fail('Gate output path/hash invalid');
-    const path = await realpath(resolve(folder, output.path));
+    const path = resolve(folder, output.path);
     if (!inside(folder, path)) fail('Reviewed output outside requirement folder');
-    const bytes = await readFile(path);
-    if (sha256(bytes) !== output.sha256) fail('Reviewed output changed');
-    outputs.push({ ...output, path, bytes });
+    const identity = memberIdentity(output);
+    if (identity && identity.some(value => typeof value !== 'string' || !value.trim())) fail('Incomplete member identity');
+    outputs.push({ ...output, path });
   }
   return outputs;
+}
+
+const memberFields = ['source_id', 'language', 'member_id'];
+const memberIdentity = output => memberFields.some(key => key in output)
+  ? memberFields.map(key => output[key]) : null;
+const outputBinding = output => ({
+  path: output.path, sha256: output.sha256,
+  ...Object.fromEntries(memberFields.filter(key => key in output).map(key => [key, output[key]]))
+});
+function matchesMember(left, right) {
+  const identity = memberIdentity(left);
+  const other = memberIdentity(right);
+  return identity && other && identity.every((value, index) => value === other[index]);
+}
+
+function hasUploadResource(entry) {
+  const result = decodeResult(entry.response);
+  return result?.success !== false &&
+    [...collect(result, 'resourceId'), ...collect(result, 'resource_id'),
+      ...collect(result, 'publicUrl'), ...collect(result, 'public_url')]
+      .some(value => typeof value === 'string' && value.trim());
+}
+
+function provenUploads(entries, operationIds, requirementId) {
+  if (!Array.isArray(operationIds) || !operationIds.length ||
+      operationIds.length !== new Set(operationIds).size) fail('Upload operation IDs must be unique');
+  const uploads = recordsFor(entries, 'material_r2_upload_from_bytes')
+    .filter(entry => entry.requirement_id === requirementId && operationIds.includes(entry.operation_id));
+  if (uploads.length !== operationIds.length) fail('Upload provenance not found');
+  return uploads.map(entry => {
+    const [output] = entry.outputs || [];
+    if (entry.outputs?.length !== 1 || !HASH.test(output.sha256)) fail('Missing reviewed upload binding');
+    return { ...uploadResource(decodeResult(entry.response)), output };
+  });
 }
 
 function imageKind(bytes) {
@@ -151,28 +195,32 @@ async function prepareArguments({ request, intake, folder, entries }) {
   if (request.tool === 'material_r2_upload_from_bytes') {
     if ('file_base64' in args) fail('Do not supply base64; caller reads reviewed output');
     const outputs = await reviewedOutputs(folder, request, intake.summary.id);
-    const output = outputs.find(item => item.sha256 === request.output_sha256 &&
+    const selected = outputs.filter(item => item.sha256 === request.output_sha256 &&
       (request.output_path === undefined || item.path === resolve(folder, request.output_path)));
-    if (!output) fail('output_sha256 must identify a reviewed output');
-    const kind = imageKind(output.bytes);
-    if (output.bytes.length > 50 * 1024 * 1024) fail('Upload exceeds 50MiB');
+    if (selected.length !== 1) fail('output_sha256 must identify one reviewed output');
+    const [output] = selected;
+    const prior = recordsFor(entries, request.tool).filter(entry =>
+      entry.requirement_id === intake.summary.id && hasUploadResource(entry));
+    if (prior.some(entry => entry.outputs?.some(old =>
+      matchesMember(old, output) || old.sha256 === output.sha256 || old.path === output.path))) {
+      fail('Member already uploaded; reconcile the frozen resource');
+    }
+    const path = await realpath(output.path);
+    if (!inside(folder, path)) fail('Reviewed output outside requirement folder');
+    if ((await stat(path)).size > 50 * 1024 * 1024) fail('Upload exceeds 50MiB');
+    const bytes = await readFile(path);
+    if (sha256(bytes) !== output.sha256) fail('Reviewed output changed');
+    const kind = imageKind(bytes);
+    if (bytes.length > 50 * 1024 * 1024) fail('Upload exceeds 50MiB');
     if (args.content_type !== kind.mime || ![kind.ext, ...(kind.ext === 'jpg' ? ['jpeg'] : [])].includes(args.ext)) fail('MIME/ext do not match image bytes');
-    return { args: { ...args, file_base64:output.bytes.toString('base64') }, outputs:[{path:output.path,sha256:output.sha256}] };
+    return { args: { ...args, file_base64:bytes.toString('base64') }, outputs:[outputBinding({...output, path})] };
   }
   if (request.tool === 'material_upload_from_url') {
     if (args.confirmed !== true) fail('Import requires explicit confirmed:true; false is skipped');
     if ('VedioSouce' in args || !Array.isArray(args.items) || !args.items.length) fail('Only ordinary image/button import allowed');
-    const outputs = await reviewedOutputs(folder, request, intake.summary.id);
-    const hashes = new Set(outputs.map(output => output.sha256));
-    if (!Array.isArray(request.upload_operation_ids) || !request.upload_operation_ids.length) fail('Import requires upload_operation_ids');
-    const uploads = recordsFor(entries, 'material_r2_upload_from_bytes').filter(entry => request.upload_operation_ids.includes(entry.operation_id));
-    if (uploads.length !== new Set(request.upload_operation_ids).size) fail('Upload provenance not found');
-    const pairs = uploads.flatMap(entry => {
-      const resource = uploadResource(decodeResult(entry.response));
-      if (!hashes.has(entry.outputs?.[0]?.sha256)) fail('Upload receipt does not prove one reviewed resource');
-      return [{...resource,hash:entry.outputs[0].sha256}];
-    });
-    const used = [];
+    const pairs = provenUploads(entries, request.upload_operation_ids, intake.summary.id);
+    await checkImportGate(folder, request, intake.summary.id, pairs);
+    const groups = [];
     for (const item of args.items) {
       const allowed = new Set(['url','urls','already_in_r2','resource_id','resource_ids','source','type','name','file_name','file_names','tags','shared_dept_id','mime_type','file_size','md5','width','height']);
       for (const key of Object.keys(item)) if (!allowed.has(key)) fail(`Import field forbidden: ${key}`);
@@ -184,24 +232,28 @@ async function prepareArguments({ request, intake, folder, entries }) {
       if (Boolean(item.url) === Boolean(item.urls) || Boolean(item.resource_id) === Boolean(item.resource_ids)) fail('Choose single or bundled URL/resource fields');
       if (!Array.isArray(urls) || !urls.length || !Array.isArray(ids) || urls.length !== ids.length) fail('URL/resource alignment invalid');
       if (item.type === 'button' && (!item.url || urls.length !== 1)) fail('Button must be single URL');
-      urls.forEach((url,index) => { const match = pairs.find(pair => pair.url === url && pair.id === ids[index]); if (!match) fail('Import resource not proven by same-demand upload receipt'); used.push(match.hash); });
+      groups.push(urls.map((url, index) => {
+        const match = pairs.find(pair => pair.url === url && pair.id === ids[index]);
+        if (!match) fail('Import resource not proven by same-demand upload receipt');
+        return match.output;
+      }));
     }
-    return {args,outputs:outputs.filter(output => used.includes(output.sha256)).map(({path,sha256})=>({path,sha256}))};
+    const used = groups.flat();
+    assertNewImports(entries, used);
+    return {args,outputs:used,outputGroups:groups};
   }
   const materialIds = new Set(recordsFor(entries, 'material_upload_from_url').flatMap(entry => collect(decodeResult(entry.response), 'material_id')).filter(id => typeof id === 'string'));
   if (request.tool === 'material_append_images') {
     if (args.confirmed !== true || !materialIds.has(args.material_id) || !Array.isArray(args.images) || !args.images.length) fail('Append requires confirmed same-demand imported material');
-    const outputs = await reviewedOutputs(folder, request, intake.summary.id);
-    if (!Array.isArray(request.upload_operation_ids) || !request.upload_operation_ids.length) fail('Append requires upload_operation_ids');
-    const uploads = recordsFor(entries, 'material_r2_upload_from_bytes').filter(entry => request.upload_operation_ids.includes(entry.operation_id));
-    if (uploads.length !== new Set(request.upload_operation_ids).size) fail('Append upload provenance not found');
+    const pairs = provenUploads(entries, request.upload_operation_ids, intake.summary.id);
+    await checkImportGate(folder, request, intake.summary.id, pairs);
     const selected = args.images.map(image => {
       if (Object.keys(image).length !== 1 || typeof image.file_url !== 'string') fail('Append accepts only proven file_url');
-      const upload = uploads.find(entry => uploadResource(decodeResult(entry.response)).url === image.file_url);
-      const output = outputs.find(output => output.sha256 === upload?.outputs?.[0]?.sha256);
-      if (!output) fail('Append resource not proven by same-demand reviewed upload');
-      return {path:output.path,sha256:output.sha256};
+      const matched = pairs.find(pair => pair.url === image.file_url);
+      if (!matched) fail('Append resource not proven by same-demand reviewed upload');
+      return matched.output;
     });
+    assertNewImports(entries, selected);
     return {args,outputs:selected};
   }
   if (request.tool === 'material_attribution_update') {
@@ -220,6 +272,36 @@ async function prepareArguments({ request, intake, folder, entries }) {
     if (item.requirement_id !== intake.summary.id || !item.material_ids?.length || item.material_ids.some(id => !materialIds.has(id))) fail('Wrong requirement or unproven material IDs');
   }
   return {args,outputs:[]};
+}
+
+async function checkImportGate(folder, request, requirementId, pairs) {
+  if (request.gate_file === undefined) return;
+  const outputs = await reviewedOutputs(folder, request, requirementId);
+  if (pairs.some(({output}) => !outputs.some(current => current.sha256 === output.sha256 &&
+    (!memberIdentity(output) || matchesMember(output, current))))) fail('Upload receipt does not prove one reviewed resource');
+}
+
+function assertNewImports(entries, outputs) {
+  if (new Set(outputs.map(output => output.sha256)).size !== outputs.length) fail('Duplicate resource in request');
+  const previous = ['material_upload_from_url', 'material_append_images'].flatMap(tool =>
+    recordsFor(entries, tool).flatMap(registeredOutputs));
+  if (previous.some(old => outputs.some(output => old.sha256 === output.sha256 || matchesMember(old, output)))) {
+    fail('Resource already registered; reconcile the existing material');
+  }
+}
+
+function registeredOutputs(entry) {
+  const response = decodeResult(entry.response);
+  const items = response?.results ?? response?.items;
+  if (Array.isArray(entry.output_groups) && Array.isArray(items) &&
+      items.every(item => Number.isInteger(item.item_index) &&
+        item.item_index >= 0 && item.item_index < entry.output_groups.length)) {
+    return entry.output_groups.flatMap((group, index) => {
+      const item = items.find(result => result.item_index === index);
+      return item?.success === false && !item.material_id ? [] : group;
+    });
+  }
+  return (collect(response, 'material_id').length || response?.success === true) ? entry.outputs || [] : [];
 }
 
 /** Execute at most one business call; transport is injected for offline tests. */
@@ -253,15 +335,18 @@ export async function publish({ root=ROOT, code, operationId, request, transport
       if (!Array.isArray(authorization.historical_unknown_operations) || unresolved.some(entry => !authorization.historical_unknown_operations.some(original => original.operation_id === entry.operation_id && original.request_sha256 === entry.request_sha256))) fail('Unapproved unknown operation exists');
       reuploadAuthorization = {path:relative(root, authorizationPath),sha256:sha256(authorizationBytes),user_request:authorization.user_request};
     } else if (unresolved.length && !request.isolate_unknown_uploads) fail('Unknown operation exists; inspect remote state, no automatic retry');
-    const prepared = await prepareArguments({request,intake,folder,entries});
+    let isolatedOutputs = [];
     if (unresolved.length && request.isolate_unknown_uploads) {
-      const isolatedOutputs = unresolved.map(entry => {
+      isolatedOutputs = unresolved.map(entry => {
         const [output] = entry.outputs || [];
         if (entry.tool !== 'material_r2_upload_from_bytes' || entry.requirement_id !== intake.summary.id || entry.outputs?.length !== 1 ||
             typeof output?.path !== 'string' || !isAbsolute(output.path) || !inside(folder, output.path) ||
             !HASH.test(output.sha256)) fail('Only attributable unknown R2 uploads can be isolated');
         return output;
       });
+    }
+    const prepared = await prepareArguments({request,intake,folder,entries});
+    if (isolatedOutputs.length) {
       let selected = prepared.outputs;
       if (request.tool === 'requirement_bind_materials' || request.tool === 'material_attribution_update') {
         const ids = prepared.args.material_ids ?? prepared.args.items[0].material_ids;
@@ -272,7 +357,8 @@ export async function publish({ root=ROOT, code, operationId, request, transport
           return originating.flatMap(entry => entry.outputs);
         });
       }
-      if (!selected.length || selected.some(output => isolatedOutputs.some(unknown => unknown.path === output.path || unknown.sha256 === output.sha256))) {
+      if (!selected.length || selected.some(output => isolatedOutputs.some(unknown =>
+        unknown.path === output.path || unknown.sha256 === output.sha256 || matchesMember(unknown, output)))) {
         fail('Operation overlaps an unresolved upload; original write cannot be replayed');
       }
     }
@@ -285,6 +371,7 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     const receipt = await open(receiptPath,'wx');
     try {
       const entry = {operation_id:operationId,requirement_id:intake.summary.id,code,tool:request.tool,schema_version:definition.schema_version,contract,request_sha256:sha256(JSON.stringify(request)),outputs:prepared.outputs,state:'unknown'};
+      if (prepared.outputGroups?.length > 1) entry.output_groups = prepared.outputGroups;
       if (reuploadAuthorization) entry.reupload_authorization = reuploadAuthorization;
       if (request.isolate_unknown_uploads) entry.isolated_unknown_upload_ids = unresolved.map(item => item.operation_id);
       if (request.tool === 'material_upload_from_url') {
@@ -297,8 +384,9 @@ export async function publish({ root=ROOT, code, operationId, request, transport
       const parameters = definition.invoke_via === 'tool_write' ? {tool:request.tool,schema_version:definition.schema_version,arguments:prepared.args} : prepared.args;
       const response = await transport.call(definition.invoke_via,parameters);
       const received = {...entry,state:'received',response};
-      await receipt.writeFile(JSON.stringify(received,null,2)); await receipt.sync();
-      await appendJournal(journalPath,received);
+      const receiptBytes = JSON.stringify(received,null,2);
+      await receipt.writeFile(receiptBytes); await receipt.sync();
+      await appendJournal(journalPath,{...entry,state:'received',receipt_sha256:sha256(receiptBytes)});
       return {receiptPath,operationId,received:true,businessSuccessNotAssumed:true,isError:response?.isError===true};
     } finally { await receipt.close(); }
   } finally {

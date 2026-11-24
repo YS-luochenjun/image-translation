@@ -355,11 +355,18 @@ def status(code: str, root: Path) -> dict:
 
 def accept(code: str, root: Path) -> dict:
     """Accept the current resolved local version without platform writes."""
+    from .fireplay_capacity import Capacity, monitor_directory
+
     folder = request_folder(code, root)
-    with _lock(folder):
+    with _lock(monitor_directory(root)), _lock(folder):
         record = load_record(code, root)
         _require(not record['blockers'] and record['translation_intent'] is True
                  and record['sources'] and record['targets'], 'Requirement has unresolved intake blockers')
+        capacity = Capacity(root)
+        if not capacity.available(record['requirement_id']):
+            return {'code': code, 'requirement_id': record['requirement_id'],
+                    'state': 'queued_capacity', 'capacity': capacity.summary()}
+        capacity.reserve(record['requirement_id'], code)
         if record['state'] == 'accepted':
             return record
         record['state'] = 'accepted'

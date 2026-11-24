@@ -32,12 +32,13 @@ class AutomationCliTests(unittest.TestCase):
                     if command == 'delivery-next':
                         self.assertFalse(result['complete'])
                         self.assertEqual(2, result['expected_members'])
-                        self.assertEqual({'make'}, {row['action'] for row in result['actions']})
+                        self.assertEqual({'make'}, {row['action'] for row in result['next_actions']})
                     else:
                         self.assertFalse(result['passed'])
                         self.assertFalse(result['requirement_complete'])
                         self.assertEqual([], result['outputs'])
-            self.assertEqual(before, sorted(path.name for path in base.iterdir()))
+            self.assertEqual(sorted([*before, '.output-checkpoints.sqlite3']),
+                             sorted(path.name for path in base.iterdir()))
 
     def test_local_business_locale_aliases_preserve_canonical_dedup(self):
         # Fireplay's business code "in" is Hindi; Indonesian remains "id".
