@@ -308,6 +308,16 @@ class ReviewHttpTests(ReviewDeskTests):
             self.assertIn('error', json.loads(body))
             self.assertNotIn(self.server.token.encode(), body)
 
+    def test_workbench_replaces_root_and_keeps_version_review(self):
+        status, body, _ = self.request('GET', '/')
+        self.assertEqual(200, status)
+        self.assertIn('译制工作台 · 图片本地化', body.decode())
+        self.assertIn(b'id="feedback-form"', self.request('GET', '/review')[1])
+        self.assertEqual(403, self.request('GET', '/api/workbench', headers={'X-Review-Token': ''})[0])
+        status, body, _ = self.request('GET', '/api/workbench')
+        self.assertEqual(200, status)
+        self.assertEqual([], json.loads(body)['requirements'])
+
     def test_http_groups_and_revision_prompt_are_authenticated_and_read_only(self):
         listing_status, listing_body, _ = self.request('GET', '/api/tasks')
         self.assertEqual(200, listing_status)

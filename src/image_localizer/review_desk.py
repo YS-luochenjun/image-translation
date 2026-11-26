@@ -18,6 +18,8 @@ import webbrowser
 from .review_groups import group_id, group_tasks, revision_instruction, summarize
 from .project_monitor import ProjectMonitor
 from .workflow_desk import WorkflowDesk
+from . import workbench
+from .workbench_usage import session_usage
 
 APP_ID = 'single-image-localizer-review-desk'
 MAX_BODY = 128 * 1024
@@ -425,7 +427,7 @@ class ReviewHandler(BaseHTTPRequestHandler):
             if parsed.scheme or parsed.netloc:
                 raise DeskError(400, 'Invalid request target')
             path = parsed.path
-            is_public = path in ('/api/bootstrap', '/api/assets')
+            is_public = path in ('/api/bootstrap', '/api/assets', '/api/workbench/source')
             self.check_origin(token=post or (path.startswith('/api/') and not is_public),
                               iframe_navigation=not post and path in ('/', '/index.html') and not parsed.query)
             if post:
@@ -480,6 +482,25 @@ class ReviewHandler(BaseHTTPRequestHandler):
                 self.send_file(artifact)
             elif path == '/api/monitor':
                 self.respond(200, self.server.desk.monitor.snapshot())
+            elif path == '/api/workbench':
+                self.respond(200, workbench.snapshot(self.server.desk.root))
+            elif path == '/api/workbench/usage':
+                root = self.server.desk.root
+                self.respond(200, session_usage(root, workbench.snapshot(root)['requirements']))
+            elif path == '/api/workbench/source':
+                query = parse_qs(parsed.query)
+                if set(query) != {'code', 'index', 'sha'} or any(len(values) != 1 for values in query.values()):
+                    raise DeskError(400, 'Invalid workbench source identity')
+                asset = workbench.source_bytes(self.server.desk.root, query['code'][0], query['index'][0], query['sha'][0])
+                if asset is None:
+                    raise DeskError(404, 'Workbench source missing or changed')
+                self.send_bytes(*asset)
+            elif path == '/api/workbench/knowledge':
+                identities = parse_qs(parsed.query).get('id', [])
+                document = workbench.knowledge_document(self.server.desk.root, identities[0]) if len(identities) == 1 else None
+                if document is None:
+                    raise DeskError(404, 'Knowledge entry not found')
+                self.respond(200, document)
             elif path == '/api/tasks':
                 self.respond(200, self.server.desk.list_tasks())
             elif path.startswith('/api/tasks/') and path.endswith('/revision-prompt'):
@@ -551,16 +572,24 @@ class ReviewHandler(BaseHTTPRequestHandler):
             raise DeskError(400, 'Invalid JSON body') from None
 
     def send_file(self, path):
-        body = path.read_bytes()
+        content_type = IMAGE_TYPES.get(path.suffix.lower()) or mimetypes.guess_type(path.name)[0] or 'application/octet-stream'
+        self.send_bytes(content_type, path.read_bytes())
+
+    def send_bytes(self, content_type, body):
         self.send_response(200)
-        self.send_header('Content-Type', IMAGE_TYPES.get(path.suffix.lower()) or mimetypes.guess_type(path.name)[0] or 'application/octet-stream')
+        self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 
     def static_file(self, path):
         root = self.server.web_root.resolve()
-        candidate = (root / (unquote(path).lstrip('/') or 'index.html')).resolve()
+        embedded = self.server.dsh_origin and self.headers.get('Sec-Fetch-Dest') == 'iframe'
+        if path in ('/', '/index.html'):
+            path = '/index.html' if embedded else '/workbench.html'
+        elif path == '/review':
+            path = '/index.html'
+        candidate = (root / unquote(path).lstrip('/')).resolve()
         if not candidate.is_relative_to(root) or candidate.suffix not in ('.html', '.css', '.js', '.ico') or not candidate.is_file():
             raise DeskError(404, 'Page not found')
         self.send_file(candidate)

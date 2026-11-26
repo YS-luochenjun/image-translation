@@ -39,21 +39,28 @@ def _publication_response(base, entry):
     receipt = json.loads(data)
     _require(all(receipt[key] == entry[key] for key in ('operation_id', 'requirement_id', 'tool', 'state')),
              'Publication receipt identity mismatch')
+    _require(all(receipt.get(key) == entry.get(key) for key in
+                 ('outputs', 'output_groups', 'attribution', 'binding_material_ids')),
+             'Publication receipt provenance mismatch')
     return receipt['response']
 
 
-def _upload_index(base, requirement_id, records, expected):
-    from .fireplay import _http, payload
-
+def _journal_operations(base, requirement_id):
     journal = base / 'publication-journal.jsonl'
     if not journal.exists():
-        return {}, set(), False
+        return {}
     with journal.open(encoding='utf-8') as stream:
         entries = [json.loads(line) for line in stream if line.strip()]
     operations = {}
     for entry in entries:
         _require(entry['requirement_id'] == requirement_id, 'Publication journal requirement mismatch')
         operations[entry['operation_id']] = entry
+    return operations
+
+
+def _upload_index(base, operations, records, expected):
+    from .fireplay import _http, payload
+
     by_path = {(base / row['output_path']).resolve(): key
                for key, row in records.items() if row.get('output_path')}
     frozen, pending = {}, set()
@@ -84,11 +91,11 @@ def _upload_index(base, requirement_id, records, expected):
                 _require(key not in frozen or frozen[key]['sha256'] == output['sha256'],
                          'Multiple uploaded byte versions need explicit member reconciliation')
                 frozen[key] = {'path': output['path'], 'sha256': output['sha256'],
-                               'resource_id': next(iter(resource_ids), None), 'operation_id': entry['operation_id']}
+                               'resource_id': next(iter(resource_ids), None), 'url': next(iter(urls), None),
+                               'warnings': response.get('warnings'), 'operation_id': entry['operation_id']}
         elif entry['state'] == 'unknown':
             pending.add(key)
-    unresolved = [entry for entry in operations.values() if entry['state'] == 'unknown']
-    return frozen, pending, bool(unresolved)
+    return frozen, pending
 
 
 def _upload_values(response):
@@ -135,9 +142,16 @@ def next_delivery(spec_path: Path) -> dict:
         key = _member(record)
         _require(all(isinstance(value, str) and value for value in key) and key not in records,
                  'Duplicate or malformed member identity')
+        if 'group_id' in record:
+            _require(isinstance(record['group_id'], str) and record['group_id'].strip(),
+                     'group_id must identify a planned nonempty group')
         records[key] = record
     expected = {(item['source_id'], item['language'], item['member_id']) for item in plan['items']}
-    frozen, pending_uploads, journal_unknown = _upload_index(base, requirement['id'], records, expected)
+    from .fireplay_publication_receipts import receipt_coverage
+
+    operations = _journal_operations(base, requirement['id'])
+    frozen, pending_uploads = _upload_index(base, operations, records, expected)
+    receipt_status = receipt_coverage(base, requirement, operations, frozen, records, _publication_response)
     unique_members = {(item['source_id'], item['language'], item['member_id']) for item in plan['items']
                       if item.get('delivery_mode') in ('standard_seven_set', 'explicit_members', 'reference_seven_set')}
     used_paths, used_hashes, output_hashes = set(), set(), {}
@@ -147,15 +161,17 @@ def next_delivery(spec_path: Path) -> dict:
         output = (base / record['output_path']).resolve()
         _require(output not in used_paths, 'Distinct members cannot reuse one output path')
         used_paths.add(output)
-        if output.is_file():
-            output_hash = sha256(output)
+        if key in frozen or output.is_file():
+            output_hash = frozen[key]['sha256'] if key in frozen else sha256(output)
             _require(output_hash not in used_hashes, 'Distinct members cannot duplicate output bytes')
             used_hashes.add(output_hash)
             output_hashes[key] = output_hash
     _require(not records.keys() - expected, 'Unexpected member outside explicit matrix')
     unknown = state.get('publication_unknown', [])
     _require(isinstance(unknown, list), 'publication_unknown must be a list')
+    unknown = unknown or [operation_id for operation_id, entry in operations.items() if entry['state'] == 'unknown']
     actions = []
+    verified = {}
     for item in plan['items']:
         identity = {key: item[key] for key in MEMBER_FIELDS}
         key = _member(item)
@@ -163,28 +179,49 @@ def next_delivery(spec_path: Path) -> dict:
         publication = record.get('publication', {})
         legacy_frozen = isinstance(publication, dict) and bool(publication.get('upload_receipt')) and bool(publication.get('resource_id'))
         try:
-            if key in frozen:
-                action = _frozen_action(identity, publication, frozen[key], requirement, base, bool(unknown))
-            elif key in pending_uploads:
+            receipt = receipt_status.get(key)
+            if key in pending_uploads:
                 action = {**identity, 'action': 'await_official_result',
                           'reason': 'Read back the original member upload before doing more work'}
+            elif key in frozen:
+                action = _frozen_action(identity, publication, frozen[key], requirement, base, bool(unknown), receipt)
             else:
                 action = _next_member(item, record, requirement, sources, base, bool(unknown), output_hashes.get(key))
                 if legacy_frozen and action['action'] in ('make', 'review', 'rework', 'blocked'):
                     action = {**identity, 'action': 'reconcile_frozen', 'frozen': True,
                               'reason': 'Recover the original upload receipt and approved evidence'}
             actions.append(action)
+            if action['action'] == 'delivery_verified':
+                verified[key] = ((receipt['material_id'], frozen[key]['resource_id'], 'official_receipts')
+                                 if action.get('evidence') == 'official_receipts'
+                                 else (publication['material_id'], publication['resource_id'], 'fresh_download'))
         except (OSError, ValueError, KeyError, TypeError) as error:
             actions.append({**identity, 'action': 'reconcile_frozen' if key in frozen or legacy_frozen else 'review',
                             'reason': f'Invalid member evidence: {type(error).__name__}: {error}'})
-    complete = bool(actions) and all(row['action'] == 'delivery_verified' for row in actions)
-    return {'requirement_id': requirement['id'], 'code': requirement['code'],
-            'expected_members': len(actions), 'verified_members': sum(row['action'] == 'delivery_verified' for row in actions),
-            'complete': complete, 'actions': actions, 'external_write': False,
-            'publication_unknown': unknown or (['unresolved_publication_journal'] if journal_unknown else []),
-            'verified_material_ids': sorted({records[_member(row)]['publication']['material_id']
-                                            for row in actions if row['action'] == 'delivery_verified'}),
-            'note': 'Host must execute and save real receipts. Scores/JSON cannot prove actual viewing or current platform state.'}
+    resources = {resource for _, resource, _ in verified.values()}
+    group_materials, material_groups = {}, {}
+    for key, (material_id, _, _) in verified.items():
+        group_id = records.get(key, {}).get('group_id')
+        if group_id:
+            group = (group_id, key[1])
+            group_materials.setdefault(group, set()).add(material_id)
+            material_groups.setdefault(material_id, set()).add(group)
+    matrix_ok = (len(resources) == len(verified) and
+                 all(len(values) == 1 for values in (*group_materials.values(), *material_groups.values())))
+    complete = bool(actions) and len(verified) == len(actions) and matrix_ok and not unknown
+    report = {'requirement_id': requirement['id'], 'code': requirement['code'],
+              'expected_members': len(actions), 'verified_members': len(verified),
+              'complete': complete, 'actions': actions, 'external_write': False,
+              'publication_unknown': unknown,
+              'verified_material_ids': sorted({material for material, _, _ in verified.values()}),
+              'evidence_counts': dict(Counter(evidence for _, _, evidence in verified.values())),
+              'matrix_issue': None if matrix_ok else 'Check repeated resources or groups split across material IDs',
+              'note': 'Host saves official receipts and confirms current binding and status on the requirement panel.'}
+    if complete:
+        report['owner_closeout'] = ('当前矩阵已核齐。若覆盖本需求全部应交成员，由原执行会话用 '
+                                    'fireplay-transition finish 准备 Fireplay 状态写回，读回「已完成」和素材绑定，'
+                                    '保存 confirmed 回执后再报告结案（见 docs/optimization-pilot.md）。')
+    return report
 
 
 def compact_delivery(result: dict, spec_path: Path, since: str | None) -> dict:
@@ -193,19 +230,22 @@ def compact_delivery(result: dict, spec_path: Path, since: str | None) -> dict:
     actions = result['actions']
     compact = {key: result[key] for key in ('requirement_id', 'code', 'expected_members', 'verified_members',
                                            'complete', 'publication_unknown')}
+    compact.update({key: result[key] for key in ('evidence_counts', 'matrix_issue', 'verified_material_ids',
+                                                'owner_closeout') if key in result})
     compact['counts'] = dict(Counter(row['action'] for row in actions))
     members = {json.dumps(_member(row), ensure_ascii=False, separators=(',', ':')):
                {key: value for key, value in row.items() if key != 'assessment'} for row in actions}
     pending = [row for row in members.values() if row['action'] != 'delivery_verified']
     compact['more_actions'] = max(0, len(pending) - 8)
     compact['state_file'] = str(spec_path.resolve())
+    always = ('code', 'complete', 'owner_closeout') if 'owner_closeout' in compact else ('code', 'complete')
     return checkpoint_output(compact, since, scope=f"delivery:{spec_path.resolve()}:{result['requirement_id']}",
-                             directory=spec_path.resolve().parent, always=('code', 'complete'),
+                             directory=spec_path.resolve().parent, always=always,
                              collections={'member_changes': members},
                              snapshot={'next_actions': pending[:8]})
 
 
-def _frozen_action(identity, publication, evidence, requirement, base, unknown):
+def _frozen_action(identity, publication, evidence, requirement, base, unknown, receipt=None):
     def action(name, reason):
         return {**identity, 'action': name, 'reason': reason, 'frozen': True,
                 'upload_operation_id': evidence['operation_id']}
@@ -213,19 +253,31 @@ def _frozen_action(identity, publication, evidence, requirement, base, unknown):
     if publication.get('resource_id') not in (None, evidence['resource_id']) and evidence['resource_id']:
         return action('reconcile_frozen', 'Saved resource differs from the official upload receipt')
     observed = {**publication, 'resource_id': evidence['resource_id'] or publication.get('resource_id')}
-    for field, name in [('material_id', 'import'), ('attribution_receipt', 'attribute'), ('binding_receipt', 'bind')]:
-        if not observed.get(field):
-            return action('await_official_result' if unknown else name,
-                          f'Resume the frozen resource at {field}')
+    if receipt and receipt['action'] == 'delivery_verified':
+        if observed.get('material_id') not in (None, receipt['material_id']):
+            return action('reconcile_frozen', 'Saved material differs from the official import receipt')
+        return {**action('delivery_verified', 'Official upload, import and binding receipts cover this member'),
+                'evidence': 'official_receipts', 'material_id': receipt['material_id']}
     fresh = observed.get('fresh_verification')
-    if isinstance(fresh, dict):
+    if isinstance(fresh, dict) and all(observed.get(field) for field in ('material_id', 'attribution_receipt', 'binding_receipt')):
         try:
             if _fresh(fresh, observed, requirement, identity, (base / evidence['path']).resolve(),
                       base, evidence['sha256']):
                 return action('delivery_verified', 'Current readback matches the original reviewed upload')
         except (OSError, ValueError, KeyError, TypeError):
             pass
-    return action('verify', 'Read back the frozen resource, binding and downloaded bytes')
+    if receipt:
+        name = receipt['action']
+        reason = {'attribute': 'Complete the required ownership on the imported material',
+                  'bind': 'Bind the imported material to the exact requirement',
+                  'verify': 'Check this material’s incomplete or exceptional official receipt'}[name]
+        return {**action('await_official_result' if unknown else name, reason),
+                'material_id': receipt['material_id']}
+    for field, name in [('material_id', 'import'), ('attribution_receipt', 'attribute'), ('binding_receipt', 'bind')]:
+        if not observed.get(field):
+            return action('await_official_result' if unknown else name,
+                          f'Resume the frozen resource at {field}')
+    return action('verify', 'Check the original receipts or read back this material if evidence is incomplete')
 
 
 def publication_gate(spec_path: Path) -> dict:

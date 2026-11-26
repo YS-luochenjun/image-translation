@@ -41,7 +41,9 @@ const importRequest=(uploadId)=>({tool:'material_upload_from_url',schema_version
 
 test('reviewed image -> own import -> own bind; journals contain no base64',async t=>{
   const f=await fixture(t); const uploadId=randomUUID();
-  await run(f,f.upload,uploadId);
+  const uploadResult=await run(f,f.upload,uploadId);
+  assert.equal(uploadResult.summary.resource_id,resourceId);
+  assert.equal(uploadResult.summary.public_url,publicUrl);
   await run(f,importRequest(uploadId));
   await run(f,{tool:'requirement_bind_materials',schema_version:definitions[3].schema_version,arguments:{confirmed:true,items:[{requirement_id:requirementId,material_ids:[materialId]}]}});
   assert.equal(f.calls.filter(call=>call.name==='tool_catalog').length,3);
@@ -50,6 +52,8 @@ test('reviewed image -> own import -> own bind; journals contain no base64',asyn
   assert.ok(!journal.includes('file_base64'));
   const entries=journal.trim().split('\n').map(JSON.parse);
   assert.deepEqual(entries.map(entry=>entry.state),['unknown','received','unknown','received','unknown','received']);
+  assert.deepEqual(entries[3].output_groups,[entries[1].outputs]);
+  assert.deepEqual(entries[5].binding_material_ids,[materialId]);
   assert.ok(entries.filter(entry=>entry.state==='received').every(entry=>entry.receipt_sha256&&!entry.response));
   const receipt=join(f.folder,`publication-${uploadId}.json`);
   assert.ok(JSON.parse(await readFile(receipt,'utf8')).response);
@@ -67,6 +71,23 @@ test('a previously uploaded and imported reviewed image stays frozen',async t=>{
   await assert.rejects(run(f,importRequest(firstUpload)), /already registered/);
   assert.equal(f.calls.filter(call=>call.name==='tool_write' && call.args.tool==='material_r2_upload_from_bytes').length,1);
   assert.equal(f.calls.filter(call=>call.name==='material_upload_from_url').length,1);
+});
+
+test('publication accepts the exact registration receipts without flattening intake', async t => {
+  const fixtureData = await fixture(t);
+  const intakePath = join(fixtureData.folder, 'intake.json');
+  const original = JSON.parse(await readFile(intakePath, 'utf8'));
+  const receipts = {
+    summary: { items: [{ code: 'OTHER-20000101-002' }, original.summary] },
+    brief: { items: [{ ...original.brief, code }] },
+    material_receipt: { items: [{ ...original.delivery, code }, { ...original.delivery, code }] },
+  };
+  await writeFile(intakePath, JSON.stringify(receipts));
+  await assert.rejects(run(fixtureData, fixtureData.upload), /Intake identity mismatch/);
+  assert.equal(fixtureData.calls.length, 0);
+  receipts.material_receipt.items.pop();
+  await writeFile(intakePath, JSON.stringify(receipts));
+  assert.equal((await run(fixtureData, fixtureData.upload)).received, true);
 });
 
 test('one upload ignores unrelated candidates and freezes the member across path and byte changes',async t=>{

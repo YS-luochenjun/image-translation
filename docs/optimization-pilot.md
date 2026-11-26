@@ -7,8 +7,8 @@
 1. 主控用 `scripts/fireplay-monitor-plan.mjs` 生成查询。首次试点在 `work/fireplay-monitor/` 建立 `assignments.json`，初始内容为 `{"requirements":{}}`。日常 `new` 查询只取官方图片翻译选项下的「未开始」，每 24 小时 `full` 跨状态对账，已接入项用 `tracked` 按 UUID 读取。按计划的 `discovery_mode` 保存完整分页回执。`new_candidates` 是待核候选。拿到正文、来源、语言、当前负责人及交付记录后，才确定由本项目接手。
 2. 用 `fireplay-register CODE --snapshot INTAKE.json` 保存当前接入版本，再执行 `fireplay-accept CODE` 本地承接。优化版最多占用 20 个需求名额。`queued_capacity` 的候选留待下一轮，本单仍在承接前。准备 `STATUS.json`，其中 `summary` 与 `blind_brief` 分别是当前实际官方 exact UUID 查询结果，`options` 是 `requirement_create_options` 的实际回执。两次列表查询使用 `scope=all` 和对应视图。
 3. 运行下方开工命令。宿主用当前官方接口合同核对 `host_action`，在实际授权内调用一次 Fireplay。保存真实写回响应，重新取得该 UUID 的两份视图，将响应随新的观察 JSON 保存，用 `--reconcile` 读回。确认 `in_progress` 后再派发。已有负责人的进行中需求沿原会话继续。
-4. 执行会话逐张制作和审图。用 `delivery-next` 读取下一步。和 `delivery-state.json` 放在同一需求目录的 `publication-journal.jsonl` 保存官方资源及各成员绑定。官方成功上传的图片优先从原回执续办入库、归属、共享、绑定与下载校验。
-5. 主控在所有成员都核验后重新注册当前正文。`delivery-state.json` 的 `content_version` 使用该交付清单所对应的本地承接版本。将同版本的当前 `delivery` 视图加入 `STATUS.json`，用 `finish` 准备一次写回。预览和写回前均重新检查交付清单及面板上的绑定素材。写回后按同一操作读回「已完成」，再登记本地结案。
+4. 执行会话按[全新原图制作](../agent/workflows/fireplay-autonomous.md#全新原图制作)规划并审核成员，通过项目发布器上传、批量入库和绑定。`delivery-state.json` 与 `publication-journal.jsonl` 放在同一需求目录。`delivery-next` 自动核对官方回执并返回简要结果，原会话只处理缺项或异常。当前矩阵齐套会显示 `owner_closeout` 提示，原会话确认矩阵覆盖全部应交成员后执行下一步。
+5. 原执行会话收齐回执后，在平台更新时间变化时注册当前正文。`delivery-state.json` 的 `content_version` 对应当前承接的交付清单。将当前 exact UUID 的 `summary`、`blind_brief`、`delivery` 和官方选项回执存入 `STATUS.json`，用 `finish --prepare` 核对面板绑定并生成一次状态写回。原执行会话调用官方接口并保存响应，取该 UUID 的一次最新 `delivery` 查询结果放进 `READBACK.json` 的 `delivery` 字段。用 `--reconcile` 确认「已完成」和全部绑定素材，取得 `state/fireplay/CODE/status-finish.json` 的 `confirmed` 后，才在最终回复报告结案。若有缺件、权限阻塞或写入结果待核，报告阶段、已交/应交件数、实际原因和下一步。工作台同步完成结果与账本。
 
 ```sh
 python bin/it.py fireplay-transition CODE start STATUS.json
@@ -20,9 +20,13 @@ python bin/it.py fireplay-transition CODE finish READBACK.json --reconcile
 
 `--prepare` 持久登记一个操作并只返回一次写回参数。遇到超时或写回状态冲突时，按原操作读取实际结果。已有人负责或权限不足时，主控按当前实际情况记入待核。`canUpdateStatus` 和 `canBindMaterials` 各自决定对应操作权限。平台「已完成」可能发出素材交付通知。
 
+旧版已准备的结案操作若未记录素材 ID，续用当时的 `summary` 和 `blind_brief` 读回格式。正常发布回执显示全部成员已核时，可直接进入结案。只有受影响的组或成员需要查详情或按需下载。
+
 `work/fireplay-monitor/admissions.json` 保存承接名额，和 `assignments.json` 按 UUID 去重。开工待确认、仍需续作及写入结果待核的需求占用名额。完整交付核验后的结案读回释放名额，主控已终核或已核实撤销的记录也释放名额。超过三天的历史需求仍按跟踪规则处理，已有占位保留至主控核实交付或撤销。排名先看优先级，同优先级用创建时间、更新时间和编号排序。
 
 主控计划的 `continuation_candidates` 列出已有名额、仍无执行会话、需要核对原开工状态的需求。先查原开工操作并确认状态，再沿原记录完成派发。
+
+`owner_closeout_candidates` 列出交付齐套、原会话已停且面板仍「进行中」的待结案需求。工作台以当轮官方记录和会话状态确认后，把结案动作交回同一执行会话。交接及去重规则见[巡检流程](../agent/workflows/fireplay-monitor.md#有工作时跟踪已有需求与上传)。
 
 ## 制作与续办
 

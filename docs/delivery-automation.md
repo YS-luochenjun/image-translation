@@ -71,12 +71,14 @@ checks每项{checked:布尔,notes:具体依据}，九项必须齐全：amounts_n
 
 size_spec、member输出/审核、fresh下载路径相对state；审核内部source/artifact路径相对review文件。没有输出/审核的member可省略并返回make；已输出但无review返回review。证据损坏或过期仅退回该member，不拖其他独立成员。矩阵身份冲突、重复构图文件等整包冲突先纠正再规划。
 
-publication每阶段由宿主写真实已核回执：upload_receipt、material_id、resource_id、attribution_receipt、binding_receipt、fresh_verification。若字段缺失，依次输出upload/import/attribute/bind/verify。回执字段的存在只驱动下一步，不能证明平台成功。fresh_verification必须含requirement_id/source_id/language/member_id/material_id/resource_id、designer_ids和非空shared_dept_ids字符串数组、creation_type=derivative、sha256、带时区observed_at、实际下载的downloaded_path。设计师排除罗晨钧和邹彬；设计师可以留空，requirement和fresh的designer_ids均为空数组即可，不要求额外证明文件。当前版本限30分钟内；未来时间不接受。资源下载字节必须与已审输出一致，下载路径不能直接指原输出。
+同一需求包含多组图时，在 `members` 中为同组成员填写相同的 `group_id`。程序按组和语种核对素材 ID。组内张数以实际成员清单为准，大按钮保持单张入库。
 
-已审输出和当前规格必须一致，格式为 PNG 或 JPEG。按需求内的成员身份、输出 SHA 与原操作记录核对上传结果。已成功上传的成员使用原资源继续入库和绑定。结果未知时保存原操作 ID 并对账，确定不重叠的独立成员可按发布器规则继续。全部成员通过 fresh 核验后，主控才按[优化版运行手册](optimization-pilot.md)准备结案状态写回。
+`delivery-next` 从 `publication-journal.jsonl` 自动比对官方 R2 资源、按组入库结果、共享及归属和 exact UUID 的绑定结果。`evidence_counts.official_receipts` 是由回执核齐的成员数。允许设计师留空时，可接受「未识别到 DID，设计师为空」。遇到「文件名归属信息无法解析，已按未标注处理」时，批量补登二创。后续官方成功回执必须覆盖对应素材 ID，归属须符合需求，上传资源、入库和绑定也须匹配。满足这些条件即可用回执核齐该素材。全部成员核齐后由执行会话按[优化版运行手册](optimization-pilot.md)自行写回完成并确认。
+
+有未解决的回执警告、资源变更、数量不符、历史流水字段不全或结果不明时，只用原操作 ID 对账受影响的素材，必要时单独补 `publication.fresh_verification`。旧记录仍可使用该字段，包含 `requirement_id`、`source_id`、`language`、`member_id`、`material_id`、`resource_id`、`designer_ids`、`shared_dept_ids`、`creation_type=derivative`、`sha256`、实际下载的 `downloaded_path` 和带时区的 `observed_at`。下载回执限 30 分钟内，下载路径须指回下载文件。已成功上传的成员沿用原资源。
 
 ## 对接现有发布器
 
 delivery-gate重新评估当前state，输出旧发布器可消费的requirement_id/passed/reviewed_by/evidence/outputs(path,sha256)。将此JSON通过文件工具保存到对应需求目录，并把相对gate路径交给现有发布请求gate_file；未知写、未审/过期或未达标项不入gate。部分合格可以发布，但requirement_complete仍false。每次旧发布器仍核实际SHA、原operation_id、当前tool_catalog与原journal，不重放未知写。
 
-发布器仍使用本地intake权限快照和真实官方合同；按当前用户规则排除罗晨钧和邹彬，其他设计师仅在身份可确认时填写，也可留空。不能把规则更新描述为全部历史需求已经完成，也不能说这是离开宿主仍能运行的图像生产守护程序。
+发布器仍使用本地接入权限快照和真实官方合同。命令输出包含素材 ID、业务结果和警告等简要字段，可直接继续下一步。原始响应留在发布流水关联的回执文件。按当前用户规则排除罗晨钧和邹彬，其他设计师仅在身份可确认时填写，也可留空。

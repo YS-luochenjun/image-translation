@@ -27,7 +27,7 @@ MAX_TASKS = 300
 MAX_BENCHMARKS = 40
 MAX_JSON_BYTES = 512 * 1024
 MAX_READ_BYTES = 16 * 1024 * 1024
-MAX_HASH_BYTES = 128 * 1024 * 1024
+MAX_HASH_BYTES = 512 * 1024 * 1024
 MAX_FILE_BYTES = 40 * 1024 * 1024
 MAX_HISTORY_BYTES = 2 * 1024 * 1024
 MAX_HISTORY_LINES = 2000
@@ -61,6 +61,10 @@ def _counts(values, keys=STATUSES):
 
 def _bound(record, task):
     return all(key in record and record[key] == task.get(key) for key in BINDINGS)
+
+
+class HashBudgetExceeded(ValueError):
+    pass
 
 
 class EvidenceReader:
@@ -120,16 +124,20 @@ class EvidenceReader:
         used = self.hash_bytes if hashing else self.read_bytes
         budget = MAX_HASH_BYTES if hashing else MAX_READ_BYTES
         if used + info.st_size > budget:
-            raise ValueError('Evidence exceeds aggregate read budget')
+            error = HashBudgetExceeded if hashing else ValueError
+            raise error('Evidence exceeds aggregate read budget')
         descriptor = os.open(path, os.O_RDONLY | getattr(os, 'O_BINARY', 0) | getattr(os, 'O_NOFOLLOW', 0))
         with os.fdopen(descriptor, 'rb') as stream:
             opened = os.fstat(stream.fileno())
             if (opened.st_dev, opened.st_ino) != (info.st_dev, info.st_ino):
                 raise ValueError('Evidence changed while opening')
-            data = stream.read(maximum + 1)
+            data = stream.read(min(maximum, budget - used) + 1)
         self.safe(path)
-        if len(data) > maximum or used + len(data) > budget:
-            raise ValueError('Evidence grew beyond read budget')
+        if len(data) > maximum:
+            raise ValueError('Evidence grew beyond file budget')
+        if used + len(data) > budget:
+            error = HashBudgetExceeded if hashing else ValueError
+            raise error('Evidence grew beyond aggregate read budget')
         if hashing:
             self.hash_bytes += len(data)
         else:
@@ -152,6 +160,9 @@ class EvidenceReader:
         if path not in self.hashes:
             try:
                 self.hashes[path] = hashlib.sha256(self.read(path, MAX_FILE_BYTES, hashing=True)).hexdigest()
+            except HashBudgetExceeded:
+                self.warn('指纹扫描达到单次读取上限，部分版本的文件指纹待核对。')
+                self.hashes[path] = None
             except (OSError, ValueError):
                 self.warn('Hash unavailable: ' + self.relative(path))
                 self.hashes[path] = None

@@ -164,6 +164,17 @@ class ProjectMonitorTests(unittest.TestCase):
         self.assertEqual(403, caught.exception.status)
         self.assertFalse((self.run / 'evaluations.jsonl').exists())
 
+    def test_hash_budget_reports_one_notice_without_assigning_unverified_fingerprints(self):
+        source = self.run / 'source.png'
+        translated = self.output / 'translated.png'
+        with patch('image_localizer.project_monitor.MAX_HASH_BYTES', 1):
+            reader = EvidenceReader(self.root)
+            self.assertIsNone(reader.digest(source))
+            self.assertIsNone(reader.digest(translated))
+            self.assertEqual(1, len(reader.warnings))
+            self.assertIn('单次读取上限', reader.warnings[0])
+        self.assertEqual(digest(source), EvidenceReader(self.root).digest(source))
+
     def test_cache_copy_and_http_auth_roundtrip(self):
         first = self.monitor.snapshot()
         generated_at = first['generated_at']

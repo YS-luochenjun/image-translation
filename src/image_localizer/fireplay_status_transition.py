@@ -23,14 +23,29 @@ def _time(value):
 
 def _observe(snapshot, view, code, requirement_id, now):
     response = payload(snapshot[view])
+    rows = response.get('items')
     _require(response.get('view') == view and response.get('scope') == 'all' and
-             isinstance(response.get('items'), list) and len(response['items']) == 1,
+             isinstance(rows, list) and rows,
              f'{view} must be a fresh exact-UUID observation')
     row = _exact(response, code)
+    if len(rows) > 1:
+        filters = response.get('query_meta', {}).get('filters_applied', {})
+        ids = filters.get('requirement_ids')
+        _require(isinstance(ids, list) and len(ids) == len(rows)
+                 and set(ids) == {item['id'] for item in rows}
+                 and response.get('total') == len(rows) and response.get('next_cursor') is None
+                 and response.get('next_offset') is None, f'{view} must be a complete exact-UUID batch')
     observed = _time(response.get('serverTime'))
     _require(row['id'] == requirement_id and _time(row.get('updatedAt')) <= observed
              and 0 <= (now - observed).total_seconds() <= 1800, f'Stale or unrelated {view} observation')
     return row, observed
+
+
+def _bound_materials(row, expected):
+    materials = row.get('materials')
+    return (isinstance(materials, list) and bool(expected) and
+            (row.get('materialSelection') or {}).get('status') != 'waiting_selection' and
+            expected <= {item.get('id') for item in materials if isinstance(item, dict)})
 
 
 def status_transition(root: Path, code: str, action: str, snapshot: dict, *,
@@ -42,12 +57,20 @@ def status_transition(root: Path, code: str, action: str, snapshot: dict, *,
     with _lock(monitor_directory(root)), _lock(folder):
         record = load_record(code, root)
         requirement_id = record['requirement_id']
-        row, observed = _observe(snapshot, 'summary', code, requirement_id, now)
-        brief, brief_observed = _observe(snapshot, 'blind_brief', code, requirement_id, now)
-        _require(row['updatedAt'] == brief['updatedAt'] and row['status'] == brief['status'],
-                 'Requirement changed between the two reads')
         path = folder / f'status-{action}.json'
         prior = read_json(path) if path.exists() else None
+        receipt_finish = action == 'finish' and prior and prior.get('verified_material_ids')
+        if receipt_finish and reconcile:
+            row, observed = _observe(snapshot, 'delivery', code, requirement_id, now)
+            brief_observed = observed
+            _require(_bound_materials(row, set(prior['verified_material_ids'])),
+                     'Fireplay readback does not include every bound material')
+        else:
+            row, observed = _observe(snapshot, 'summary', code, requirement_id, now)
+            brief, brief_observed = _observe(snapshot, 'blind_brief', code, requirement_id, now)
+            _require(row['updatedAt'] == brief['updatedAt'] and
+                     ('status' not in brief or row['status'] == brief['status']),
+                     'Requirement changed between the two reads')
         result = {'code': code, 'requirement_id': requirement_id, 'status': row['status'],
                   'target_status': target}
         if prior:
@@ -115,14 +138,14 @@ def status_transition(root: Path, code: str, action: str, snapshot: dict, *,
                      'Delivery view changed before status write')
             report = next_delivery(delivery_state)
             _require(report['requirement_id'] == requirement_id and report['code'] == code and
-                     report['complete'] and not report['publication_unknown'], 'All members need fresh verified delivery')
-            _require(isinstance(delivery_row.get('materials'), list) and
-                     (delivery_row.get('materialSelection') or {}).get('status') != 'waiting_selection',
-                     'Need the current visible bound materials')
+                     report['complete'] and not report['publication_unknown'],
+                     'All members need verified delivery receipts or exception readback. Check delivery-next.')
             verified_materials = set(report['verified_material_ids'])
-            _require(verified_materials and verified_materials <= {item.get('id') for item in delivery_row['materials']},
+            _require(_bound_materials(delivery_row, verified_materials),
                      'Fresh Fireplay binding does not include every verified material')
             result['verified_members'] = report['verified_members']
+            result['verified_material_ids'] = sorted(verified_materials)
+            result['evidence_counts'] = report.get('evidence_counts', {})
         if not prepare:
             return {**result, 'state': 'eligible'}
         operation = {**result, 'state': 'reconcile_required', 'operation_id': str(uuid4()),

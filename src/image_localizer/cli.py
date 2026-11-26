@@ -145,7 +145,7 @@ def main(argv: list[str] | None = None) -> int:
             command.add_argument('--image', type=int, default=1, help='One-based source image index')
         if name == 'fireplay-job':
             command.add_argument('--output', type=Path, required=True)
-    review_desk = commands.add_parser('review-desk', help='Open a local image comparison and user feedback desk')
+    review_desk = commands.add_parser('workbench', aliases=['review-desk'], help='Open the local image translation workbench')
     review_desk.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[2])
     review_desk.add_argument('--port', type=int, default=8765)
     review_desk.add_argument('--open', action='store_true', help='Open the desk in the default browser')
@@ -167,7 +167,7 @@ def main(argv: list[str] | None = None) -> int:
             command.add_argument('event', type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.command == 'review-desk':
+        if args.command in ('workbench', 'review-desk'):
             from .review_desk import serve
             serve(args.root, port=args.port, open_browser=args.open, dsh_origin=args.dsh_origin)
             return 0

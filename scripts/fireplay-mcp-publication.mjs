@@ -125,6 +125,13 @@ function matchesMember(left, right) {
   return identity && other && identity.every((value, index) => value === other[index]);
 }
 
+function intakeRow(receipt, code, requirementId) {
+  if (!receipt || !Object.hasOwn(receipt, 'items')) return receipt;
+  if (!Array.isArray(receipt.items)) return null;
+  const rows = receipt.items.filter(row => row?.code === code && (!requirementId || row.id === requirementId));
+  return rows.length === 1 ? rows[0] : null;
+}
+
 function hasUploadResource(entry) {
   const result = decodeResult(entry.response);
   return result?.success !== false &&
@@ -166,6 +173,31 @@ function uploadResource(result) {
     fail('Upload receipt does not prove one reviewed resource');
   }
   return {url:urls[0],id:ids[0]};
+}
+
+function receiptSummary(tool, response) {
+  if (response?.isError) return null;
+  const result = decodeResult(response);
+  if (tool === 'material_r2_upload_from_bytes') {
+    try {
+      const {id, url} = uploadResource(result);
+      return {resource_id:id, public_url:url, warnings:result.warnings};
+    } catch {
+      return null;
+    }
+  }
+  if (tool === 'material_upload_from_url' || tool === 'requirement_bind_materials') {
+    if (!Array.isArray(result?.results)) return null;
+    const fields = tool === 'material_upload_from_url'
+      ? ['item_index','success','material_id','count','shared_dept_id','creation_type','warnings','compression_notice']
+      : ['requirement_id','success','materialIds','warnings'];
+    return {results:result.results.map(item =>
+      Object.fromEntries(fields.filter(field=>Object.hasOwn(item ?? {},field)).map(field=>[field,item[field]])))};
+  }
+  if (tool === 'material_attribution_update' && result?.success === true) {
+    return {updated:result.updated, unmatched_count:result.unmatched_count};
+  }
+  return null;
 }
 
 async function publicationContract(root, folder, tool) {
@@ -315,7 +347,13 @@ export async function publish({ root=ROOT, code, operationId, request, transport
   if ('isolate_unknown_uploads' in request && typeof request.isolate_unknown_uploads !== 'boolean') fail('isolate_unknown_uploads must be boolean');
   if (request.isolate_unknown_uploads && request.reupload_authorization_file) fail('Choose isolation or explicit reupload authorization');
   const folder = await realpath(join(root,'work','fireplay-production',code));
-  const intake = await json(join(folder,'intake.json'));
+  const snapshot = await json(join(folder,'intake.json'));
+  const summary = intakeRow(snapshot.summary, code);
+  const intake = {
+    summary,
+    brief: intakeRow(snapshot.brief, code, summary?.id),
+    delivery: intakeRow(snapshot.delivery ?? snapshot.material_receipt, code, summary?.id),
+  };
   if (intake.summary?.code !== code || !UUID.test(intake.summary?.id || '') || intake.brief?.id !== intake.summary.id || intake.delivery?.id !== intake.summary.id) fail('Intake identity mismatch');
   if (intake.summary.canBindMaterials !== true) fail('Intake has no delivery permission');
   const lock = await open(join(folder,'publication.lock'),'wx');
@@ -371,7 +409,12 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     const receipt = await open(receiptPath,'wx');
     try {
       const entry = {operation_id:operationId,requirement_id:intake.summary.id,code,tool:request.tool,schema_version:definition.schema_version,contract,request_sha256:sha256(JSON.stringify(request)),outputs:prepared.outputs,state:'unknown'};
-      if (prepared.outputGroups?.length > 1) entry.output_groups = prepared.outputGroups;
+      if (prepared.outputGroups) entry.output_groups = prepared.outputGroups;
+      if (request.tool === 'material_attribution_update' && prepared.args.confirmed === true) {
+        const {material_ids, designer_ids, creation_type} = prepared.args;
+        entry.attribution = {material_ids, designer_ids, creation_type};
+      }
+      if (request.tool === 'requirement_bind_materials') entry.binding_material_ids = prepared.args.items[0].material_ids;
       if (reuploadAuthorization) entry.reupload_authorization = reuploadAuthorization;
       if (request.isolate_unknown_uploads) entry.isolated_unknown_upload_ids = unresolved.map(item => item.operation_id);
       if (request.tool === 'material_upload_from_url') {
@@ -387,7 +430,8 @@ export async function publish({ root=ROOT, code, operationId, request, transport
       const receiptBytes = JSON.stringify(received,null,2);
       await receipt.writeFile(receiptBytes); await receipt.sync();
       await appendJournal(journalPath,{...entry,state:'received',receipt_sha256:sha256(receiptBytes)});
-      return {receiptPath,operationId,received:true,businessSuccessNotAssumed:true,isError:response?.isError===true};
+      return {receiptPath,operationId,received:true,businessSuccessNotAssumed:true,
+        isError:response?.isError===true,summary:receiptSummary(request.tool,response)};
     } finally { await receipt.close(); }
   } finally {
     await lock.close();

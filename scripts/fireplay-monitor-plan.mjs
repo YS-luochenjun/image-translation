@@ -76,6 +76,7 @@ export function planMonitor({state,assignments,admissions={requirements:{}},now,
  const tracked=new Set([...Object.keys(state.pending_briefs),...Object.keys(state.pending_brief_updates||{}),
   ...[...active].filter(id=>admissions.requirements[id]?.state==='reserved')].filter(id=>!excluded(id)));
  const chats=new Map();
+ const ownerCloseouts=[];
  for(const [id,summary] of Object.entries(state.summaries)){
   if(excluded(id))continue;
   const entry=assignments.requirements[id];
@@ -93,6 +94,18 @@ export function planMonitor({state,assignments,admissions={requirements:{}},now,
    ...(entry.wait_cursor?{afterCursor:entry.wait_cursor}:{}),
    ...(entry.submitted_materials_frozen?{mode:'read_only_reconciliation'}:{})
   });
+  const summaryStatus=state.summaries[id]?.status??entry.platform_status;
+  if(entry.state==='awaiting_owner_closeout'&&summaryStatus==='in_progress'&&owner&&!unknown&&
+     ['idle','error','notLoaded'].includes(entry.last_chat_status)&&entry.last_turn_status&&
+     entry.last_turn_status!=='inProgress'&&!entry.owner_closeout_handoff){
+   ownerCloseouts.push({
+    requirement_id:id,
+    code:entry.code,
+    threadId:owner,
+    hostId:entry.host_id||'local',
+    signal:`owner-closeout:${id}:${owner}`
+   });
+  }
  }
  const ids=[...tracked].sort();
  if(ids.some(id=>!uuid.test(id)))fail('Invalid tracked requirement identity');
@@ -120,6 +133,7 @@ export function planMonitor({state,assignments,admissions={requirements:{}},now,
  return {full_due:fullDue,discovery_mode:fullDue?'full':'new',discovery_query:monitorQuery(fullDue?'full':'new',aiMode),
   new_candidates:candidates.filter(id=>active.has(id)||eligible.has(id)),
   continuation_candidates:continuation,
+  owner_closeout_candidates:ownerCloseouts,
   capacity:{limit:policy.max_active_requirements,active:active.size,available,queued:Math.max(0,unreserved.length-available)},
   queued_candidates:unreserved.slice(available,available+8),
   tracked_queries:Array.from({length:Math.ceil(ids.length/40)},(_,index)=>monitorQuery('tracked',aiMode,ids.slice(index*40,index*40+40))),

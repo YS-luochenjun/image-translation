@@ -60,6 +60,22 @@ class ProgramOptimizationTests(unittest.TestCase):
         self.assertEqual('confirmed', self.transition('start', readback, reconcile=True)['state'])
         self.assertNotIn('host_action', self.transition('start', readback, prepare=True))
 
+    def test_start_accepts_complete_exact_batch_when_blind_brief_omits_status(self):
+        receipt, now = self.snapshot()
+        other_id = str(uuid4())
+        for view in ('summary', 'blind_brief'):
+            response = receipt[view]
+            row = response['items'][0]
+            if view == 'blind_brief':
+                del row['status']
+            response['items'].append({**row, 'id': other_id, 'code': 'TEST-20261123-002'})
+            response['total'] = 2
+            response['query_meta'] = {'filters_applied': {'requirement_ids': [self.requirement_id, other_id]}}
+        self.assertEqual('eligible', self.transition('start', (receipt, now))['state'])
+        receipt['summary']['next_cursor'] = 'remaining'
+        with self.assertRaisesRegex(ValueError, 'complete exact-UUID batch'):
+            self.transition('start', (receipt, now))
+
     def test_status_permissions_and_existing_owner_are_checked(self):
         self.assertEqual('needs_status_permission', self.transition('start', self.snapshot(permission=False), prepare=True)['state'])
         self.assertEqual('manual_review', self.transition('start', self.snapshot('in_progress'), prepare=True)['state'])
@@ -108,7 +124,8 @@ class ProgramOptimizationTests(unittest.TestCase):
         write_json(self.folder / 'status-start.json', {'state': 'confirmed', 'requirement_id': self.requirement_id})
         snapshot = self.snapshot('in_progress', materials=[{'id': 'verified-material'}])
         report = {'requirement_id': self.requirement_id, 'code': self.code, 'complete': False,
-                  'verified_material_ids': ['verified-material'], 'verified_members': 7, 'publication_unknown': []}
+                  'verified_material_ids': ['verified-material'], 'verified_members': 7, 'publication_unknown': [],
+                  'evidence_counts': {'official_receipts': 7}}
         with patch('image_localizer.fireplay_status_transition.next_delivery', return_value=report):
             with self.assertRaisesRegex(ValueError, 'All members'):
                 self.transition('finish', snapshot, prepare=True, delivery_state=delivery_state)
@@ -118,7 +135,11 @@ class ProgramOptimizationTests(unittest.TestCase):
             intent = self.transition('finish', snapshot, prepare=True, delivery_state=delivery_state)
         self.assertEqual('done', intent['host_action']['arguments']['items'][0]['status'])
         later = (self.now + timedelta(seconds=1)).isoformat()
-        self.assertEqual('confirmed', self.transition('finish', self.snapshot('done', tick=2, version=later),
+        missing, now = self.snapshot('done', tick=2, version=later)
+        with self.assertRaisesRegex(ValueError, 'does not include every bound material'):
+            self.transition('finish', ({'delivery': missing['delivery']}, now), reconcile=True)
+        readback, now = self.snapshot('done', tick=3, version=later, materials=[{'id': 'verified-material'}])
+        self.assertEqual('confirmed', self.transition('finish', ({'delivery': readback['delivery']}, now),
                                                       reconcile=True)['state'])
         admissions = read_json(self.root / 'work/fireplay-monitor/admissions.json')
         self.assertEqual('released', admissions['requirements'][self.requirement_id]['state'])

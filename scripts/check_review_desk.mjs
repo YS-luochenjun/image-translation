@@ -5,7 +5,7 @@ import { resolve } from 'node:path';
 import { once } from 'node:events';
 
 const fixtureMode = process.argv.includes('--fixture');
-let target = process.argv.find((arg, index) => index > 1 && arg.startsWith('http')) || 'http://127.0.0.1:8765/';
+let target = process.argv.find((arg, index) => index > 1 && arg.startsWith('http')) || 'http://127.0.0.1:8765/review';
 let fixture;
 if (fixtureMode) {
   fixture = spawn('C:/Users/Echo/.dsh/dsh-runtimes/dsh-primary-runtime/dependencies/python/python.exe', ['-u', 'scripts/review_fixture_server.py'], { stdio: ['ignore', 'pipe', 'inherit'] });
@@ -14,7 +14,7 @@ if (fixtureMode) {
     fixture.on('error', reject);
     fixture.stdout.on('data', (chunk) => {
       const match = chunk.toString().match(/http:\/\/127\.0\.0\.1:\d+\//);
-      if (match) { clearTimeout(timer); resolveTarget(match[0]); }
+      if (match) { clearTimeout(timer); resolveTarget(new URL('review', match[0]).href); }
     });
   });
 }

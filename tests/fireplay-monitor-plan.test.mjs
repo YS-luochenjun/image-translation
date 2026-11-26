@@ -62,6 +62,27 @@ test('local owners and unknown operations survive done, changed type/mode and mi
  assert.deepEqual(plan(missing,requirements).tracked_queries[0].requirement_ids,[id]);
 });
 
+test('owner closeout is routed once to the stopped original owner and does not replace chat tracking',()=>{
+ const entry={code:row().code,state:'awaiting_owner_closeout',platform_status:'in_progress',
+  responsible_thread_id:'owner-chat',last_chat_status:'idle',last_turn_status:'completed'};
+ const withEntry=(changes={},state=emptyMonitorState())=>plan(state,{[id]:{...entry,...changes}});
+ const [candidate]=withEntry().owner_closeout_candidates;
+ assert.deepEqual(candidate,{requirement_id:id,code:entry.code,threadId:'owner-chat',hostId:'local',
+  signal:`owner-closeout:${id}:owner-chat`});
+ for(const changes of [
+  {state:'partial'},{state:'verified_complete'},{responsible_thread_id:null},
+  {last_chat_status:'active'},{last_chat_status:'notLoaded',last_turn_status:'inProgress'},
+  {pending_operation:'operation'},{owner_closeout_handoff:{signal:candidate.signal,state:'intent'}},
+  {owner_closeout_handoff:{signal:candidate.signal,state:'sent'}},
+  {request_date:'2026-11-07'},
+ ]){
+  assert.deepEqual(withEntry(changes).owner_closeout_candidates,[]);
+ }
+ const done=accept(emptyMonitorState(),'tracked',[row({status:'done'})],{ids:[id]});
+ assert.deepEqual(withEntry({},done).owner_closeout_candidates,[]);
+ assert.equal(withEntry({owner_closeout_handoff:{signal:candidate.signal,state:'sent'}}).chat_targets.length,1);
+});
+
 test('tracked small pages keep the original UUID batch and require the full cursor chain',()=>{
  const ids=Array.from({length:14},(_,index)=>`f3e17b15-2e91-4a5c-b5a8-${index.toString(16).padStart(12,'0')}`);
  const items=ids.map((requirementId,index)=>row({id:requirementId,code:`REQ-${index}`}));

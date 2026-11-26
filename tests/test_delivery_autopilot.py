@@ -12,8 +12,9 @@ from uuid import uuid4
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
-from image_localizer.delivery_autopilot import next_delivery, publication_gate
+from image_localizer.delivery_autopilot import compact_delivery, next_delivery, publication_gate
 from image_localizer.delivery_quality import CHECKS, WEIGHTS
+from image_localizer.fireplay_publication_receipts import EMPTY_DESIGNER_WARNING, FILENAME_ATTRIBUTION_WARNING
 from image_localizer.material_sizes import plan_sizes, validate_sizes
 
 
@@ -42,6 +43,34 @@ class DeliveryAutopilotTests(unittest.TestCase):
 
     def action(self):
         return self.plan()['actions'][0]['action']
+
+    def receipt(self, tool, response, **evidence):
+        operation_id = str(uuid4())
+        received = {'operation_id': operation_id, 'tool': tool, 'requirement_id': 'req',
+                    'state': 'received', 'response': {'structuredContent': response}, **evidence}
+        path = self.save(f'publication-{operation_id}.json', received)
+        entry = {key: value for key, value in received.items() if key != 'response'}
+        entry['receipt_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+        with (self.base / 'publication-journal.jsonl').open('a', encoding='utf-8') as journal:
+            journal.write(json.dumps(entry) + '\n')
+        return operation_id
+
+    def receipt_group(self, members, material_id, *, index=0, warning=None, creation_type='derivative'):
+        outputs, urls = [], []
+        for member in members:
+            record, _ = self.ready(member)
+            record['group_id'] = material_id
+            output = {field: record[field] for field in ('source_id', 'language', 'member_id')}
+            output.update(self.binding(record['output_path']))
+            url = f'https://example.invalid/{member}.png'
+            self.receipt('material_r2_upload_from_bytes',
+                         {'success': True, 'resource_id': f'{member}-resource', 'public_url': url}, outputs=[output])
+            outputs.append(output)
+            urls.append(url)
+        item = {'item_index': index, 'success': True, 'material_id': material_id, 'type': 'image',
+                'shared_dept_id': 'dept', 'designers': [], 'creation_type': creation_type,
+                'count': len(outputs), 'urls': urls, 'warnings': [warning] if warning else []}
+        return outputs, item
 
     def binding(self, name):
         return {'path': name, 'sha256': hashlib.sha256((self.base / name).read_bytes()).hexdigest()}
@@ -73,7 +102,9 @@ class DeliveryAutopilotTests(unittest.TestCase):
         (self.base / downloaded).write_bytes((self.base / record['output_path']).read_bytes())
         record['publication'] = {
             'upload_receipt': 'upload-observed', 'material_id': record['member_id'] + '-material',
-            'resource_id': record['member_id'] + '-resource', 'attribution_receipt': 'attribution-observed',
+            'resource_id': (record['member_id'] + '-resource' if record['language'] == 'ja'
+                            else f"{record['member_id']}-{record['language']}-resource"),
+            'attribution_receipt': 'attribution-observed',
             'binding_receipt': 'binding-observed'}
         record['publication']['fresh_verification'] = {
             'requirement_id': 'req', 'material_id': record['publication']['material_id'],
@@ -104,6 +135,103 @@ class DeliveryAutopilotTests(unittest.TestCase):
         self.assertEqual('delivery_verified', result['actions'][0]['action'])
         self.assertTrue(result['complete'])
         self.assertFalse(result['external_write'])
+
+    def test_official_receipts_cover_unequal_groups_without_downloads(self):
+        self.state['requirement']['designer_ids'] = []
+        self.spec['explicit_members'] += [
+            {'member_id': member, 'width': 300, 'height': 300} for member in ('two', 'three')]
+        first, first_result = self.receipt_group(['one', 'two'], 'group-a', creation_type='unmarked',
+                                                 warning='未识别到 DID，设计师为空')
+        second, second_result = self.receipt_group(['three'], 'group-b', index=1)
+        self.receipt('material_upload_from_url', {'results': [second_result, first_result]},
+                     outputs=first + second, output_groups=[first, second])
+        self.assertEqual(['attribute', 'attribute', 'bind'], [row['action'] for row in self.plan()['actions']])
+        self.receipt('material_attribution_update', {'success': True, 'updated': ['group-a']},
+                     attribution={'material_ids': ['group-a'], 'creation_type': 'derivative'})
+        self.receipt('requirement_bind_materials',
+                     {'results': [{'requirement_id': 'req', 'success': True,
+                                   'materialIds': ['group-a', 'group-b']}]},
+                     binding_material_ids=['group-a', 'group-b'])
+        result = self.plan()
+        self.assertTrue(result['complete'])
+        self.assertEqual({'official_receipts': 3}, result['evidence_counts'])
+        self.assertEqual(['group-a', 'group-b'], result['verified_material_ids'])
+        self.assertFalse(list(self.base.glob('download-*')))
+        compact = compact_delivery(result, self.base / 'delivery-state.json', None)
+        self.assertIn('原执行会话', compact['owner_closeout'])
+        unchanged = compact_delivery(result, self.base / 'delivery-state.json', compact['checkpoint'])
+        self.assertEqual(compact['owner_closeout'], unchanged['owner_closeout'])
+
+    def test_warning_leaves_other_group_verified_and_unknown_blocks_finish(self):
+        self.state['requirement']['designer_ids'] = []
+        self.spec['explicit_members'].append({'member_id': 'two', 'width': 300, 'height': 300})
+        first, first_result = self.receipt_group(['one'], 'group-a')
+        second, second_result = self.receipt_group(['two'], 'group-b', index=1, warning='Resource changed')
+        self.receipt('material_upload_from_url', {'results': [first_result, second_result]},
+                     outputs=first + second, output_groups=[first, second])
+        self.receipt('requirement_bind_materials',
+                     {'results': [{'requirement_id': 'req', 'success': True,
+                                   'materialIds': ['group-a', 'group-b']}]})
+        result = self.plan()
+        self.assertFalse(result['complete'])
+        self.assertNotIn('owner_closeout', result)
+        self.assertEqual(['delivery_verified', 'verify'], [row['action'] for row in result['actions']])
+        self.assertEqual('group-b', result['actions'][1]['material_id'])
+        with (self.base / 'publication-journal.jsonl').open('a', encoding='utf-8') as journal:
+            journal.write(json.dumps({'tool': 'requirement_bind_materials', 'operation_id': 'timed-out',
+                                      'requirement_id': 'req', 'state': 'unknown'}) + '\n')
+        self.assertEqual(['timed-out'], self.plan()['publication_unknown'])
+
+    def test_filename_warning_requires_later_attribution_for_each_material(self):
+        self.state['requirement']['designer_ids'] = []
+        self.spec['explicit_members'] += [
+            {'member_id': member, 'width': 300, 'height': 300} for member in ('two', 'three')
+        ]
+        self.receipt('material_attribution_update', {'success': True, 'updated': ['group-b']},
+                     attribution={'material_ids': ['group-b'], 'creation_type': 'derivative'})
+        outputs, results, groups = [], [], []
+        for index, (member, material_id) in enumerate(zip(('one', 'two', 'three'), ('group-a', 'group-b', 'group-c'))):
+            group, item = self.receipt_group([member], material_id, index=index, creation_type='unmarked')
+            item['warnings'] = [FILENAME_ATTRIBUTION_WARNING, EMPTY_DESIGNER_WARNING]
+            if material_id == 'group-c':
+                item['warnings'].append('Resource changed')
+            outputs.extend(group)
+            results.append(item)
+            groups.append(group)
+        self.receipt('material_upload_from_url', {'results': results}, outputs=outputs, output_groups=groups)
+        self.assertEqual(['attribute', 'attribute', 'verify'], [row['action'] for row in self.plan()['actions']])
+
+        self.receipt('material_attribution_update', {'success': True, 'updated': ['group-a', 'group-c']},
+                     attribution={'material_ids': ['group-a', 'group-b', 'group-c'], 'creation_type': 'derivative'})
+        self.receipt('requirement_bind_materials',
+                     {'results': [{'requirement_id': 'req', 'success': True,
+                                   'materialIds': ['group-a', 'group-b', 'group-c']}]},
+                     binding_material_ids=['group-a', 'group-b', 'group-c'])
+        result = self.plan()
+        self.assertEqual(['delivery_verified', 'attribute', 'verify'], [row['action'] for row in result['actions']])
+        self.assertEqual({'official_receipts': 1}, result['evidence_counts'])
+        self.assertFalse(result['complete'])
+        self.assertFalse(list(self.base.glob('download-*')))
+
+    def test_official_receipts_with_wrong_binding_cannot_close(self):
+        self.state['requirement']['designer_ids'] = []
+        outputs, item = self.receipt_group(['one'], 'group-a')
+        self.receipt('material_upload_from_url', {'results': [item]}, outputs=outputs, output_groups=[outputs])
+        self.receipt('requirement_bind_materials',
+                     {'results': [{'requirement_id': 'another-req', 'success': True, 'materialIds': ['group-a']}]},
+                     binding_material_ids=['group-a'])
+        self.assertEqual('verify', self.action())
+        self.assertFalse(self.plan()['complete'])
+
+    def test_partial_import_without_a_result_for_its_group_requires_reconciliation(self):
+        self.state['requirement']['designer_ids'] = []
+        self.spec['explicit_members'].append({'member_id': 'two', 'width': 300, 'height': 300})
+        first, first_result = self.receipt_group(['one'], 'group-a')
+        second, _ = self.receipt_group(['two'], 'group-b', index=1)
+        self.receipt('material_upload_from_url', {'results': [first_result]},
+                     outputs=first + second, output_groups=[first, second])
+        self.assertEqual(['bind', 'verify'], [row['action'] for row in self.plan()['actions']])
+        self.assertFalse(self.plan()['complete'])
 
     def test_rework_continues_after_two_rounds(self):
         record, review = self.ready()

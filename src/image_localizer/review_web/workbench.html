@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>译制工作台 · 图片本地化</title>
+  <link rel="stylesheet" href="/workbench.css">
+  <script src="/workbench.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">跳到内容</a>
+  <aside class="rail" aria-label="主导航">
+    <a class="brand" href="#ledger"><span class="brand-mark" aria-hidden="true">译</span><span class="brand-title">译制工作台<small>图片本地化</small></span></a>
+    <nav>
+      <a href="#ledger" data-nav="ledger" aria-current="page"><span aria-hidden="true">▦</span>需求台账</a>
+      <a href="#efficiency" data-nav="efficiency"><span aria-hidden="true">↗</span>效率分析</a>
+      <a href="#tasks" data-nav="tasks"><span aria-hidden="true">▤</span>任务与图片<span id="nav-count" class="nav-count" hidden></span></a>
+      <a href="#sessions" data-nav="sessions"><span aria-hidden="true">◫</span>会话总览</a>
+      <a href="#automations" data-nav="automations"><span aria-hidden="true">◷</span>自动任务</a>
+      <a href="#knowledge" data-nav="knowledge"><span aria-hidden="true">⌘</span>知识与调用</a>
+      <a href="#system" data-nav="system"><span aria-hidden="true">◷</span>运行概况</a>
+    </nav>
+    <div class="rail-note"><span class="read-dot"></span>本机 · 台账与制作记录<p>制作沿用图片项目门禁</p></div>
+  </aside>
+  <div class="workspace">
+    <header class="topbar">
+      <span class="breadcrumb">广告图片本地化<span>/</span><strong id="page-label">需求台账</strong></span>
+      <div class="refresh-controls"><span id="connection" role="status">连接中</span><label class="auto"><input id="auto" type="checkbox" checked>自动更新</label><button id="refresh" class="icon-button" title="立即更新" aria-label="立即更新">↻</button></div>
+    </header>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <main id="main" tabindex="-1">
+      <section class="page-heading"><div><h1 id="page-title">需求台账</h1><p id="page-description"></p></div><span id="read-time" class="quiet">读取项目记录…</span></section>
+      <section id="overview" aria-label="统计"></section>
+      <div id="toolbar" class="toolbar" hidden>
+        <label class="search-label"><span class="sr-only">搜索需求或语种</span><input id="search" type="search" placeholder="搜索需求或语种" autocomplete="off"></label>
+        <label><span class="sr-only">筛选进度</span><select id="progress"><option value="all">全部进度</option><option value="active">进行中</option><option value="waiting">待开始</option><option value="blocked">阻塞</option><option value="done">已完成</option><option value="closed">已关闭</option></select></label>
+        <label><span class="sr-only">筛选查看范围</span><select id="scope"><option value="current">当前跟踪</option><option value="all">含历史记录</option></select></label>
+      </div>
+      <div id="content"><div class="empty panel">正在读取本地台账…</div></div>
+      <section id="detail" class="panel detail" hidden></section>
+      <details id="record-notes" class="fold-panel record-notes" hidden>
+        <summary><span>本地记录提示</span><span id="record-note-count" class="badge"></span></summary>
+        <div class="fold-body">
+          <div class="fold-scroll" role="region" aria-label="本地记录提示明细" tabindex="0"><ul id="record-note-list"></ul></div>
+        </div>
+      </details>
+    </main>
+    <footer>本机记录自动更新<span>制作、审核与平台提交分别记录</span></footer>
+  </div>
+  <dialog id="document"><div class="dialog-head"><h2 id="document-title">知识正文</h2><form method="dialog"><button>关闭</button></form></div><pre id="document-text"></pre></dialog>
+</body>
+</html>

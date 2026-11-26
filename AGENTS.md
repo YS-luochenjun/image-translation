@@ -8,7 +8,7 @@
 
 处理需求面板批次时，入口是[自主交付流程](agent/workflows/fireplay-autonomous.md)：按官方“AI承接交付=图片翻译”的实际选项筛选长方竖图和大按钮，接入/下载细节见[需求接入](agent/workflows/fireplay-intake.md)。宿主连接器与现有发布脚本已支持查询和素材提交；Python接入仍是回执驱动，不能当作无人宿主生产守护进程。基础CLI和[分层配置工具](docs/layered-tools.md)、[原生观感任务入口](docs/native-workflow.md)负责可控排版、版本和检查；按图片需要选可用工具。
 
-需求面板任务按[会话分工与调度](agent/workflows/fireplay-autonomous.md#会话分工与调度)执行。优化版最多同时承接 20 个逻辑需求。每个需求沿用唯一执行会话，新单拿到名额后才承接、写回开工并派发。主控负责接入、派发、跟踪和终核，执行会话负责制作、审核和上传。新开需求执行会话使用宿主默认模型和推理等级，已有需求沿原会话续办。
+需求面板任务按[会话分工与调度](agent/workflows/fireplay-autonomous.md#会话分工与调度)执行。优化版最多同时承接 20 个逻辑需求。每个需求沿用唯一执行会话，新单拿到名额后才承接、写回开工并派发。工作台负责接入、派发、跟踪和汇总。原执行会话负责制作、审核、通过官方 MCP 上传入库并绑定。全量交付齐套后，原执行会话必须在发最终回复前自行写回 Fireplay「已完成」，读回状态和绑定并保存 `status-finish.json` 的 `confirmed` 回执。正常单由程序按成员清单核对官方发布回执与面板绑定，只有缺项、警告或结果不明时才定向对账，必要时回下载。部分交付或写回受阻时，记录实际缺项或错误与下一步。工作台发现素材齐套、原会话已停且面板仍「进行中」时，登记待结案并交回同一会话补办，汇总以实际确认回执为准。新开需求执行会话使用宿主默认模型和推理等级，已有需求沿原会话续办。
 
 用户2026-11-19明确知情同意：已交办图片需求可通过 Fireplay 官方流程上传成品，即使接口生成可从公网访问的图片地址；并授权继续素材入库、共享、需求面板绑定及核验，不需项目逐次确认。R2中已有重复对象本身无需清理；用户后续要求已成功上传的具体成员冻结，不再因重复对象可接受而重传或替换该成员。此授权不等于宿主自动审批已通过；按宿主实际结果和官方工具对未知写入的约束执行，不绕过拒绝。
 
@@ -26,15 +26,15 @@
 
 ## 执行顺序
 
-默认交付口径按用户2026-11-06指示为“大致相同、画面流畅、基本一致”，先读[交付评分与取舍](knowledge/methods/delivery-balanced-review.md)。允许自然补全与局部差异，达80分及底线即提交，不追完美；未达标且有可行改进路线时继续针对性修正，不设固定返工次数；同一方法无改善时换路线，确无可行路线才记录阻塞。历史固定37批次续作另读[统一执行控制](work/fireplay-production/unified-control.md)，其原会话/归档/专门授权约束不推广为未来新需求默认。MCP负责查询和发布绑定，以明确来源×语言×成员矩阵及fresh终核认定交付。
+默认交付口径按用户2026-11-06指示为“大致相同、画面流畅、基本一致”，先读[交付评分与取舍](knowledge/methods/delivery-balanced-review.md)。允许自然补全与局部差异，达80分及底线即提交，不追完美；未达标且有可行改进路线时继续针对性修正，不设固定返工次数；同一方法无改善时换路线，确无可行路线才记录阻塞。历史固定37批次续作另读[统一执行控制](work/fireplay-production/unified-control.md)，其原会话/归档/专门授权约束不推广为未来新需求默认。MCP负责查询和发布绑定，以来源×语言×成员矩阵、官方业务成功回执和面板读回认定交付。
 
-制作、尺寸适配及提交前必须读 [原图图组与尺寸规划](knowledge/methods/source-set-and-size-planning.md)，按明确需求→同组同类他人已交付规格→项目默认选择尺寸；机器策略见 [尺寸配置](docs/material-size-policy.json)。用户2026-11-17确认：标准长方竖图每套固定7张（1长、3方、3竖），不要求正文再次写“标准输出”。每个独立原图创意×该来源去重目标语言各一套；9个独立横图×1语言=63张，4创意×7语言=196张。多张横图不是完整长方竖图组，不能按附件数缩为1、2、3张；真实已提供1长3方3竖完整七成员时整套翻译一次，不逐成员再乘七。仅需求或用户明确指定只翻原图/特殊成员时按有据例外交付。已审合格成员保留，缺什么补什么；标准套未齐只能报partial，不得结案。只对缺规格的待制作/待适配项采用默认，已明确或已验收交付保持原规格；用 `material-size-plan` / `material-size-validate` 核实来源×去重语言×成员×尺寸矩阵、真实文件像素和字节限制。
+制作、尺寸适配及提交前必须读 [原图图组与尺寸规划](knowledge/methods/source-set-and-size-planning.md)。用户明确要求按实际创意与版式识别所供图组，每套按真实待翻成员交付，套数和每套张数由看图及来源证据确定，可以是5、7、8、10张等。多套分别制作、入库和核验。独立原图需要派生版式且未指定规格时，才使用默认1长、3方、3竖。尺寸按明确需求→原图或同类已交付规格→默认选择。缺少已确定成员只能报partial；用 `material-size-plan` / `material-size-validate` 核实来源×去重语言×成员×尺寸矩阵、真实像素和字节限制。
 
 1. 读 [单图工作流](agent/workflows/single-image.md)、[图片生成与去字路线](docs/image-generation-policy.md) 与 [知识目录](knowledge/README.md)，通过 [索引](knowledge/index.json) 按需选方法和相符案例。通用流程是 [五阶段分层](knowledge/methods/layered-localization.md)：语义与样式提取、背景单独去字审核、独立透明目标字层、合成、全图适配审核。
 2. 运行 `python bin/it.py doctor`，区分依赖存在、宿主可看图、外部服务真实验证。新分阶段任务用`init-job SOURCE --targets zh-CN,ja --output runs/ID`，对每个languages/LANGUAGE运行packet；基础任务仍可用`init/packet`。实际打开规范化源图与局部。规范化PNG哈希与原始文件哈希分开，坐标用规范化画布。
 3. 使用 [解析](agent/prompts/analyze.md) 和 [翻译](agent/prompts/translate.md) 提示词，逐区记录原文/译文/保留理由、保护对象、样式与疑点；实际复核 confidence<0.9 的文字后才填 recognition_verified。不可辨内容不猜补，unresolved 未解决不标完成。
 4. 按 [内容路由](knowledge/methods/content-routing.md)、[文字构图](knowledge/methods/typography-composition.md) 和 [修复提示词](agent/prompts/repair.md) 选择方法。摄影图去字或出现暗带/糊化时必须读[清晰背景与遮罩退化检查](knowledge/methods/photographic-background-repair.md)，背景单独通过后再排字。均匀底色才用 solid；也可局部源像素重建、矢量容器重建或宿主真正编辑。增强路线需保留各阶段输出和真实观察，先审无字背景再制作透明字层，再合成。任务region_map精确覆盖每个翻译区和实际row/textasset；不能改数字标点蒙混文本核对。manifest的保留区并入共享保护。prepare-job冻结输入后停在背景待审，实际填当前背景审核后才render-job。基础 CLI 走 `validate`、`render [--clean-background PATH]`；参数以实际合同为准。
-5. 使用 [审核提示词](agent/prompts/review.md) 和 [差异驱动自检](knowledge/methods/visual-fidelity-self-review.md) 看全图缩略、100%及必要放大局部。制作前从源图选出3～5项关键视觉要求；交付前逐项记录源图与候选的实际差异，主动找最弱区域，发现可见缺口即自主返工相关层，不等待用户提醒。基础路线运行 `review-packet RUN`，真实填写当前版本审核后 `quality RUN`。visual_targets与style_comparisons绑定源图观察、失败判据、当前证据和目标实际观察；只有style=true而无具体比较不能放行。使用compare/benchmark生成辅助证据，已知缺陷标签不是自动检测结果。独立身份和计算门禁不能替代足以否决候选的视觉标准；返工需重新绑定实际文件哈希并复审，透明层或 quality 文件存在不能自动证明五阶段审核成立。
+5. 使用 [审核提示词](agent/prompts/review.md) 和 [差异驱动自检](knowledge/methods/visual-fidelity-self-review.md) 看全图缩略、100%及必要放大局部。制作前从源图选出3～5项关键视觉要求；交付前逐项记录源图与候选的实际差异，主动找最弱区域，只对影响正常展示或触及质量底线的实质缺陷返工。正常展示不显眼、仅放大或刻意对照才察觉且不触及底线的轻微光晕、非核心边缘接痕，记为minor，不为此换模型、重跑或追加复审。基础路线运行 `review-packet RUN`，真实填写当前版本审核后 `quality RUN`。visual_targets与style_comparisons绑定源图观察、失败判据、当前证据和目标实际观察；只有style=true而无具体比较不能放行。使用compare/benchmark生成辅助证据，已知缺陷标签不是自动检测结果。独立身份和计算门禁不能替代足以否决候选的视觉标准；返工需重新绑定实际文件哈希并复审，透明层或 quality 文件存在不能自动证明五阶段审核成立。
 
 ## 不变量
 
@@ -44,7 +44,7 @@
 - 每区有动作、坐标、原文、定稿或保留理由、样式与修复依据。空清单、analysis.complete=false、脚本测量、模型返回成功均不代表完成。
 - 翻译与艺术改写须明确区分；不能为凑行宽增加承诺或对象。字重、黑白面积、宽高比、字距、立体质感、弧度/透视、光照与张力共同审核，不能只称字号相同。行宽与容器一起设计，不强拉字，不要求所有图上长下短。
 - 真实审核绑定当前 manifest 和输出字节 SHA256，逐区及全图写具体观察；自审标 self，不能冒称独立。历史失败run和审核保留，不自动把旧 pass 升级为满足新视觉要求的 pass。
-- 图片翻译上传时带上对应目标语种Tag，沿用需求里的`ja`、`hi`等写法即可；明确尺寸建议打Tag，产品/主题词及需求编号按方便搜索添加。保留已有合理标签，不强制中文语种名或复杂格式，不增加额外交付门禁。具体见[素材Tag约定](docs/material-tags.md)。
+- 图片翻译上传时带上对应目标语种Tag，沿用需求里的`ja`、`hi`等写法即可；明确尺寸建议打Tag，产品/主题词及需求编号按方便搜索添加。读需求或识读素材时顺手确认更新类别，明确属于更新或非更新的素材在入库时分别加`更新`或`非更新`，依据不足留空。保留已有合理标签，不增加巡检、识图轮次或交付门禁。具体见[素材Tag约定](docs/material-tags.md)。
 - 分开报告技术完成、Agent质量和用户反馈；将用户原话、认可范围与当前输出哈希追加到相应案例，不改写历史审核。个案认可不自动扩大为通用能力或付费授权；本轮用户明确提出的通用交付容差已写入评分规则，后续按该规则自主取舍，不重复求认可。
 
 字段合同见 [架构](docs/architecture.md)，参考边界见 [复用说明](docs/reference-reuse.md)。项目薄 skill 入口见 [image-localization](.agents/skills/image-localization/SKILL.md)；不写全局 skill 或 hook。
