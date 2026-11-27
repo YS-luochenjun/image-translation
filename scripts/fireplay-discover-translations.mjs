@@ -7,7 +7,7 @@ import {resolve} from 'node:path';
 const fail=message=>{throw new Error(message);};
 const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HASH=/^[0-9a-f]{64}$/;
-async function definition(transport,name){
+export async function definition(transport,name){
  const raw=await transport.call('tool_catalog',{tool:name});
  const result=decodeResult(raw);
  if(raw?.isError||result?.name!==name||result.operation_class!=='read'||!HASH.test(result.schema_version||'')
@@ -15,7 +15,7 @@ async function definition(transport,name){
     ||!result.inputSchema.properties||!Object.keys(result.inputSchema.properties).length)fail(`Read contract unavailable: ${name}`);
  return result;
 }
-async function read(transport,contract,args){
+export async function read(transport,contract,args){
  validateSchema(args,contract.inputSchema);
  const parameters=contract.invoke_via==='tool_read'?{tool:contract.name,schema_version:contract.schema_version,arguments:args}:args;
  const raw=await transport.call(contract.invoke_via,parameters);

@@ -66,6 +66,8 @@ python bin/it.py stage-summary work/fireplay-production/CODE/stage-events.jsonl
 
 `python bin/it.py storage-preview --limit 20` 扫描 `work/fireplay-production`、`runs` 和 `state/fireplay`，按 SHA256 汇总重复图片和字体，并显示重复组中位于已确认结案需求目录的副本数。报告供清理前核引用使用。实际释放空间受文件系统写时复制、硬链接和仍被引用的产物影响。保留需求回执、审核证据和历史交付关系后，再按授权处理具体文件。
 
+当前项目的同字节压缩、结案复用档案、阶段清理和返工恢复见[本地产物和保留规则](storage-retention.md)。
+
 `python bin/it.py legacy-font-compact LEGACY_PROJECT` 只预览旧版可处理的同哈希字体。明确执行时追加 `--receipt NEW_AUDIT.jsonl`，回执须新建在旧项目之外。仅处理主控已核验交付、没有活动或待处理标记、且发布流水无未决写入的需求。用 macOS 写时复制保留每个字体路径和独立文件，只共享相同数据块。不同字节、有硬链接、无法克隆或无法通过元数据校验的文件不替换。不删除旧项目或改动发布流水，结果以回执记录的文件数及磁盘可用空间变化为准。重复运行会找到相同的逻辑副本，不应把预览字节数当作还能释放的磁盘空间。
 
 旧工作区作为原址档案保留，历史回执中的绝对路径仍用于读取。新单在优化版接入，既有旧单沿原会话和原账本。清理前按历史引用、未确认写入和唯一证据判定边界。Git 归档、旧账本哈希和清理回执存放在本地 `work/maintenance/`。

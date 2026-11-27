@@ -6,14 +6,19 @@ visual approval. Frozen job.json and inputs can be relocated and prepared again 
 from __future__ import annotations
 
 from copy import deepcopy
+import hashlib
+import json
 from pathlib import Path
 import re
+import shutil
+from tempfile import TemporaryDirectory
 
 from .artifact_copy import copy_artifact
 from .production_timing import timed_production
 from .contracts import require, validate_manifest
+from .fireplay import _lock
 from .layer_ops import _fields
-from .layered import _image, _path, _verify, prepare_layered, render_layered, check_layered
+from .layered import _image, _path, _verify, background_artifact, prepare_layered, render_layered, check_layered
 from .pipeline import new_manifest, normalize_source, read_json, write_json, sha256
 from .visual_review import validate_visual_targets
 from .job_content import validate_region_map, merged_protections
@@ -42,8 +47,7 @@ def initialize_job(source: Path, targets: list[str], output: Path) -> dict:
     for language in languages:
         run = output / 'languages' / language
         run.mkdir(parents=True)
-        copy_artifact(output / 'source.png', run / 'source.png')
-        write_json(run / 'manifest.json', new_manifest(language, metadata, canvas))
+        write_json(run / 'manifest.json', new_manifest(language, {**metadata, 'path': '../../source.png'}, canvas))
         entries.append({'language': language, 'manifest': f'languages/{language}/manifest.json',
                         'rows': [], 'assets': [], 'text_clear_boxes': [], 'notes': [], 'region_map': []})
     project = {'schema_version': 1, 'source': 'source.png', 'source_sha256': metadata['sha256'],
@@ -98,18 +102,15 @@ def _plan(project: dict, target: dict) -> dict:
             'notes': [*project.get('notes', []), *target.get('notes', [])]}
 
 
-def prepare_job(job_path: Path, output: Path, *, reuse_background: Path | None = None) -> dict:
-    require(not output.exists(), 'Prepared job already exists; choose another directory')
+def prepare_job(job_path: Path, output: Path, *, reuse_background: Path | None = None,
+                revisioned: bool = False) -> dict:
     project, languages = _load_job(job_path)
     previous_review = _background_review(reuse_background) if reuse_background is not None else None
     base = job_path.resolve().parent
-    output.mkdir(parents=True)
-    resources = output / 'inputs'
-    resources.mkdir()
-    copied: dict[str, str] = {}
+    resources: dict[str, tuple[Path, str]] = {}
     originals: dict[str, str] = {}
     snapshots: dict[Path, str] = {}
-    storage = {'clone': 0, 'copy': 0}
+    semantics = {}
     total_bytes = 0
 
     def snapshot(value: str, relative_base: Path = base) -> str:
@@ -123,12 +124,9 @@ def prepare_job(job_path: Path, output: Path, *, reuse_background: Path | None =
         extension = source.suffix.lower()
         require(re.fullmatch(r'\.[a-z0-9]{1,10}', extension) is not None, 'Input must have a simple file extension')
         relative = f'inputs/{digest}{extension}'
-        destination = output / relative
-        if relative not in copied:
+        if relative not in resources:
             require(total_bytes + size <= MAX_BUNDLE_BYTES, 'Job inputs exceed256MiB budget')
-            storage[copy_artifact(source, destination)] += 1
-            require(sha256(destination) == digest == sha256(source), 'Input changed while snapshotting')
-            copied[relative] = digest
+            resources[relative] = (source, digest)
             total_bytes += size
         originals[str(source)] = digest
         snapshots[source] = relative
@@ -144,14 +142,14 @@ def prepare_job(job_path: Path, output: Path, *, reuse_background: Path | None =
     for target, original in zip(frozen['targets'], project['targets']):
         manifest_path = _path(base, original['manifest'])
         manifest = read_json(manifest_path)
+        manifest['source']['path'] = '../' + frozen['source']
         for region in manifest['regions']:
             if region['action'] == 'translate':
                 # Preserve the declared semantic font dependency as well as actual row fonts.
                 font = snapshot(region['style']['font_path'], manifest_path.parent)
                 region['style']['font_path'] = '../' + font
         relative_manifest = f"semantics/{target['language']}.json"
-        (output / 'semantics').mkdir(exist_ok=True)
-        write_json(output / relative_manifest, manifest)
+        semantics[relative_manifest] = manifest
         target['manifest'] = relative_manifest
         originals[str(manifest_path)] = sha256(manifest_path)
         for row in target['rows']:
@@ -160,15 +158,56 @@ def prepare_job(job_path: Path, output: Path, *, reuse_background: Path | None =
         for asset in target['assets']:
             require(isinstance(asset, dict), 'Each asset must be an object')
             asset['path'] = snapshot(asset.get('path'))
+    review_digest = sha256(reuse_background / 'background-review.json') if reuse_background is not None else None
+
+    def prepare_at(destination: Path) -> dict:
+        destination.mkdir(parents=True)
+        try:
+            return _write_prepared_job(destination, frozen, languages, semantics, resources, originals,
+                                       reuse_background, previous_review, review_digest, frozen_refs=revisioned)
+        except Exception:
+            shutil.rmtree(destination)
+            raise
+
+    if not revisioned:
+        require(not output.exists(), 'Prepared job already exists; choose another directory')
+        return prepare_at(output)
+
+    identity = {'version': 1, 'job': frozen, 'semantics': semantics, 'background_review_sha256': review_digest}
+    revision = hashlib.sha256(json.dumps(identity, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    with _lock(output, '.prepare.lock'):
+        destination = output / revision
+        if destination.exists():
+            require(verify_bundle(destination) == frozen, 'Prepared revision differs from requested inputs')
+            require(all(read_json(destination / relative) == manifest for relative, manifest in semantics.items()),
+                    'Prepared revision differs from requested semantics')
+            _verify_prepared_background(destination)
+            return _prepare_result(destination, languages, reused=True)
+        return prepare_at(destination)
+
+
+def _write_prepared_job(output, frozen, languages, semantics, resources, originals,
+                        reuse_background, previous_review, review_digest, *, frozen_refs):
+    storage = {'clone': 0, 'copy': 0}
+    (output / 'inputs').mkdir()
+    (output / 'semantics').mkdir()
+    for relative, (source, digest) in resources.items():
+        destination = output / relative
+        storage[copy_artifact(source, destination)] += 1
+        require(sha256(destination) == digest == sha256(source), 'Input changed while snapshotting')
+    for relative, manifest in semantics.items():
+        write_json(output / relative, manifest)
     write_json(output / 'job.json', frozen)
     # Plans live beside job.json so every frozen path stays relative to this package.
     for target in frozen['targets']:
         write_json(output / f"plan-{target['language']}.json", _plan(frozen, target))
     prepare_layered(output / f'plan-{languages[0]}.json', output / 'background',
-                    reuse=reuse_background / 'background' if reuse_background is not None else None)
-    clean = output / 'background' / 'background.png'
+                    reuse=reuse_background / 'background' if reuse_background is not None else None,
+                    frozen_refs=frozen_refs)
+    receipt_path = output / 'background' / 'receipt.json'
+    receipt = read_json(receipt_path)
     template = {'schema_version': 1, 'source_sha256': frozen['source_sha256'],
-                'background_sha256': sha256(clean), 'receipt_sha256': sha256(output / 'background' / 'receipt.json'),
+                'background_sha256': receipt['artifact_sha256']['background.png'], 'receipt_sha256': sha256(receipt_path),
                 'reviewer': '', 'review_kind': 'self', 'checks': {
                     'no_residual_text': None, 'seam_continuity': None, 'protected_content': None},
                 'observations': '', 'issues': []}
@@ -178,23 +217,36 @@ def prepare_job(job_path: Path, output: Path, *, reuse_background: Path | None =
                 'Reused background differs from the reviewed bytes')
         write_json(output / 'background-review.json', {
             **previous_review, 'receipt_sha256': template['receipt_sha256'],
-            'reused_review_sha256': sha256(reuse_background / 'background-review.json')})
+            'reused_review_sha256': review_digest})
     files = {str(path.relative_to(output).as_posix()): sha256(path)
              for path in output.rglob('*') if path.is_file()
              and path.name not in ('render-timing.json', 'background-review.json')}
     write_json(output / 'bundle.json', {'schema_version': 1, 'files': files, 'origin_inputs': originals,
                                       'notice': 'Origin paths are provenance only. Frozen job inputs do not depend on those paths. Visual review is not automated.'})
-    return {'prepared': str(output.resolve()), 'status': 'pending', 'languages': languages,
-            'input_storage': storage, 'background_reused': previous_review is not None,
-            'next': ('Render new lettering and inspect every current candidate.' if previous_review is not None
-                     else 'Actually inspect background. Copy background-review-template.json to background-review.json and record review before render-job.')}
+    return _prepare_result(output, languages, storage=storage)
+
+
+def _prepare_result(output, languages, *, reused=False, storage=None):
+    receipt = read_json(output / 'background' / 'receipt.json')
+    reviewed = (output / 'background-review.json').is_file()
+    if reused and reviewed:
+        try:
+            _background_review(output)
+        except (OSError, ValueError, TypeError, KeyError):
+            reviewed = False
+    return {'prepared': str(output.resolve()), 'status': 'pending', 'languages': languages, 'reused': reused,
+            'input_storage': storage if storage is not None else {'clone': 0, 'copy': 0},
+            'background_artifacts': {name: str(background_artifact(output / 'background', receipt, name).resolve())
+                                     for name in ('source.png', 'background.png', 'edit-mask.png')},
+            'background_reused': 'reused_receipt_sha256' in receipt,
+            'next': ('Render new lettering and inspect every current candidate.' if reviewed else
+                     'Actually inspect background. Copy background-review-template.json to background-review.json and record review before render-job.')}
 
 
 def verify_bundle(prepared: Path) -> dict:
     bundle = read_json(prepared / 'bundle.json')
     require(bundle.get('schema_version') == 1 and isinstance(bundle.get('files'), dict), 'Invalid job bundle')
     required = {'job.json', 'background-review-template.json', 'background/receipt.json',
-                'background/source.png', 'background/background.png', 'background/edit-mask.png',
                 'background/background-plan.json', 'background/repair-layout.json'}
     root = prepared.resolve()
 
@@ -233,18 +285,28 @@ def verify_bundle(prepared: Path) -> dict:
         plan_path = dependency(f"plan-{target['language']}.json")
         require(read_json(plan_path) == _plan(project, target), 'Frozen plan differs from its job target')
     receipt = read_json(prepared / 'background' / 'receipt.json')
+    require({'source.png', 'background.png', 'edit-mask.png'} <= set(receipt['artifact_sha256']),
+            'Bundle background receipt lacks required artifacts')
     for artifact in receipt['artifact_sha256']:
-        dependency(artifact, root / 'background')
+        require(Path(artifact).name == artifact, 'Invalid frozen background artifact name')
+        path = background_artifact(root / 'background', receipt, artifact).resolve()
+        require(path.is_relative_to(root), 'Frozen background artifact escaped bundle')
+        relative = path.relative_to(root).as_posix()
+        dependency(relative)
+        require(bundle['files'][relative] == receipt['artifact_sha256'][artifact],
+                f'Frozen background hash differs from receipt: {artifact}')
     require(required <= set(bundle['files']), 'Bundle dependency inventory is incomplete')
     return project
 
 
 def _background_review(prepared: Path) -> dict:
     project = read_json(prepared / 'job.json')
+    folder = prepared / 'background'
+    receipt = folder / 'receipt.json'
     return verify_background_review(prepared / 'background-review.json',
                                     source_sha256=project['source_sha256'],
-                                    background=prepared / 'background' / 'background.png',
-                                    receipt=prepared / 'background' / 'receipt.json')
+                                    background=background_artifact(folder, read_json(receipt), 'background.png'),
+                                    receipt=receipt)
 
 
 def _verify_prepared_background(prepared: Path) -> None:
@@ -257,28 +319,67 @@ def _verify_prepared_background(prepared: Path) -> None:
 
 
 @timed_production(input_name='prepared', output_name='output')
-def render_job(prepared: Path, output: Path) -> dict:
-    require(not output.exists(), 'Render job output already exists')
+def render_job(prepared: Path, output: Path, *, full_previews: bool = False) -> dict:
     project = verify_bundle(prepared)
     _background_review(prepared)
     _verify_prepared_background(prepared)
-    output.mkdir(parents=True)
+    expected = [target['language'] for target in project['targets']]
+    record = {'schema_version': 1, 'prepared': str(prepared.resolve()),
+              'bundle_sha256': sha256(prepared / 'bundle.json'),
+              'background_review_sha256': sha256(prepared / 'background-review.json'), 'languages': expected}
+    existing = output.exists()
+    output.mkdir(parents=True, exist_ok=True)
     results = {}
-    for target in project['targets']:
-        language = target['language']
-        results[language] = render_layered(prepared / f'plan-{language}.json', prepared / 'background', output / language)
-        receipt_path = output / language / 'receipt.json'
-        receipt = read_json(receipt_path)
-        for dependency in ('background-review.json', 'bundle.json'):
-            path = prepared / dependency
-            receipt['input_sha256'][str(path.resolve())] = sha256(path)
-        write_json(receipt_path, receipt)
-    write_json(output / 'job-render.json', {'schema_version': 1, 'prepared': str(prepared.resolve()),
-                                          'bundle_sha256': sha256(prepared / 'bundle.json'),
-                                          'background_review_sha256': sha256(prepared / 'background-review.json'),
-                                          'languages': list(results)})
+    record_path = output / 'job-render.json'
+    with _lock(output, '.render.lock'):
+        if existing or record_path.exists():
+            require(record_path.is_file() and read_json(record_path) == record,
+                    'Render directory belongs to another prepared job or review')
+        else:
+            write_json(record_path, record)
+        for target in project['targets']:
+            language = target['language']
+            directory = output / language
+            if directory.exists():
+                receipt = _verify_job_language(prepared, directory, target)
+                require(not full_previews or receipt.get('profile') != 'compact',
+                        'Use a separate export directory for full previews')
+                results[language] = {'output_dir': str(directory.resolve()), 'status': receipt['status'],
+                                     'technical': receipt['technical'], 'reused': True,
+                                     'shared_artifacts': receipt.get('artifact_refs', {}),
+                                     **{key: receipt[key] for key in ('artifact_aliases', 'empty_artifacts') if key in receipt}}
+                continue
+            with TemporaryDirectory(prefix='.render-stage-', dir=output) as temporary:
+                staging = Path(temporary) / language
+                result = render_layered(prepared / f'plan-{language}.json', prepared / 'background', staging,
+                                        compact=not full_previews)
+                receipt_path = staging / 'receipt.json'
+                receipt = read_json(receipt_path)
+                for dependency in ('background-review.json', 'bundle.json'):
+                    path = prepared / dependency
+                    receipt['input_sha256'][str(path.resolve())] = sha256(path)
+                write_json(receipt_path, receipt)
+                staging.rename(directory)
+            results[language] = {**result, 'output_dir': str(directory.resolve()), 'reused': False}
     return {'output': str(output.resolve()), 'status': 'fail' if any(result['status'] == 'fail' for result in results.values()) else 'pending',
             'languages': results, 'next': 'Actually compare all language outputs; complete each current review.json, then check-job.'}
+
+
+def _verify_job_language(prepared, render_dir, target):
+    language = target['language']
+    plan_path = prepared / f'plan-{language}.json'
+    require(sha256(render_dir / 'plan.json') == sha256(plan_path),
+            f'{language}: output belongs to another plan')
+    require(read_json(render_dir / 'plan.json').get('target_language') == language,
+            f'{language}: output language mismatch')
+    receipt = _verify(render_dir, 'render')
+    require(receipt['input_sha256'].get(str(plan_path.resolve())) == sha256(plan_path),
+            f'{language}: receipt does not bind expected target plan')
+    evidence = [_path(prepared.resolve(), target['manifest']), prepared / 'bundle.json', prepared / 'background-review.json']
+    for path in evidence:
+        require(receipt['input_sha256'].get(str(path.resolve())) == sha256(path),
+                f'{language}: receipt does not bind {path.name}')
+    return receipt
 
 
 def check_job(output: Path) -> dict:
@@ -292,18 +393,7 @@ def check_job(output: Path) -> dict:
         expected = [target['language'] for target in project['targets']]
         require(record.get('languages') == expected, 'Rendered language inventory changed')
         for target in project['targets']:
-            language = target['language']
-            render_dir = output / language
-            plan_path = prepared / f'plan-{language}.json'
-            require(sha256(render_dir / 'plan.json') == sha256(plan_path), f'{language}: output belongs to another plan')
-            require(read_json(render_dir / 'plan.json').get('target_language') == language,
-                    f'{language}: output language mismatch')
-            receipt = read_json(render_dir / 'receipt.json')
-            require(receipt['input_sha256'].get(str(plan_path.resolve())) == sha256(plan_path),
-                    f'{language}: receipt does not bind expected target plan')
-            manifest_path = _path(prepared.resolve(), target['manifest'])
-            require(receipt['input_sha256'].get(str(manifest_path)) == sha256(manifest_path),
-                    f'{language}: receipt does not bind target semantics')
+            _verify_job_language(prepared, output / target['language'], target)
         results = {language: check_layered(output / language) for language in expected}
         statuses = {item['status'] for item in results.values()}
         status = 'fail' if 'fail' in statuses else 'pending' if 'pending' in statuses else 'pass'

@@ -19,7 +19,15 @@ python bin/it.py check-job runs/poster-render-v1
 
 `init-job`不识字，不自动选择风格；新清单保持analysis.complete=false。`prepare-job`要求分析已完成、无未解决疑点、每区域定稿与字层映射完整、至少一项源图视觉要求。建议按方法写3～5项最影响观感的要求。它冻结完整输入，单独生成背景并停在pending；背景审核缺失、哈希过期、检查未完成或有major/critical问题时，任务及其底层渲染入口都不进入排字。保存minor问题和具体观察，不能以新字遮住背景问题。
 
-`render-job`共享同一个准备背景，依次制作各语言独立字层和合成。`check-job`逐语言核对实际计划、语义清单、源图/字体/素材、背景审核及各产物哈希；把中文目录复制成日文目录不能通过。`pass=0`、`pending=2`、`fail=1`是check命令退出码；prepare/render成功退出0仅表示该技术阶段完成。错误中断可留下诊断目录，保留它并用新目录重做。
+`init-job`的语种清单共用任务根目录的 `source.png`。`render-job`默认把源图和已审底图记录为带哈希的共享文件，只为每个语言写入实际字层、合成、蒙版和审核证据。审阅台可以直接显示原图、底图与成图。确实需要本地对照、棋盘或放大 PNG 时，向独立导出目录运行 `render-job --full-previews`。
+
+Fireplay 批次使用 `prepare-job JOB` 与 `render-job PREPARED` 的默认目录，其他任务可用 `prepare-job JOB --revisioned --output SLOT` 指定固定目录。回执 `prepared` 指向实际准备版本，`background_artifacts` 提供原图、底图和蒙版路径。同一套配置与依赖字节再次提交时，程序校验并返回已有版本。新版本在同包内引用冻结原图与通过像素检查的外部底图和蒙版。只调整文案或排版时，可用 `--reuse-background PRIOR_PREPARED` 沿用与当前底图输入匹配的已审结果。
+
+`prepare-job JOB --build-script SCRIPT` 可先运行显式指定的本地 Python 脚本。脚本以 `JOB` 的绝对路径为参数，负责更新该来源的作者配置或底图。退出码为 `0` 才进入准备步骤。独立来源使用各自的工作包调用。
+
+默认渲染回执的 `empty_artifacts` 记录省略的全透明图层。叠加层和字层像素完全相同时，`artifact_aliases` 的 `overlay.png` 指向同目录 `text-layer.png`，两个用途共用一个哈希。审核引用可以继续用 `overlay.png`，审阅台按回执读取。完整导出会写出所有图层。
+
+中断后对同一准备包运行原命令即可续跑。程序核对准备包、审核和已完成语种的证据，只渲染缺少的语种。输入或审核发生变化时使用新的版本目录。`check-job`逐语言核对计划、语义清单、共享原图、字体、素材、底图审核和产物哈希。`pass=0`、`pending=2`、`fail=1` 是检查退出码。独立 `render-layered` 支持原有完整输出。
 
 ## 任务合同
 

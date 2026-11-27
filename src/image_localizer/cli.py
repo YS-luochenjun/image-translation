@@ -9,7 +9,7 @@ from pathlib import Path
 
 from PIL import Image, __version__ as pillow_version, features
 
-from .contracts import advisory_checks
+from .contracts import advisory_checks, require
 from .pipeline import initialize, load_run, packet, quality, render, review_packet
 
 
@@ -115,9 +115,15 @@ def main(argv: list[str] | None = None) -> int:
                            ('compare', 'spec'), ('benchmark', 'spec')]:
         command = commands.add_parser(name)
         command.add_argument(argument, type=Path)
-        command.add_argument('--output', required=True, type=Path)
+        command.add_argument('--output', required=name in ('compare', 'benchmark'), type=Path)
         if name == 'prepare-job':
             command.add_argument('--reuse-background', type=Path, help='Prior prepared job with the identical reviewed background')
+            command.add_argument('--revisioned', action='store_true',
+                                 help='Use a stable output slot and reuse verified revisions with identical inputs')
+            command.add_argument('--build-script', type=Path,
+                                 help='Run a local per-source Python builder with the job path before preparation')
+        if name == 'render-job':
+            command.add_argument('--full-previews', action='store_true', help='Export standalone comparison and zoom PNGs')
     job_check = commands.add_parser('check-job', help='Check all language outputs without inventing user acceptance')
     job_check.add_argument('output', type=Path)
     font_check = commands.add_parser('font-check', help='Verify Unicode glyph mappings in a real local font')
@@ -141,9 +147,50 @@ def main(argv: list[str] | None = None) -> int:
     fireplay_reuse.add_argument('code')
     fireplay_reuse.add_argument('--image', type=int, default=1, help='One-based original image index')
     fireplay_reuse.add_argument('--lookup', type=Path, help='Saved official image-search and resource responses')
+    reuse_plan = commands.add_parser('fireplay-reuse-plan', help='Match historical output against the frozen delivery matrix')
+    reuse_plan.add_argument('code')
+    reuse_plan.add_argument('state', type=Path)
+    reuse_plan.add_argument('--rework', action='store_true')
+    reuse_plan.add_argument('--remote-image', type=int, help='Select one planned original for Fireplay fallback')
+    reuse_plan.add_argument('--lookup', type=Path, help='Saved official search, resource and panel responses')
+    reuse_stage = commands.add_parser('fireplay-reuse-stage', help='Stage verified historical bytes for current visual review')
+    reuse_stage.add_argument('code')
+    reuse_stage.add_argument('state', type=Path)
+    reuse_stage.add_argument('source_id')
+    reuse_stage.add_argument('language')
+    reuse_stage.add_argument('member_id')
+    reuse_stage.add_argument('material_id')
+    reuse_stage.add_argument('--evidence', type=Path, required=True)
     commands.add_parser('knowledge-audit', help='Check curated knowledge and list evidence awaiting manual review')
     storage_preview = commands.add_parser('storage-preview', help='Inventory exact duplicate images and fonts')
     storage_preview.add_argument('--limit', type=int, default=20)
+    storage_compact = commands.add_parser('storage-compact', help='Preview or clone closed demand fonts and work images')
+    storage_compact.add_argument('--receipt', type=Path, help='Execute compaction and write a new audit file')
+    storage_compact.add_argument('--images-only', action='store_true')
+    storage_retention = commands.add_parser('storage-retention', help='Preview or apply verified Fireplay retention')
+    storage_retention.add_argument('code', nargs='?')
+    storage_retention.add_argument('--apply', action='store_true')
+    storage_retention.add_argument('--archive-only', action='store_true')
+    storage_hold = commands.add_parser('storage-hold', help='Protect a demand or restart retention after release')
+    storage_hold.add_argument('code')
+    storage_hold.add_argument('reason')
+    storage_hold.add_argument('--release', action='store_true')
+    storage_quarantine = commands.add_parser('storage-quarantine', help='Preview or apply quarantine recovery or expiry')
+    storage_quarantine.add_argument('code')
+    storage_quarantine.add_argument('--purge', action='store_true')
+    storage_quarantine.add_argument('--apply', action='store_true')
+    artifact_stage = commands.add_parser('artifact-stage', help='Stage or reuse an exact artifact at a canonical path')
+    artifact_stage.add_argument('source', type=Path)
+    artifact_stage.add_argument('destination', type=Path)
+    scratch_stage = commands.add_parser('scratch-stage', help='Register a model edit once under the requirement scratch directory')
+    scratch_stage.add_argument('code')
+    scratch_stage.add_argument('source', type=Path)
+    scratch_stage.add_argument('--provider', required=True)
+    scratch_stage.add_argument('--operation', required=True)
+    scratch_stage.add_argument('--member', action='append', required=True)
+    scratch_preview = commands.add_parser('scratch-preview', help='Build or reuse a demand contact sheet')
+    scratch_preview.add_argument('code')
+    scratch_preview.add_argument('spec', type=Path)
     legacy_fonts = commands.add_parser('legacy-font-compact', help='Preview or clone identical legacy font snapshots')
     legacy_fonts.add_argument('project', type=Path)
     legacy_fonts.add_argument('--receipt', type=Path, help='Execute compaction and create this new audit file')
@@ -163,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
         if name in ('fireplay-download', 'fireplay-job'):
             command.add_argument('--image', type=int, default=1, help='One-based source image index')
         if name == 'fireplay-job':
-            command.add_argument('--output', type=Path, required=True)
+            command.add_argument('--output', type=Path, help='Override the default per-source scratch job path')
     review_desk = commands.add_parser('workbench', aliases=['review-desk'], help='Open the local image translation workbench')
     review_desk.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[2])
     review_desk.add_argument('--port', type=int, default=8765)
@@ -208,6 +255,14 @@ def main(argv: list[str] | None = None) -> int:
             elif args.command == 'fireplay-reuse':
                 from .fireplay_reuse import search_history
                 result = search_history(root, args.code, args.image, read_json(args.lookup) if args.lookup else None)
+            elif args.command == 'fireplay-reuse-plan':
+                from .fireplay_reuse import reuse_plan
+                result = reuse_plan(root, args.code, args.state, rework=args.rework,
+                                    lookup=read_json(args.lookup) if args.lookup else None, remote_image=args.remote_image)
+            elif args.command == 'fireplay-reuse-stage':
+                from .fireplay_reuse import stage_reuse
+                result = stage_reuse(root, args.code, args.state, args.source_id, args.language, args.member_id,
+                                     args.material_id, read_json(args.evidence))
             elif args.command == 'fireplay-status':
                 result = fireplay.status(args.code, root)
             elif args.command == 'fireplay-transition':
@@ -215,6 +270,13 @@ def main(argv: list[str] | None = None) -> int:
                 result = status_transition(root, args.code, args.action, read_json(args.snapshot),
                                            prepare=args.prepare, reconcile=args.reconcile,
                                            delivery_state=args.delivery_state)
+                if args.action == 'finish' and result.get('state') == 'confirmed':
+                    from .storage_retention import maintain_storage
+                    try:
+                        storage = maintain_storage(root, code=args.code, apply=True, archive_only=True)
+                        result['local_archive'] = next(iter(storage['demands']), {'state': 'missing_closeout_receipt'})
+                    except (ValueError, OSError, KeyError, TypeError) as error:
+                        result['local_archive'] = {'state': 'kept_for_review', 'reason': str(error)}
             else:
                 from .fireplay_download import download_source, initialize_source_job
                 result = (download_source(args.code, args.image, root)
@@ -223,6 +285,30 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == 'storage-preview':
             from .storage_preview import preview_storage
             result = preview_storage(Path(__file__).resolve().parents[2], args.limit)
+        elif args.command == 'storage-compact':
+            from .legacy_storage import compact_legacy_fonts
+            result = compact_legacy_fonts(Path(__file__).resolve().parents[2], args.receipt, current=True,
+                                          images_only=args.images_only)
+        elif args.command == 'storage-retention':
+            from .storage_retention import maintain_storage
+            result = maintain_storage(Path(__file__).resolve().parents[2], code=args.code, apply=args.apply,
+                                      archive_only=args.archive_only)
+        elif args.command == 'storage-hold':
+            from .storage_retention import retention_hold
+            result = retention_hold(Path(__file__).resolve().parents[2], args.code, args.reason, release=args.release)
+        elif args.command == 'storage-quarantine':
+            from .storage_retention import manage_quarantine
+            result = manage_quarantine(Path(__file__).resolve().parents[2], args.code, purge=args.purge, apply=args.apply)
+        elif args.command == 'artifact-stage':
+            from .artifact_copy import stage_artifact
+            result = stage_artifact(args.source, args.destination)
+        elif args.command == 'scratch-stage':
+            from .scratch_artifacts import stage_model_output
+            result = stage_model_output(Path(__file__).resolve().parents[2], args.code, args.source,
+                                        provider=args.provider, operation=args.operation, members=args.member)
+        elif args.command == 'scratch-preview':
+            from .scratch_artifacts import scratch_preview
+            result = scratch_preview(Path(__file__).resolve().parents[2], args.code, args.spec)
         elif args.command == 'knowledge-audit':
             from .knowledge import audit_knowledge
             result = audit_knowledge(Path(__file__).resolve().parents[2])
@@ -270,9 +356,40 @@ def main(argv: list[str] | None = None) -> int:
             if args.command == 'init-job':
                 result = initialize_job(args.source, [value.strip() for value in args.targets.split(',')], args.output)
             elif args.command == 'prepare-job':
-                result = prepare_job(args.job, args.output, reuse_background=args.reuse_background)
+                output, revisioned = args.output, args.revisioned
+                if output is None:
+                    author = args.job.resolve().parent
+                    require(author.parent.name == 'jobs' and author.parent.parent.name == 'scratch',
+                            'Specify --output for a job outside the standard scratch/jobs layout')
+                    output, revisioned = author.parent.parent / 'prepared' / author.name, True
+                if args.build_script is None:
+                    result = prepare_job(args.job, output, reuse_background=args.reuse_background, revisioned=revisioned)
+                else:
+                    from subprocess import PIPE, run
+                    from .fireplay import _lock
+
+                    job = args.job.resolve(strict=True)
+                    script = args.build_script.resolve(strict=True)
+                    require(job.is_file() and script.is_file() and script.suffix == '.py',
+                            'Expected a job file and a local Python build script')
+                    with _lock(job.parent, '.build.lock'):
+                        built = run([sys.executable, str(script), str(job)], stdout=PIPE,
+                                    encoding='utf-8', errors='replace')
+                        if built.stdout:
+                            print(built.stdout, end='', file=sys.stderr)
+                        require(built.returncode == 0,
+                                f'Source build failed (exit {built.returncode}); preparation did not run')
+                        result = prepare_job(job, output, reuse_background=args.reuse_background, revisioned=revisioned)
             elif args.command == 'render-job':
-                result = render_job(args.prepared, args.output)
+                output = args.output
+                if output is None:
+                    prepared = args.prepared.resolve()
+                    slot = prepared.parent
+                    require(not args.full_previews and slot.parent.name == 'prepared'
+                            and slot.parent.parent.name == 'scratch',
+                            'Specify --output for previews or a prepared job outside the standard layout')
+                    output = slot.parent.parent / 'rendered' / slot.name / prepared.name
+                result = render_job(args.prepared, output, full_previews=args.full_previews)
             else:
                 from .check_records import record_check
                 result = record_check('check-job', args.output, check_job)

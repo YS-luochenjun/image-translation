@@ -259,6 +259,20 @@ class DownloadTests(unittest.TestCase):
             download.initialize_source_job('REQ-1', 1, output, self.root)
         self.network.assert_not_called()
 
+    def test_default_fireplay_job_path_is_per_source_under_scratch(self):
+        result = download.initialize_source_job('REQ-1', 1, None, self.root)
+        self.assertEqual(Path(result['job']),
+                         self.root.resolve() / 'work/fireplay-production/REQ-1/scratch/jobs/source-1/job.json')
+        self.assertFalse(Path(result['job']).with_name('languages').joinpath('ja/source.png').exists())
+        self.network.reset_mock()
+        repeated = download.initialize_source_job('REQ-1', 1, None, self.root)
+        self.assertTrue(repeated['reused'])
+        self.assertEqual(repeated['job'], result['job'])
+        self.network.assert_not_called()
+        self.record['content_version'] = 'v2'
+        with self.assertRaisesRegex(ValueError, 'different content version'):
+            download.initialize_source_job('REQ-1', 1, None, self.root)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -73,11 +73,27 @@ def initialize(source: Path, target: str, run: Path) -> dict:
 def load_run(run: Path, *, ready: bool = True) -> dict:
     manifest = read_json(run / "manifest.json")
     validate_manifest(manifest, ready=ready)
-    require(manifest["source"].get("path") == "source.png", "Source must reference the run's immutable source.png")
-    require(sha256(run / "source.png") == manifest["source"]["sha256"], "Source changed; create a new run")
-    with Image.open(run / "source.png") as image:
+    source = run_source(run, manifest)
+    require(sha256(source) == manifest["source"]["sha256"], "Source changed; create a new run")
+    with Image.open(source) as image:
         require(image.size == (manifest["canvas"]["width"], manifest["canvas"]["height"]), "Manifest canvas differs from actual source")
     return manifest
+
+
+def run_source(run: Path, manifest: dict) -> Path:
+    value = manifest["source"].get("path")
+    if value == "source.png":
+        return run / value
+    job = run.parent.parent
+    require(value == "../../source.png" and run.parent.name == 'languages' and (job / 'job.json').is_file()
+            and not (run / 'source.png').exists(),
+            "Source must reference the run or its multi-language job")
+    project = read_json(job / 'job.json')
+    require(project.get('source') == 'source.png' and project.get('source_sha256') == manifest['source']['sha256']
+            and any(target.get('manifest') == f'languages/{run.name}/manifest.json'
+                    and target.get('language') == manifest['target_language'] for target in project.get('targets', [])),
+            'Language source is not bound to its parent job')
+    return job / 'source.png'
 
 
 def _checkpoint_directory(run: Path) -> Path:
@@ -93,7 +109,7 @@ def packet(run: Path, *, compact: bool = False, since: str | None = None) -> dic
                                tags=manifest['analysis'].get('content_tags'), include_content=not compact)
     prompts = [PROJECT_ROOT / "agent" / "prompts" / name for name in ("analyze.md", "translate.md", "repair.md")]
     result = {
-        "stage": "analyze-and-translate", "source": str((run / "source.png").resolve()),
+        "stage": "analyze-and-translate", "source": str(run_source(run, manifest).resolve()),
         "source_sha256": manifest["source"]["sha256"], "manifest": manifest,
         "coordinate_system": "EXIF-normalized source.png pixels, bbox=[x,y,width,height]",
         "prompts": {path.name: ({"path": str(path), "sha256": sha256(path)} if compact
@@ -145,13 +161,14 @@ def render(run: Path, clean_background: Path | None = None) -> dict:
     output = run / "renders" / version
     bind_timing_output(output)
     manifest_hash = sha256(run / "manifest.json")
-    source_hash = sha256(run / "source.png")
+    source = run_source(run, manifest)
+    source_hash = sha256(source)
     background_hash = sha256(clean_background) if clean_background else None
     font_hashes = {region["style"]["font_path"]: sha256(Path(region["style"]["font_path"]))
                    for region in manifest["regions"] if region["action"] == "translate"}
-    paths = render_image(run / "source.png", manifest, output, clean_background)
+    paths = render_image(source, manifest, output, clean_background)
     require(all(sha256(Path(path)) == digest for path, digest in font_hashes.items()), "Font changed during render")
-    require(sha256(run / "manifest.json") == manifest_hash and sha256(run / "source.png") == source_hash,
+    require(sha256(run / "manifest.json") == manifest_hash and sha256(source) == source_hash,
             "Input changed during render; rerender required")
     if clean_background:
         require(sha256(clean_background) == background_hash, "Clean background changed during render")
@@ -188,7 +205,8 @@ def current_render(run: Path) -> tuple[Path, dict]:
     require(sha256(output / "receipt.json") == pointer.get("receipt_sha256"), "Render receipt changed")
     receipt = read_json(output / "receipt.json")
     require(sha256(run / "manifest.json") == receipt.get("manifest_sha256"), "Manifest changed after render; rerender required")
-    require(sha256(run / "source.png") == receipt.get("source_sha256"), "Source changed after render")
+    manifest = read_json(run / "manifest.json")
+    require(sha256(run_source(run, manifest)) == receipt.get("source_sha256"), "Source changed after render")
     require(sha256(output / "translated.png") == receipt.get("output_sha256"), "Rendered image changed; regenerate and review")
     require(sha256(output / "layout.json") == receipt.get("layout_sha256"), "Layout evidence changed")
     artifact_hashes = receipt.get("artifact_sha256", {})
@@ -211,7 +229,7 @@ def review_packet(run: Path, *, compact: bool = False, since: str | None = None)
     if not template_path.exists() or read_json(template_path) != template:
         write_json(template_path, template)
     instructions = PROJECT_ROOT / "agent/prompts/review.md"
-    result = {"source": str((run / "source.png").resolve()), "output": str((output / "translated.png").resolve()),
+    result = {"source": str(run_source(run, manifest).resolve()), "output": str((output / "translated.png").resolve()),
             "manifest_path": str((run / "manifest.json").resolve()),
             "receipt_path": str((output / "receipt.json").resolve()),
             "layout_path": str((output / "layout.json").resolve()),

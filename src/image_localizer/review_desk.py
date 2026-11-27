@@ -194,13 +194,24 @@ class ReviewDesk:
         return None
 
     def _task(self, directory, manifest_path, manifest, plan, receipt, warnings):
+        from .layered import render_artifact
+
+        def artifact(name):
+            path = render_artifact(directory, receipt, name)
+            candidate = self.existing(directory, path)
+            if (name in receipt.get('artifact_refs', {}) or name in receipt.get('artifact_aliases', {})) and (
+                    candidate is None or digest(candidate) != receipt['artifact_sha256'][name]):
+                warnings.append(f'Missing or changed shared artifact: {self.relative(directory)}/{name}')
+                return None
+            return candidate
+
         source_data = manifest.get('source', {})
         source_value = source_data.get('path') if isinstance(source_data, dict) else source_data
-        source = self.existing(directory, 'source.png')
+        source = artifact('source.png')
         if source is None and manifest_path:
             source = self.existing(manifest_path.parent, source_value)
         output = self.existing(directory, 'translated.png') if receipt else None
-        background = self.existing(directory, 'background.png') if receipt else None
+        background = artifact('background.png') if receipt else None
         text_layer = self.existing(directory, 'text-layer.png') if receipt else None
         language = manifest.get('target_language') or plan.get('target_language') or ''
         if not language and receipt:
@@ -223,7 +234,7 @@ class ReviewDesk:
         inventory = receipt.get('artifact_sha256', {})
         if isinstance(inventory, dict):
             for name in inventory:
-                path = self.existing(directory, name)
+                path = artifact(name)
                 if path and path.suffix.lower() in IMAGE_TYPES:
                     images.setdefault(name, path)
                     artifacts.append({'name': name, 'url': self.asset_url(path)})

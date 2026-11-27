@@ -11,7 +11,7 @@ python bin/it.py fireplay-register ABC-20261103-001 --snapshot work/image-requir
 python bin/it.py fireplay-accept ABC-20261103-001
 python bin/it.py fireplay-status ABC-20261103-001
 python bin/it.py fireplay-download ABC-20261103-001 --image 1
-python bin/it.py fireplay-job ABC-20261103-001 --image 1 --output runs/ABC-20261103-001-1
+python bin/it.py fireplay-job ABC-20261103-001 --image 1
 ```
 
 示例编号仅用于说明格式，不能作为真实平台需求。所有 CLI 状态保存在项目根目录 `state/fireplay/`，不随终端当前目录改变。

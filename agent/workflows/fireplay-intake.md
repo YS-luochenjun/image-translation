@@ -10,7 +10,7 @@
 4. 核对每张原图和全部目标语种。显式来源需真实正文或 `material_receipt` 中可核实的 URL；扩展名不明确的素材通过当前素材详情工具解析，不猜素材 ID。语言缺失或不支持、来源缺失、已完成或取消都保留 blocker。正文与结构化语言冲突时先核实，再用有来源的 decision 选定；注册不会推断数量的业务含义。
 5. 在用户交办范围内执行 `fireplay-accept CODE`，登记本地承接。新单核实唯一负责人后，用 `fireplay-transition` 准备开工写回并读回确认。步骤见[优化版运行手册](../../docs/optimization-pilot.md)。
 6. 对每张来源执行 `fireplay-download CODE --image N`。核验真实静态 PNG/JPEG/WebP、文件大小、尺寸和 SHA256；链接失效时刷新真实素材回执。下载失败保持失败，不拿 HTML/缩略图/视频代替原图。
-7. 执行 `fireplay-job CODE --image N --output runs/CODE-N`，复用已验证原图，创建所有已解析目标语言的 pending 工作包。按 [单图流程](single-image.md) 实际看图、定稿、制作和审核。多张原图分别建立工作包，完成一张不代表整个需求完成。
+7. 执行 `fireplay-job CODE --image N`，复用已验证原图，在本单的 `scratch/jobs/source-N` 创建各目标语言的 pending 工作包。按 [单图流程](single-image.md) 实际看图、定稿、制作和审核。多张原图分别建立工作包，整单按成员矩阵确认覆盖。
 
 ## 续作
 

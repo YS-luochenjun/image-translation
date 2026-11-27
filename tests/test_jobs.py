@@ -1,5 +1,8 @@
 """Integration checks for semantic, background and visual-review stage boundaries."""
 import copy
+from contextlib import redirect_stderr, redirect_stdout
+from io import StringIO
+import json
 from pathlib import Path
 import shutil
 import sys
@@ -11,8 +14,8 @@ from PIL import Image, ImageDraw
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
 from image_localizer.cli import available_fonts, main
 from image_localizer.jobs import initialize_job, prepare_job, render_job, check_job, verify_bundle
-from image_localizer.pipeline import read_json, write_json, sha256
-from image_localizer.layered import check_layered
+from image_localizer.pipeline import load_run, run_source, read_json, write_json, sha256
+from image_localizer.layered import check_layered, render_artifact
 
 
 class JobTests(unittest.TestCase):
@@ -79,10 +82,103 @@ class JobTests(unittest.TestCase):
         directory = self.root / 'fresh'
         result = initialize_job(self.root / 'input.png', ['ja', 'zh-CN'], directory)
         self.assertEqual(result['status'], 'pending')
-        manifest = read_json(directory / 'languages/ja/manifest.json')
+        language = directory / 'languages/ja'
+        manifest = load_run(language, ready=False)
         self.assertFalse(manifest['analysis']['complete'])
+        self.assertFalse((language / 'source.png').exists())
+        self.assertEqual(directory / 'source.png', run_source(language, manifest))
         with self.assertRaises(ValueError):
             prepare_job(directory / 'job.json', self.root / 'unready')
+
+    def test_revisioned_prepare_reuses_frozen_external_background_and_validates_revisions(self):
+        clean = self.path.parent / 'clean.png'
+        mask = self.path.parent / 'mask.png'
+        Image.new('RGB', (100, 70), 'white').save(clean)
+        Image.new('L', (100, 70), 255).save(mask)
+        self.project['background'] = {'path': clean.name, 'mask': mask.name}
+        write_json(self.path, self.project)
+        slot = self.root / 'scratch/prepared/source-1'
+        result = prepare_job(self.path, slot, revisioned=True)
+        self.prepared = Path(result['prepared'])
+        self.assertFalse(result['reused'])
+        self.assertEqual(list(self.prepared.glob('background/*.png')), [])
+        self.assertEqual(Path(result['background_artifacts']['background.png']).parent, self.prepared / 'inputs')
+        self.approve_background_fixture()
+        repeat = prepare_job(self.path, slot, revisioned=True)
+        self.assertTrue(repeat['reused'])
+        self.assertEqual(repeat['prepared'], result['prepared'])
+        self.assertEqual(list(slot.iterdir()), [self.prepared])
+        render_job(self.prepared, self.output)
+        self.assertEqual(check_job(self.output)['status'], 'pending')
+        full_output = self.root / 'full'
+        render_job(self.prepared, full_output, full_previews=True)
+        self.assertEqual(check_job(full_output)['status'], 'pending')
+
+        self.project['notes'].append('Revision for changed author input')
+        write_json(self.path, self.project)
+        changed = prepare_job(self.path, slot, revisioned=True, reuse_background=self.prepared)
+        self.assertNotEqual(changed['prepared'], result['prepared'])
+        self.assertTrue(changed['background_reused'])
+        self.assertEqual(list(Path(changed['prepared']).glob('background/*.png')), [])
+
+        Path(result['background_artifacts']['background.png']).write_bytes(b'changed')
+        self.assertEqual(check_job(self.output)['status'], 'fail')
+        self.project['notes'].pop()
+        write_json(self.path, self.project)
+        with self.assertRaisesRegex(ValueError, 'Frozen job input changed'):
+            prepare_job(self.path, slot, revisioned=True)
+
+    def test_standard_scratch_cli_uses_stable_preparation_and_render_paths(self):
+        scratch = self.root / 'scratch'
+        author = scratch / 'jobs/source-1'
+        author.parent.mkdir(parents=True)
+        self.path.parent.rename(author)
+        stdout = StringIO()
+        with redirect_stdout(stdout):
+            main(['prepare-job', str(author / 'job.json')])
+        result = json.loads(stdout.getvalue())
+        self.prepared = Path(result['prepared'])
+        self.assertEqual(self.prepared.parent, scratch / 'prepared/source-1')
+        self.approve_background_fixture()
+        expected = scratch / 'rendered/source-1' / self.prepared.name
+        for reused in (False, True):
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                main(['render-job', str(self.prepared)])
+            result = json.loads(stdout.getvalue())
+            self.assertEqual(result['output'], str(expected))
+            self.assertEqual(result['languages']['en']['reused'], reused)
+
+    def test_failed_source_builder_leaves_no_prepared_revision(self):
+        script = self.root / 'build.py'
+        script.write_text('raise SystemExit(7)\n', encoding='utf-8')
+        stderr = StringIO()
+        with redirect_stderr(stderr):
+            exit_code = main(['prepare-job', str(self.path), '--output', str(self.prepared),
+                              '--revisioned', '--build-script', str(script)])
+        self.assertEqual(exit_code, 1)
+        self.assertIn('Source build failed (exit 7)', stderr.getvalue())
+        self.assertFalse(self.prepared.exists())
+        self.assertFalse((self.path.parent / '.build.lock').exists())
+        self.assertEqual(self.prepare()['status'], 'pending')
+
+    def test_compact_render_records_empty_layers_and_verifies_overlay_alias(self):
+        self.render()
+        directory = self.output / 'en'
+        receipt = read_json(directory / 'receipt.json')
+        self.assertIn('asset-layer.png', receipt['empty_artifacts'])
+        self.assertIn('effects-depth.png', receipt['empty_artifacts'])
+        self.assertTrue(set(receipt['empty_artifacts']).isdisjoint(receipt['artifact_sha256']))
+        self.assertFalse(any((directory / name).exists() for name in receipt['empty_artifacts']))
+        self.assertEqual(render_artifact(directory, receipt, 'overlay.png'), directory / 'text-layer.png')
+        self.assertFalse((directory / 'overlay.png').exists())
+
+        (directory / 'overlay.png').write_bytes((directory / 'text-layer.png').read_bytes())
+        self.assertEqual(check_job(self.output)['status'], 'fail')
+        (directory / 'overlay.png').unlink()
+        self.assertEqual(check_job(self.output)['status'], 'pending')
+        (directory / 'text-layer.png').write_bytes(b'changed')
+        self.assertEqual(check_job(self.output)['status'], 'fail')
 
     def test_reuse_checked_background_keeps_bytes_and_requires_current_approvals(self):
         self.prepare()
@@ -127,7 +223,24 @@ class JobTests(unittest.TestCase):
         self.assertEqual(result['status'], 'pending')
         self.assertEqual(check_job(self.output)['status'], 'pending')
         self.assertEqual(check_job(self.output)['user_acceptance'], 'not_recorded')
-        self.assertEqual(sha256(self.output/'en/background.png'), sha256(self.output/'fr/background.png'))
+        for language in ('en', 'fr'):
+            directory = self.output / language
+            receipt = read_json(directory / 'receipt.json')
+            self.assertEqual(self.prepared / 'background/background.png',
+                             render_artifact(directory, receipt, 'background.png'))
+            for name in ('source.png', 'background.png', 'comparison.png', 'view.png', 'overlay-preview.png'):
+                self.assertFalse((directory / name).exists())
+        clean = self.prepared / 'background/background.png'
+        clean.write_bytes(b'changed shared background')
+        self.assertEqual('fail', check_layered(self.output / 'en')['status'])
+
+    def test_full_previews_remain_available_for_export(self):
+        self.prepare()
+        self.approve_background_fixture()
+        render_job(self.prepared, self.output, full_previews=True)
+        for name in ('source.png', 'background.png', 'comparison.png', 'view.png', 'overlay-preview.png'):
+            self.assertTrue((self.output / 'en' / name).is_file())
+        self.assertEqual('pending', check_job(self.output)['status'])
 
     def test_frozen_inputs_do_not_depend_on_live_author_files(self):
         self.prepare()
@@ -223,8 +336,8 @@ class JobTests(unittest.TestCase):
         before = sha256(self.output/'en/translated.png')
         with self.assertRaises(ValueError):
             prepare_job(self.path, self.prepared)
-        with self.assertRaises(ValueError):
-            render_job(self.prepared, self.output)
+        result = render_job(self.prepared, self.output)
+        self.assertTrue(all(row['reused'] for row in result['languages'].values()))
         self.assertEqual(sha256(self.output/'en/translated.png'), before)
     def test_wrong_display_text_is_not_accepted_as_semantic_translation(self):
         self.project['targets'][0]['rows'][0]['text'] = 'Wrong'

@@ -15,4 +15,8 @@ description: 在本项目按图片翻译需求自动接入长方竖图和大按�
 
 按需查阅 [知识目录](../../../knowledge/README.md) 与 [索引](../../../knowledge/index.json)：通用阶段读 [分层流程](../../../knowledge/methods/layered-localization.md)，选技术路线读 [内容路由](../../../knowledge/methods/content-routing.md)，文字视觉设计读 [文字构图](../../../knowledge/methods/typography-composition.md)。仅在当前图条件相符时读取相关案例，并核查状态、证据和最新反馈。
 
+正常单在成员矩阵冻结后按[历史译件查重](../../../docs/fireplay-image-reuse.md)整单运行一次预检。历史候选进入制作前确认当前 Fireplay 状态及资源，剩余成员继续制作。多语制作直接引用同一份原图和已审底图，按[本地产物和保留规则](../../../docs/storage-retention.md)组织正式输出和临时文件。
+
+Fireplay 生产沿用 `fireplay-job CODE --image N`、`prepare-job JOB`、`render-job PREPARED` 的默认路径。模型回图用 `scratch-stage` 登记，审图时按需用 `scratch-preview`。按来源运行专用脚本时，可用 `prepare-job JOB --build-script SCRIPT` 将准备步骤绑定到脚本成功退出。见[产物规则](../../../docs/storage-retention.md#模型回图和审图预览)。
+
 具体字段与门禁以 [架构合同](../../../docs/architecture.md)、[配置分层工具](../../../docs/layered-tools.md)、[原生观感任务入口](../../../docs/native-workflow.md) 和实际命令回执为准。新分阶段任务优先使用任务入口，语义与实际字层逐区绑定，背景真实审核后才排字。已有操作优先写每图配置；只有表达不了的特殊需求才加专用实现。解析、翻译、修复、审核分别使用工作流链接的提示词。本入口不复制知识正文，不写全局 skill 或 hook。

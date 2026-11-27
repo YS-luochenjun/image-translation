@@ -74,21 +74,26 @@ class ProductionTimingTests(unittest.TestCase):
         from image_localizer import jobs
         actual = jobs.render_layered
 
-        def interrupted(plan, background, output):
+        def interrupted(plan, background, output, **kwargs):
             if output.name == 'fr':
                 raise RuntimeError('synthetic second language failure')
-            return actual(plan, background, output)
+            return actual(plan, background, output, **kwargs)
 
         with patch.object(jobs, 'render_layered', side_effect=interrupted):
             with self.assertRaisesRegex(RuntimeError, 'synthetic second language'):
                 render_job(fixture.prepared, fixture.output)
-        self.assertFalse((fixture.output / 'job-render.json').exists())
+        self.assertTrue((fixture.output / 'job-render.json').exists())
         self.assertFalse((fixture.output / 'render-timing.json').exists())
         record = read_json(next((fixture.output.parent / '.render-timings').glob('*.json')))
         self.assertEqual(record['status'], 'failed')
         self.assertEqual(record['artifact_sha256'], {})
         self.assertEqual(record['partial_artifact_sha256'], {
             'en/translated.png': sha256(fixture.output / 'en/translated.png')})
+        resumed = render_job(fixture.prepared, fixture.output)
+        self.assertTrue(resumed['languages']['en']['reused'])
+        self.assertFalse(resumed['languages']['fr']['reused'])
+        self.assertEqual(record['partial_artifact_sha256']['en/translated.png'],
+                         sha256(fixture.output / 'en/translated.png'))
 
     def test_basic_midway_failure_does_not_claim_partial_image_success(self):
         fixture = self.job_fixture()

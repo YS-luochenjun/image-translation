@@ -5,6 +5,7 @@
 ## 共享业务入口
 
 - `fireplay-discover-translations.mjs`：真实合同、完整分页和官方选项驱动的只读发现。`--department DEPT_ID`查指定部门；追加`--all-departments`查全可读范围，DEPT_ID只用来核官方选项。持久去重与版本交接见[轮询流程](../agent/workflows/fireplay-polling.md)。
+- `fireplay-reuse-search.mjs` 按同一原图的已验证字节补查 Fireplay 需求面板。使用当前登录的只读查询能力，执行期和短回执见[历史译件查重](../docs/fireplay-image-reuse.md)。
 - `fireplay-mcp-publication.mjs`：受约束上传/入库/归属/绑定，冻结审核字节并持久化原operation UUID；结果未知先核实。
 - `fireplay-image-processing.mjs`：按合同调用图片处理，费用与写入需要当前明确授权。
 - `fireplay-offline-test-contracts.mjs`：合成测试合同，不能用于真实业务调用。

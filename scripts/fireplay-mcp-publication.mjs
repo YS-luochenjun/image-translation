@@ -595,7 +595,7 @@ export async function publish({ root=ROOT, code, operationId, request, transport
   }
 }
 
-export async function connectProxy(root=ROOT) {
+export async function connectProxy(root=ROOT, { signal } = {}) {
   const authDirectory = process.env.LOCALAPPDATA
     ? join(process.env.LOCALAPPDATA, 'Tanyue', 'FireplayMcpSuite')
     : join(homedir(), '.fireplay-mcp-suite');
@@ -631,8 +631,18 @@ export async function connectProxy(root=ROOT) {
     pending.set(id,{resolve,reject,timer});
     child.stdin.write(JSON.stringify({jsonrpc:'2.0',id,method,params})+'\n');
   });
-  const close=()=>{rejectAll(new Error('Transport closed'));child.stdin.end();child.kill();};
+  let closed = false;
+  const close = () => {
+    if (closed) return;
+    closed = true;
+    signal?.removeEventListener('abort', close);
+    rejectAll(new Error('Transport closed'));
+    child.stdin.end();
+    child.kill();
+  };
   try {
+    if (signal?.aborted) fail('Transport cancelled before initialization');
+    signal?.addEventListener('abort', close, { once: true });
     await rpc('initialize',{protocolVersion:'2025-03-26',capabilities:{},clientInfo:{name:'scoped-image-publication',version:'1.0.0'}});
     child.stdin.write(JSON.stringify({jsonrpc:'2.0',method:'notifications/initialized'})+'\n');
     const listed=await rpc('tools/list',{});

@@ -15,11 +15,16 @@ from uuid import uuid4
 
 from .artifact_copy import clone_artifact
 from .fireplay import _lock
+from .storage_preview import GROUPS
 
 
 FONT_EXTENSIONS = frozenset({'.ttc', '.ttf', '.otf', '.otc'})
 CODE = re.compile(r'[A-Z][A-Z0-9]{1,15}-\d{8}-\d{3,6}')
 COPYFILE_METADATA_NOFOLLOW = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 18) | (1 << 19)
+WORK_IMAGE_DIRECTORIES = frozenset({
+    'artifacts', 'backgrounds', 'first-proof', 'fresh-downloads', 'jobs', 'lettering',
+    'preview', 'previews', 'proofs', 'scratch', 'second-proof', 'stages',
+})
 
 
 def _digest(path):
@@ -57,15 +62,27 @@ def _eligible(production, assignments, *, locked=False):
     return sorted(set(eligible))
 
 
-def _groups(eligible):
+def _groups(eligible, *, current=False, images_only=False):
     by_size = defaultdict(list)
     for demand in eligible:
+        frozen = set()
+        if current:
+            for entry in (demand / 'publication-journal.jsonl').read_text(encoding='utf-8').splitlines():
+                if entry.strip():
+                    for output in json.loads(entry).get('outputs', []):
+                        if output.get('path'):
+                            frozen.add((demand / output['path']).resolve())
         for path in demand.rglob('*'):
-            if path.suffix.lower() not in FONT_EXTENSIONS or path.is_symlink():
+            extension = path.suffix.lower()
+            relative = path.relative_to(demand)
+            image = (current and extension in GROUPS['image'] and path not in frozen and
+                     (relative.parts[0] in WORK_IMAGE_DIRECTORIES
+                      or re.fullmatch(r'render-\d+', relative.parts[0])))
+            if not (image or (extension in FONT_EXTENSIONS and not images_only)) or path.is_symlink():
                 continue
             info = path.lstat()
             if stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and info.st_size:
-                by_size[(info.st_dev, info.st_size)].append(path)
+                by_size[(info.st_dev, info.st_size, 'image' if image else 'font')].append(path)
     for paths in by_size.values():
         if len(paths) < 2:
             continue
@@ -128,27 +145,52 @@ def _free_bytes(root):
     return info.f_bavail * info.f_frsize
 
 
-def compact_legacy_fonts(root: Path, receipt: Path | None = None) -> dict:
+def compact_legacy_fonts(root: Path, receipt: Path | None = None, *, current=False, images_only=False) -> dict:
     root = root.resolve(strict=True)
     production = root / 'work' / 'fireplay-production'
     assignments = root / 'work' / 'fireplay-monitor' / 'assignments.json'
     if not production.is_dir() or production.resolve() != production or assignments.resolve() != assignments:
         raise ValueError('Expected a legacy Fireplay project with local production and assignments')
     assignments_snapshot = assignments.read_bytes()
-    eligible = _eligible(production, assignments_snapshot)
+    def eligible_demands(*, locked=False):
+        demands = _eligible(production, assignments_snapshot, locked=locked)
+        if not current:
+            return demands
+        from .fireplay import load_record, request_folder
+        from .fireplay_reuse import _confirmed_identity
+        from .pipeline import read_json
+
+        confirmed = []
+        for demand in demands:
+            try:
+                folder = request_folder(demand.name, root)
+                finish = folder / 'status-finish.json'
+                hold = folder / 'retention-hold.json'
+                if (not (folder / '.lock').exists() and finish.resolve() == finish
+                        and (not hold.exists() or not read_json(hold).get('active'))
+                        and _confirmed_identity(read_json(finish), load_record(demand.name, root))):
+                    confirmed.append(demand)
+            except (OSError, ValueError, TypeError, KeyError):
+                continue
+        return confirmed
+
+    eligible = eligible_demands()
     receipt = receipt.resolve() if receipt is not None else None
-    if receipt is not None and (sys.platform != 'darwin' or receipt.is_relative_to(root)):
-        raise ValueError('Compaction needs a macOS filesystem and a receipt outside the legacy project')
+    if receipt is not None and (sys.platform != 'darwin' or (receipt.is_relative_to(root) and
+                                not (current and receipt.is_relative_to(root / 'work/storage-retention')))):
+        raise ValueError('Compaction needs macOS and an allowed new audit path')
     result = {'mode': 'compact' if receipt else 'preview', 'project': str(root), 'eligible_demands': len(eligible),
-              'groups': 0, 'duplicate_fonts': 0, 'duplicate_logical_bytes': 0,
-              'cloned_fonts': 0, 'cloned_logical_bytes': 0, 'skipped': 0}
+              'groups': 0, 'duplicate_fonts': 0, 'duplicate_images': 0, 'duplicate_logical_bytes': 0,
+              'cloned_fonts': 0, 'cloned_images': 0, 'cloned_logical_bytes': 0, 'skipped': 0}
     with ExitStack() as stack:
         audit = None
         if receipt is not None:
+            if current:
+                stack.enter_context(_lock(assignments.parent))
             for demand in eligible:
                 stack.enter_context(_lock(demand, 'publication.lock'))
             if (assignments.read_bytes() != assignments_snapshot
-                    or not set(eligible).issubset(_eligible(production, assignments_snapshot, locked=True))):
+                    or not set(eligible).issubset(eligible_demands(locked=True))):
                 raise ValueError('Legacy demand eligibility changed while acquiring locks')
             receipt.parent.mkdir(parents=True, exist_ok=True)
             audit = stack.enter_context(receipt.open('x', encoding='utf-8'))
@@ -156,11 +198,12 @@ def compact_legacy_fonts(root: Path, receipt: Path | None = None) -> dict:
             audit.write(json.dumps({'event': 'start', 'project': str(root),
                                     'at': datetime.now(timezone.utc).isoformat()}) + '\n')
             audit.flush()
-        for digest, copies in _groups(eligible):
+        for digest, copies in _groups(eligible, current=current, images_only=images_only):
             source, *redundant = copies
             size = source.stat().st_size
+            kind = 'fonts' if source.suffix.lower() in FONT_EXTENSIONS else 'images'
             result['groups'] += 1
-            result['duplicate_fonts'] += len(redundant)
+            result[f'duplicate_{kind}'] += len(redundant)
             result['duplicate_logical_bytes'] += len(redundant) * size
             if audit is None:
                 continue
@@ -173,7 +216,7 @@ def compact_legacy_fonts(root: Path, receipt: Path | None = None) -> dict:
                     result['skipped'] += 1
                     audit.write(json.dumps({'event': 'skipped', 'reason': str(error), **record}) + '\n')
                 else:
-                    result['cloned_fonts'] += 1
+                    result[f'cloned_{kind}'] += 1
                     result['cloned_logical_bytes'] += size
                     audit.write(json.dumps({'event': 'cloned', **record}) + '\n')
                 audit.flush()

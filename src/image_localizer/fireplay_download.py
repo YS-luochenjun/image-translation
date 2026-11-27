@@ -17,7 +17,7 @@ from PIL import Image
 from . import fireplay
 from .contracts import ContractError, require
 from .jobs import initialize_job
-from .pipeline import sha256, write_json
+from .pipeline import read_json, sha256, write_json
 
 MAX_BYTES = 30 * 1024 * 1024
 MAX_PIXELS = 50_000_000
@@ -221,11 +221,26 @@ def download_source(code: str, index: int, root: Path) -> dict:
             temp_path.unlink(missing_ok=True)
 
 
-def initialize_source_job(code: str, index: int, output: Path, root: Path) -> dict:
+def initialize_source_job(code: str, index: int, output: Path | None, root: Path) -> dict:
     """Create an unreviewed local multi-target job with origin metadata."""
-    require(not output.exists(), 'Job directory already exists')
     record = fireplay.load_record(code, root)
     _source(record, index)
+    if output is None:
+        root = root.resolve()
+        output = root / 'work' / 'fireplay-production' / code / 'scratch' / 'jobs' / f'source-{index}'
+        require(output.resolve() == output, 'Linked default job paths are unsupported')
+        if output.exists():
+            origin = read_json(output / 'fireplay-source.json')
+            require(origin.get('code') == code and origin.get('source_index') == index
+                    and origin.get('content_version') == record['content_version'],
+                    'Default job belongs to a different content version; choose a new --output')
+            project = read_json(output / 'job.json')
+            require(project.get('source') == 'source.png' and sha256(output / 'source.png') == project.get('source_sha256'),
+                    'Default job source is missing or changed')
+            return {'job': str(output / 'job.json'), 'fireplay_source': str(output / 'fireplay-source.json'),
+                    'status': 'pending', 'languages': record['targets'], 'reused': True,
+                    'next': 'Continue from the existing source job and its semantic manifests.'}
+    require(not output.exists(), 'Job directory already exists')
     entry = download_source(code, index, root)
     current = fireplay.load_record(code, root)
     require(current['content_version'] == record['content_version'] == entry['content_version']
