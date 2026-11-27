@@ -6,7 +6,7 @@
     {"id":"photographic-background-repair","path":"knowledge/methods/photographic-background-repair.md","kind":"method","status":"active","tags":["photography","background","repair","overlay","review"],"scope":"摄影去字保留自然亮度和纹理，先独立审底图，再检查成图暗带与糊化；实际工具能力及有限返工"},
     {"id":"she-032-20261109","source_sha256":"b25d1f966420d274987aa0dbb918a617a715789562b2e6a812a4b180bbfed571","path":"knowledge/cases/she-032-20261109/README.md","kind":"case","status":"partial","tags":["photography","background","repair","overlay","review-failure","336x280","300x250","multilingual"],"scope":"旧版28张暗带被否定；用户只认可新去字底图，新版14语双尺寸已自审、上传绑定及fresh字节核验","user_feedback":"partial","feedback_path":"knowledge/cases/she-032-20261109/user-feedback.json"},
     {"id":"source-set-and-size-planning","path":"knowledge/methods/source-set-and-size-planning.md","kind":"method","status":"active","tags":["source-set","sizes","batch","localization","delivery"],"scope":"先区分已有原图整组翻译与明确七成员扩图；五来源六语言=六组30张；尺寸优先级、逐语言完整覆盖与合格字节复用"},
-    {"id":"delivery-balanced-review","path":"knowledge/methods/delivery-balanced-review.md","kind":"method","status":"active","tags":["delivery","review","workflow","localization","repair"],"scope":"2026-11-06用户通用指示：画面流畅基本一致，允许局部补全；80分及底线通过即交付，有可行路线时持续局部返工，不设固定次数；评分来自实际看图"},
+    {"id":"delivery-balanced-review","path":"knowledge/methods/delivery-balanced-review.md","kind":"method","status":"active","tags":["delivery","review","workflow","localization","repair"],"scope":"画面流畅和基本一致，允许局部补全。按组审一次并评分，80分及底线通过即交付。具体底线缺陷只返工受影响范围"},
     {
       "id": "layered-localization",
       "path": "knowledge/methods/layered-localization.md",
@@ -82,7 +82,7 @@
         "self-review",
         "iteration"
       ],
-      "scope": "源图关键特征与候选同尺度反证比较；用户前主动返工、退化检查和停止条件，非自动审美或一律加影"
+      "scope": "首轮看图时按源图关键特征和正常展示效果检查，轻微差异记minor。具体底线缺陷才做局部定位和复审"
     },
     {
       "id": "burgerking-20261029",

@@ -137,6 +137,11 @@ def main(argv: list[str] | None = None) -> int:
     fireplay_reconcile = commands.add_parser('fireplay-reconcile-upload', help='Verify the original R2 object for an uncertain PUT')
     fireplay_reconcile.add_argument('code')
     fireplay_reconcile.add_argument('operation_id')
+    fireplay_reuse = commands.add_parser('fireplay-reuse', help='Find historical deliveries for the exact original bytes')
+    fireplay_reuse.add_argument('code')
+    fireplay_reuse.add_argument('--image', type=int, default=1, help='One-based original image index')
+    fireplay_reuse.add_argument('--lookup', type=Path, help='Saved official image-search and resource responses')
+    commands.add_parser('knowledge-audit', help='Check curated knowledge and list evidence awaiting manual review')
     storage_preview = commands.add_parser('storage-preview', help='Inventory exact duplicate images and fonts')
     storage_preview.add_argument('--limit', type=int, default=20)
     legacy_fonts = commands.add_parser('legacy-font-compact', help='Preview or clone identical legacy font snapshots')
@@ -200,6 +205,9 @@ def main(argv: list[str] | None = None) -> int:
             elif args.command == 'fireplay-reconcile-upload':
                 from .fireplay_upload_reconcile import reconcile_upload
                 result = reconcile_upload(args.code, args.operation_id, root)
+            elif args.command == 'fireplay-reuse':
+                from .fireplay_reuse import search_history
+                result = search_history(root, args.code, args.image, read_json(args.lookup) if args.lookup else None)
             elif args.command == 'fireplay-status':
                 result = fireplay.status(args.code, root)
             elif args.command == 'fireplay-transition':
@@ -215,6 +223,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == 'storage-preview':
             from .storage_preview import preview_storage
             result = preview_storage(Path(__file__).resolve().parents[2], args.limit)
+        elif args.command == 'knowledge-audit':
+            from .knowledge import audit_knowledge
+            result = audit_knowledge(Path(__file__).resolve().parents[2])
         elif args.command == 'legacy-font-compact':
             from .legacy_storage import compact_legacy_fonts
             result = compact_legacy_fonts(args.project, args.receipt)

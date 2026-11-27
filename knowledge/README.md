@@ -12,7 +12,7 @@
 - [按内容选路](methods/content-routing.md)：provisional，图种技术候选及适用/不适用/保护/停止条件。
 - [摄影图去字与遮罩退化检查](methods/photographic-background-repair.md)：active；摄影文字修复时检查自然亮度、纹理与主体，先审底图再排字；[SHE-032案例](cases/she-032-20261109/README.md)保留旧暗带被否定、新去字底图获认可及28张新版交付证据。
 - [文字与构图](methods/typography-composition.md)：provisional，语义类型、字形力度与容器协调的检查维度。
-- [视觉差异自检与内部迭代](methods/visual-fidelity-self-review.md)：active，从本图关键特征提出可失败的标准，主动找差异、返工与复审，不等待用户漏检反馈；不是自动审美评分。
+- [视觉差异自检与内部迭代](methods/visual-fidelity-self-review.md)：active，在首轮审核中确认源图关键特征、语义和正常展示效果。按评分收敛规则交付，具体底线缺陷才定位和复审。
 - [标签语义与商标保留](methods/semantic-roles-and-brand-preservation.md)：active，先判断品牌、产品名、普通文案、规格条件和发布标识的角色，再选择翻译或保留；本次用户认可这一判断方向。
 - [食品促销广告案例](cases/burgerking-20261029/README.md)：当前效果及商标保留已获用户认可，partial表示单样例和已披露minor；[版本反馈](cases/burgerking-20261029/user-feedback.json) 独立保存。
 - [双语古典海报案例](cases/trueself-20261030/README.md)：partial，记录旧版阴影与字重漏检、自审和独立审核偏宽、用户仅认可相对改善；保留前后图和哈希。
@@ -37,3 +37,9 @@ active 表示当前采用的通用流程，不能解释为全部技术自动可�
 记录方法的适用条件、失败现象、何时停止及技术/Agent/用户三种状态；案例记录源/候选哈希、真实来源、审核身份和最新反馈。必要的少量图片可放 case/evidence 长期独立查阅，不复制整套临时 run；历史 run 不删除。哈希从实际文件读取，复制后验证一致；证据缺失就明确不可复核。
 
 用户纠正或新证据改变结论时保留历史并注明影响，不静默重写失败。字体测量不证明字形覆盖；透明层、五阶段命名或 quality 文件存在不证明已真实审核。没有可靠精确重建能力时先评估近似补全、合理裁剪与重排，以画面流畅和基本一致评分；仍无合格方案才pending。不能用突兀色块、模糊破坏主体或无证据参考冒充忠实底图。
+
+## 临时经验与人工整理
+
+常规结案保存现有质检、交付和实际费用，允许零新增知识。只有会改变下一单决策的观察才在 `work/knowledge-candidates/` 写一条 JSON。填 `observation`、`applies_when`、`next_decision`、项目相对 `evidence_path` 和对应文件 `evidence_sha256`。例如记录相似图的误命中、可复用的去字条件或用户明确纠正的判断。实际耗时或费用有回执时可一并记录。候选留在本地，工作包按已审定的 `knowledge/index.json` 加载。
+
+按需运行 `python bin/it.py knowledge-audit` 查看索引和临时候选。人工整理时先找相同适用条件的现行条目，能补充已有方法就更新同一入口。单例或相反证据归入案例，仍需验证的办法留待审。规则被覆盖时先调整索引和引用，再归档旧正文。代表图、失败证据和用户反馈继续按原哈希保留。

@@ -188,7 +188,7 @@ def _upload_values(response):
     return resource_ids, urls
 
 
-def next_delivery(spec_path: Path) -> dict:
+def next_delivery(spec_path: Path, *, include_verified=False) -> dict:
     """State: requirement{id,code,asset_type}, size_spec, members[], publication_unknown[].
 
     Each member has source_id/language/member_id, output_path?, review_path?,
@@ -305,6 +305,15 @@ def next_delivery(spec_path: Path) -> dict:
               'evidence_counts': dict(Counter(evidence for _, _, evidence in verified.values())),
               'matrix_issue': None if matrix_ok else 'Check repeated resources or groups split across material IDs',
               'note': 'Host saves official receipts and confirms current binding and status on the requirement panel.'}
+    if include_verified:
+        report['verified_deliveries'] = [
+            {**{field: item[field] for field in (*MEMBER_FIELDS, 'width', 'height')},
+             'delivery_mode': item.get('delivery_mode'),
+             'material_id': verified[key][0], 'resource_id': verified[key][1],
+             'output_sha256': frozen[key]['sha256']}
+            for item in plan['items'] if (key := _member(item)) in verified
+            and verified[key][2] == 'official_receipts'
+        ]
     if complete:
         report['owner_closeout'] = ('当前矩阵已核齐。若覆盖本需求全部应交成员，由原执行会话用 '
                                     'fireplay-transition finish 准备 Fireplay 状态写回，读回「已完成」和素材绑定，'

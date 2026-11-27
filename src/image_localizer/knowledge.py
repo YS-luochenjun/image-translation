@@ -1,6 +1,7 @@
 """Load curated project knowledge without treating unrelated cases as defaults."""
 from __future__ import annotations
 
+from collections import Counter
 import hashlib
 import json
 from pathlib import Path
@@ -45,3 +46,39 @@ def load_knowledge(root: Path, *, source_sha256: str, tags: list[str] | None = N
                 cases.append({**item, 'content': data.decode('utf-8')} if include_content else item)
     return {'index': str(index_path), 'methods': methods, 'related_cases': cases, 'available_cases': available,
             'notice': 'Methods are conditional guidance, not verified capabilities. Partial cases retain unresolved feedback; current images still require actual inspection.'}
+
+
+def audit_knowledge(root: Path) -> dict:
+    root = root.resolve()
+    knowledge = load_knowledge(root, source_sha256='')
+    entries = knowledge['methods'] + knowledge['available_cases']
+    counts = Counter(f"{entry['kind']}/{entry['status']}" for entry in entries)
+    issues = []
+    paths = set()
+    for entry in entries:
+        path = (root / entry['path']).resolve()
+        if path in paths:
+            issues.append({'entry': entry['id'], 'issue': 'duplicate_index_path'})
+        paths.add(path)
+        if reference := entry.get('feedback_path'):
+            feedback = (root / reference).resolve()
+            if not feedback.is_relative_to(root / 'knowledge') or not feedback.is_file():
+                issues.append({'entry': entry['id'], 'issue': 'missing_or_invalid_feedback_path'})
+    candidates = []
+    staging = root / 'work/knowledge-candidates'
+    for path in sorted(staging.glob('*.json')) if staging.resolve() == staging else []:
+        try:
+            require(path.resolve() == path, 'Candidate must be a local file')
+            candidate = json.loads(path.read_bytes())
+            for field in ('observation', 'applies_when', 'next_decision', 'evidence_path', 'evidence_sha256'):
+                require(isinstance(candidate.get(field), str) and candidate[field].strip(), f'Missing {field}')
+            evidence = (root / candidate['evidence_path']).resolve()
+            require(evidence.is_relative_to(root) and evidence.is_file(), 'Evidence must be a project file')
+            with evidence.open('rb') as stream:
+                actual = hashlib.file_digest(stream, 'sha256').hexdigest()
+            require(actual == candidate['evidence_sha256'], 'Candidate evidence hash changed')
+            candidates.append({'record': path.name, 'observation': candidate['observation'],
+                               'next_decision': candidate['next_decision'], 'status': 'pending_review'})
+        except (ValueError, OSError, TypeError, AttributeError) as error:
+            issues.append({'candidate': path.name, 'issue': str(error)})
+    return {'indexed': dict(counts), 'pending_candidates': candidates, 'issues': issues}

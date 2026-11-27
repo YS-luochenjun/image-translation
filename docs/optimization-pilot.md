@@ -47,6 +47,8 @@ python bin/it.py prepare-job runs/REVISION/job.json --output runs/PREPARED-NEXT 
 
 新发布操作的原始响应保存在 `publication-操作UUID.json`。流水记录文件哈希，读回时校验响应身份和字节。原有内嵌响应的流水仍可读取。
 
+首个付费制作批次前可按单张原图执行[历史译件精确查重](fireplay-image-reuse.md)。先核本地来源 SHA256 和历史交付，必要时用 Fireplay 图搜图取得候选，再比对原始字节。
+
 ## 记录耗时与费用
 
 `record-stage` 读取一份实测记录并追加到需求目录的 `stage-events.jsonl`。`stage-summary` 汇总总跨度和每阶段用时。并行阶段的秒数可以相加超过总跨度。
@@ -65,3 +67,5 @@ python bin/it.py stage-summary work/fireplay-production/CODE/stage-events.jsonl
 `python bin/it.py storage-preview --limit 20` 扫描 `work/fireplay-production`、`runs` 和 `state/fireplay`，按 SHA256 汇总重复图片和字体，并显示重复组中位于已确认结案需求目录的副本数。报告供清理前核引用使用。实际释放空间受文件系统写时复制、硬链接和仍被引用的产物影响。保留需求回执、审核证据和历史交付关系后，再按授权处理具体文件。
 
 `python bin/it.py legacy-font-compact LEGACY_PROJECT` 只预览旧版可处理的同哈希字体。明确执行时追加 `--receipt NEW_AUDIT.jsonl`，回执须新建在旧项目之外。仅处理主控已核验交付、没有活动或待处理标记、且发布流水无未决写入的需求。用 macOS 写时复制保留每个字体路径和独立文件，只共享相同数据块。不同字节、有硬链接、无法克隆或无法通过元数据校验的文件不替换。不删除旧项目或改动发布流水，结果以回执记录的文件数及磁盘可用空间变化为准。重复运行会找到相同的逻辑副本，不应把预览字节数当作还能释放的磁盘空间。
+
+旧工作区作为原址档案保留，历史回执中的绝对路径仍用于读取。新单在优化版接入，既有旧单沿原会话和原账本。清理前按历史引用、未确认写入和唯一证据判定边界。Git 归档、旧账本哈希和清理回执存放在本地 `work/maintenance/`。
