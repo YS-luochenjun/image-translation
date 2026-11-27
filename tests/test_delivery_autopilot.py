@@ -162,6 +162,47 @@ class DeliveryAutopilotTests(unittest.TestCase):
         unchanged = compact_delivery(result, self.base / 'delivery-state.json', compact['checkpoint'])
         self.assertEqual(compact['owner_closeout'], unchanged['owner_closeout'])
 
+    def test_current_intake_requires_all_designers_before_closeout(self):
+        self.state['requirement']['designer_ids'] = []
+        self.save('intake.json', {'summary': {'items': [
+            {'id': 'other', 'code': 'R-2', 'assigneeIds': ['outsider']},
+            {'id': 'req', 'code': 'R-1', 'assigneeIds': ['designer', 'c74b62d9', 'second', 'b2fbcgab', 'designer']},
+        ]}})
+        outputs, item = self.receipt_group(['one'], 'group-a', warning=EMPTY_DESIGNER_WARNING)
+        self.receipt('material_upload_from_url', {'results': [item]}, outputs=outputs, output_groups=[outputs])
+        self.receipt('requirement_bind_materials',
+                     {'results': [{'requirement_id': 'req', 'success': True, 'materialIds': ['group-a']}]})
+        result = self.plan()
+        self.assertEqual(['designer', 'second'], result['designer_ids'])
+        self.assertEqual('attribute', result['actions'][0]['action'])
+        self.assertTrue(result['actions'][0]['frozen'])
+        self.assertFalse(result['complete'])
+        for designers, complete in ((['designer'], False), (['second', 'designer'], True)):
+            self.receipt('material_attribution_update', {'success': True, 'updated': ['group-a']},
+                         attribution={'material_ids': ['group-a'], 'creation_type': 'derivative',
+                                      'designer_ids': designers})
+            self.assertEqual(complete, self.plan()['complete'])
+
+    def test_official_import_designer_objects_use_ids_not_names(self):
+        outputs, item = self.receipt_group(['one'], 'group-a')
+        item['designers'] = [{'id': 'designer', 'name': 'Design Owner'}]
+        self.receipt('material_upload_from_url', {'results': [item]}, outputs=outputs, output_groups=[outputs])
+        self.receipt('requirement_bind_materials',
+                     {'results': [{'requirement_id': 'req', 'success': True, 'materialIds': ['group-a']}]})
+        self.assertTrue(self.plan()['complete'])
+        self.state['requirement']['designer_ids'] = ['Design Owner']
+        self.assertEqual('attribute', self.action())
+
+    def test_current_intake_can_expect_no_designers(self):
+        self.save('intake.json', {'summary': {'id': 'req', 'code': 'R-1', 'assigneeIds': ['c74b62d9', 'b2fbcgab']}})
+        outputs, item = self.receipt_group(['one'], 'group-a', warning=EMPTY_DESIGNER_WARNING)
+        self.receipt('material_upload_from_url', {'results': [item]}, outputs=outputs, output_groups=[outputs])
+        self.receipt('requirement_bind_materials',
+                     {'results': [{'requirement_id': 'req', 'success': True, 'materialIds': ['group-a']}]})
+        result = self.plan()
+        self.assertEqual([], result['designer_ids'])
+        self.assertTrue(result['complete'])
+
     def test_warning_leaves_other_group_verified_and_unknown_blocks_finish(self):
         self.state['requirement']['designer_ids'] = []
         self.spec['explicit_members'].append({'member_id': 'two', 'width': 300, 'height': 300})
@@ -365,6 +406,29 @@ class DeliveryAutopilotTests(unittest.TestCase):
         fresh['designer_ids'] = ['c74b62d9']
         self.assertEqual('verify', self.action())
 
+    def test_presigned_unknown_blocks_only_its_member(self):
+        self.spec['explicit_members'].append({'member_id': 'two', 'width': 300, 'height': 300})
+        confirmed, _ = self.ready('one')
+        pending, _ = self.ready('two')
+        for record in (confirmed, pending):
+            output = {field: record[field] for field in ('source_id', 'language', 'member_id')}
+            output.update(self.binding(record['output_path']))
+            if record is confirmed:
+                self.receipt('material_r2_presign_upload', {
+                    'resourceId': str(uuid4()), 'publicUrl': 'https://example.invalid/confirmed.png',
+                    'transfer': {'method': 'PUT', 'http_status': 200, 'sha256': output['sha256']},
+                }, outputs=[output])
+            else:
+                operation = {'operation_id': str(uuid4()), 'requirement_id': 'req', 'state': 'unknown',
+                             'tool': 'material_r2_presign_upload', 'outputs': [output]}
+                with (self.base / 'publication-journal.jsonl').open('a', encoding='utf-8') as journal:
+                    journal.write(json.dumps(operation) + '\n')
+        report = self.plan()
+        self.assertTrue(report['isolate_unknown_uploads'])
+        self.assertFalse(report['complete'])
+        self.assertEqual({row['member_id']: row['action'] for row in report['actions']},
+                         {'one': 'import', 'two': 'await_official_result'})
+
     def test_unknown_publication_blocks_only_members_without_publication_evidence(self):
         self.spec['explicit_members'].append({'member_id': 'two', 'width': 300, 'height': 300})
         first, _ = self.ready('one')
@@ -410,6 +474,48 @@ class DeliveryAutopilotTests(unittest.TestCase):
         receipt.write_text('{}')
         with self.assertRaisesRegex(ValueError, 'receipt hash mismatch'):
             self.plan()
+
+    def test_authorized_same_byte_upload_recovers_original_unknown(self):
+        record, _ = self.ready()
+        output = {**self.binding(record['output_path']), 'source_id': 'source',
+                  'language': 'ja', 'member_id': 'one'}
+        tool = 'material_r2_upload_from_bytes'
+        original = {'operation_id': str(uuid4()), 'requirement_id': 'req', 'tool': tool,
+                    'state': 'unknown', 'outputs': [output], 'request_sha256': 'a' * 64}
+        journal = self.save('publication-journal.jsonl', original)
+        with journal.open('a', encoding='utf-8') as stream:
+            stream.write('\n')
+        self.state['publication_unknown'] = [original['operation_id']]
+        self.assertEqual('await_official_result', self.action())
+
+        replacement_id = str(uuid4())
+        authorization = self.save('retry.json', {
+            'authorization_source': 'explicit_current_user_message',
+            'user_request': 'Retry this upload', 'requirement_id': 'req', 'code': 'R-1',
+            'historical_unknown_operations': [
+                {key: original[key] for key in ('operation_id', 'request_sha256')},
+            ],
+            'new_operations': {replacement_id: tool},
+        })
+        replacement = {
+            **original, 'operation_id': replacement_id, 'state': 'received',
+            'reupload_authorization': {
+                'path': 'work/fireplay-production/R-1/retry.json',
+                'sha256': hashlib.sha256(authorization.read_bytes()).hexdigest(),
+            },
+        }
+        for replacement_output, expected in [({**output, 'sha256': 'b' * 64}, False), (output, True)]:
+            replacement['outputs'] = [replacement_output]
+            receipt = self.save(f'publication-{replacement_id}.json', {
+                **replacement, 'response': {'structuredContent': {
+                    'resourceId': 'one-resource', 'publicUrl': 'https://example.invalid/one.png',
+                }},
+            })
+            entry = {**replacement, 'receipt_sha256': hashlib.sha256(receipt.read_bytes()).hexdigest()}
+            journal.write_text('\n'.join(map(json.dumps, [original, entry])) + '\n', encoding='utf-8')
+            result = self.plan()
+            self.assertEqual(expected, not result['publication_unknown'])
+            self.assertEqual('import' if expected else 'await_official_result', result['actions'][0]['action'])
 
     def test_duplicate_or_unexpected_member_records_are_rejected(self):
         record, _ = self.ready()

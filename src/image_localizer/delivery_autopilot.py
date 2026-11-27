@@ -9,6 +9,8 @@ from pathlib import Path
 from uuid import UUID
 
 from .delivery_quality import assess_delivery
+from .fireplay import payload
+from .fireplay_publication_receipts import EXCLUDED_DESIGNERS, receipt_coverage
 from .material_sizes import plan_sizes
 from .pipeline import sha256
 
@@ -23,10 +25,29 @@ def _read(path):
 
 
 MEMBER_FIELDS = ('source_id', 'language', 'member_id')
+PRESIGN_UPLOAD = 'material_r2_presign_upload'
+UPLOAD_TOOLS = frozenset({'material_r2_upload_from_bytes', PRESIGN_UPLOAD})
 
 
 def _member(record):
     return tuple(record.get(field) for field in MEMBER_FIELDS)
+
+
+def _requirement_designers(base, requirement):
+    try:
+        intake = _read(base / 'intake.json')
+    except FileNotFoundError:
+        return requirement.get('designer_ids')
+    summary = payload(intake['summary'])
+    rows = summary.get('items', [summary])
+    _require(isinstance(rows, list), 'Intake summary needs requirement rows')
+    matches = [row for row in rows if isinstance(row, dict) and
+               row.get('id') == requirement['id'] and row.get('code') == requirement['code']]
+    _require(len(matches) == 1, 'Intake needs the exact requirement summary for designer attribution')
+    assignees = matches[0].get('assigneeIds')
+    _require(isinstance(assignees, list) and all(isinstance(value, str) and value.strip() for value in assignees),
+             'Intake needs current assigneeIds for designer attribution')
+    return list(dict.fromkeys(value for value in assignees if value not in EXCLUDED_DESIGNERS))
 
 
 def _publication_response(base, entry):
@@ -40,7 +61,8 @@ def _publication_response(base, entry):
     _require(all(receipt[key] == entry[key] for key in ('operation_id', 'requirement_id', 'tool', 'state')),
              'Publication receipt identity mismatch')
     _require(all(receipt.get(key) == entry.get(key) for key in
-                 ('outputs', 'output_groups', 'attribution', 'binding_material_ids')),
+                 ('outputs', 'output_groups', 'attribution', 'binding_material_ids', 'reupload_authorization',
+                  'batch_id', 'put_target', 'presign_timing', 'put_transfer_started_at', 'put_finished_at')),
              'Publication receipt provenance mismatch')
     return receipt['response']
 
@@ -58,14 +80,58 @@ def _journal_operations(base, requirement_id):
     return operations
 
 
+def _recovered_uploads(base, requirement, operations):
+    from .fireplay import _http
+
+    recovered = set()
+    upload_tool = 'material_r2_upload_from_bytes'
+    for replacement in operations.values():
+        proof = replacement.get('reupload_authorization')
+        outputs = replacement.get('outputs', [])
+        if (replacement['state'] != 'received' or replacement['tool'] != upload_tool or not proof
+                or not replacement.get('receipt_sha256') or len(outputs) != 1):
+            continue
+        requirement_path = Path('work/fireplay-production') / requirement['code']
+        relative_path = Path(proof['path']).relative_to(requirement_path)
+        path = (base / relative_path).resolve()
+        _require(path.is_relative_to(base), 'Reupload authorization outside requirement folder')
+        authorization_bytes = path.read_bytes()
+        _require(hashlib.sha256(authorization_bytes).hexdigest() == proof['sha256'],
+                 'Reupload authorization hash mismatch')
+        authorization = json.loads(authorization_bytes)
+        if (authorization.get('authorization_source') != 'explicit_current_user_message'
+                or authorization.get('requirement_id') != requirement['id']
+                or authorization.get('code') != requirement['code']
+                or not authorization.get('user_request', '').strip()
+                or authorization.get('new_operations', {}).get(replacement['operation_id']) != upload_tool):
+            continue
+        response = _publication_response(base, replacement)
+        try:
+            result = payload(response)
+        except (ValueError, KeyError, TypeError):
+            continue
+        resource_ids, urls = _upload_values(result)
+        if (result.get('success') is False or len(resource_ids) != 1 or len(urls) != 1
+                or not all(value.strip() for value in resource_ids) or not all(_http(url) for url in urls)):
+            continue
+        for historical in authorization.get('historical_unknown_operations', []):
+            original = operations.get(historical.get('operation_id'))
+            if (original and original['state'] == 'unknown' and original['tool'] in UPLOAD_TOOLS
+                    and original.get('request_sha256')
+                    and original['request_sha256'] == historical.get('request_sha256')
+                    and original.get('outputs') == outputs):
+                recovered.add(original['operation_id'])
+    return recovered
+
+
 def _upload_index(base, operations, records, expected):
-    from .fireplay import _http, payload
+    from .fireplay import _http
 
     by_path = {(base / row['output_path']).resolve(): key
                for key, row in records.items() if row.get('output_path')}
     frozen, pending = {}, set()
     for entry in operations.values():
-        if entry['tool'] != 'material_r2_upload_from_bytes' or len(entry.get('outputs', [])) != 1:
+        if entry['tool'] not in UPLOAD_TOOLS or len(entry.get('outputs', [])) != 1:
             continue
         output = entry['outputs'][0]
         key = _member(output)
@@ -81,6 +147,12 @@ def _upload_index(base, operations, records, expected):
                 continue
             if response.get('success') is False:
                 continue
+            if entry['tool'] == PRESIGN_UPLOAD:
+                transfer = response.get('transfer')
+                if (not isinstance(transfer, dict) or transfer.get('http_status') not in (200, 201, 204)
+                        or transfer.get('sha256') != output['sha256']):
+                    pending.add(key)
+                    continue
             resource_ids, urls = _upload_values(response)
             resource_ids = {value for value in resource_ids if value.strip()}
             urls = {value for value in urls if _http(value)}
@@ -126,9 +198,10 @@ def next_delivery(spec_path: Path) -> dict:
     """
     spec_path = Path(spec_path).resolve()
     state, base = _read(spec_path), spec_path.parent
-    requirement = state['requirement']
+    requirement = dict(state['requirement'])
     _require(all(isinstance(requirement.get(key), str) and requirement[key].strip()
                  for key in ('id', 'code', 'asset_type')), 'Missing requirement identity')
+    requirement['designer_ids'] = _requirement_designers(base, requirement)
     size_path = (base / state['size_spec']).resolve()
     size_spec = _read(size_path)
     _require(size_spec['asset_type'] == requirement['asset_type'], 'Asset type mismatch')
@@ -147,9 +220,10 @@ def next_delivery(spec_path: Path) -> dict:
                      'group_id must identify a planned nonempty group')
         records[key] = record
     expected = {(item['source_id'], item['language'], item['member_id']) for item in plan['items']}
-    from .fireplay_publication_receipts import receipt_coverage
-
     operations = _journal_operations(base, requirement['id'])
+    recovered_uploads = _recovered_uploads(base, requirement, operations)
+    operations = {operation_id: entry for operation_id, entry in operations.items()
+                  if operation_id not in recovered_uploads}
     frozen, pending_uploads = _upload_index(base, operations, records, expected)
     receipt_status = receipt_coverage(base, requirement, operations, frozen, records, _publication_response)
     unique_members = {(item['source_id'], item['language'], item['member_id']) for item in plan['items']
@@ -168,8 +242,20 @@ def next_delivery(spec_path: Path) -> dict:
             output_hashes[key] = output_hash
     _require(not records.keys() - expected, 'Unexpected member outside explicit matrix')
     unknown = state.get('publication_unknown', [])
-    _require(isinstance(unknown, list), 'publication_unknown must be a list')
-    unknown = unknown or [operation_id for operation_id, entry in operations.items() if entry['state'] == 'unknown']
+    _require(isinstance(unknown, list) and all(isinstance(operation, str) for operation in unknown),
+             'publication_unknown must be a list of operation IDs')
+    unknown = list(dict.fromkeys([
+        *(operation_id for operation_id in unknown if operation_id not in recovered_uploads
+          and operations.get(operation_id, {}).get('state') != 'received'),
+        *(operation_id for operation_id, entry in operations.items() if entry['state'] == 'unknown'),
+    ]))
+    isolate_uploads = bool(unknown) and all(
+        (entry := operations.get(operation_id, {})).get('tool') == PRESIGN_UPLOAD
+        and entry.get('state') == 'unknown' and len(entry.get('outputs', [])) == 1
+        and _member(entry['outputs'][0]) in pending_uploads
+        for operation_id in unknown
+    )
+    block_other_writes = bool(unknown) and not isolate_uploads
     actions = []
     verified = {}
     for item in plan['items']:
@@ -184,9 +270,9 @@ def next_delivery(spec_path: Path) -> dict:
                 action = {**identity, 'action': 'await_official_result',
                           'reason': 'Read back the original member upload before doing more work'}
             elif key in frozen:
-                action = _frozen_action(identity, publication, frozen[key], requirement, base, bool(unknown), receipt)
+                action = _frozen_action(identity, publication, frozen[key], requirement, base, block_other_writes, receipt)
             else:
-                action = _next_member(item, record, requirement, sources, base, bool(unknown), output_hashes.get(key))
+                action = _next_member(item, record, requirement, sources, base, block_other_writes, output_hashes.get(key))
                 if legacy_frozen and action['action'] in ('make', 'review', 'rework', 'blocked'):
                     action = {**identity, 'action': 'reconcile_frozen', 'frozen': True,
                               'reason': 'Recover the original upload receipt and approved evidence'}
@@ -210,9 +296,11 @@ def next_delivery(spec_path: Path) -> dict:
                  all(len(values) == 1 for values in (*group_materials.values(), *material_groups.values())))
     complete = bool(actions) and len(verified) == len(actions) and matrix_ok and not unknown
     report = {'requirement_id': requirement['id'], 'code': requirement['code'],
+              'designer_ids': requirement['designer_ids'],
               'expected_members': len(actions), 'verified_members': len(verified),
               'complete': complete, 'actions': actions, 'external_write': False,
               'publication_unknown': unknown,
+              'isolate_unknown_uploads': isolate_uploads,
               'verified_material_ids': sorted({material for material, _, _ in verified.values()}),
               'evidence_counts': dict(Counter(evidence for _, _, evidence in verified.values())),
               'matrix_issue': None if matrix_ok else 'Check repeated resources or groups split across material IDs',
@@ -230,7 +318,8 @@ def compact_delivery(result: dict, spec_path: Path, since: str | None) -> dict:
     actions = result['actions']
     compact = {key: result[key] for key in ('requirement_id', 'code', 'expected_members', 'verified_members',
                                            'complete', 'publication_unknown')}
-    compact.update({key: result[key] for key in ('evidence_counts', 'matrix_issue', 'verified_material_ids',
+    compact.update({key: result[key] for key in ('designer_ids', 'evidence_counts', 'matrix_issue', 'verified_material_ids',
+                                                'isolate_unknown_uploads',
                                                 'owner_closeout') if key in result})
     compact['counts'] = dict(Counter(row['action'] for row in actions))
     members = {json.dumps(_member(row), ensure_ascii=False, separators=(',', ':')):
@@ -290,23 +379,27 @@ def publication_gate(spec_path: Path) -> dict:
     result = next_delivery(spec_path)
     state = _read(spec_path)
     records = {(row['source_id'], row['language'], row['member_id']): row for row in state.get('members', [])}
-    outputs, reviewers, evidence = [], set(), []
+    outputs, uploads, reviewers, evidence = [], [], set(), []
     for row in result['actions']:
         scored = row.get('assessment')
         if not scored or scored['status'] != 'ready_for_submission' or row['action'] not in ('upload', 'import'):
             continue
         key = tuple(row[field] for field in ('source_id', 'language', 'member_id'))
         record = records[key]
-        outputs.append({'path': str((spec_path.parent / record['output_path']).resolve()),
-                        'sha256': _read((spec_path.parent / record['review_path']).resolve())['artifact']['sha256'],
-                        **{field: row[field] for field in ('source_id', 'language', 'member_id')}})
+        output = {'path': str((spec_path.parent / record['output_path']).resolve()),
+                  'sha256': _read((spec_path.parent / record['review_path']).resolve())['artifact']['sha256'],
+                  **{field: row[field] for field in MEMBER_FIELDS}}
+        outputs.append(output)
+        if row['action'] == 'upload':
+            uploads.append(output)
         reviewers.add(scored['reviewer']['identity'])
         evidence.append(record['review_path'])
     return {'requirement_id': result['requirement_id'], 'passed': bool(outputs),
             'reviewed_by': ', '.join(sorted(reviewers)), 'evidence': '; '.join(evidence),
-            'outputs': outputs, 'expected_members': result['expected_members'],
+            'outputs': outputs, 'upload_candidates': uploads, 'expected_members': result['expected_members'],
             'reviewed_members': len(outputs), 'requirement_complete': result['complete'],
             'publication_unknown': result['publication_unknown'],
+            'isolate_unknown_uploads': result['isolate_unknown_uploads'],
             'note': 'Gate for current reviewed members only; upload/import/ownership/binding/readback still required. Existing journal and platform permission checks remain authoritative.'}
 
 
@@ -369,7 +462,7 @@ def _fresh(fresh, publication, requirement, identity, artifact, base, sha):
                  and all(isinstance(value, str) and value for value in fresh[key]), 'Fresh ownership IDs must be arrays')
         _require(set(fresh[key]) == set(requirement[key]), 'Attribution/shared department mismatch')
     _require(bool(requirement['shared_dept_ids']), 'Shared department required')
-    _require(not set(requirement['designer_ids']) & {'c74b62d9', 'b2fbcgab'},
+    _require(not EXCLUDED_DESIGNERS.intersection(requirement['designer_ids']),
              '罗晨钧 and 邹彬 are not eligible designers')
     _require(isinstance(publication.get('material_id'), str) and bool(publication['material_id']), 'Material ID must be text')
     _require(all(fresh.get(key) == value for key, value in identity.items()), 'Fresh member identity mismatch')

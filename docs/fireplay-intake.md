@@ -63,6 +63,8 @@ python bin/it.py fireplay-job ABC-20261103-001 --image 1 --output runs/ABC-20261
 
 ## 接取、下载和制作
 
+源图有官方身份时，在 `decision.sources` 按组内原顺序登记 `resource_id` 或 `attachment_id`，并保留能把该 ID 和地址对应到同一项的原始回执。已登记的链接过期时，将实际新地址及原始官方响应保存为 `{"url":"实际新地址","receipt":{...}}`，执行 `python bin/it.py fireplay-refresh-source CODE REFRESH.json --image N`。再用原编号执行 `fireplay-download`。内容版本和成员顺序沿用原记录，本地已校验的文件仍按 SHA256 复用。旧任务若只有 URL，按正常接入核实来源变更。
+
 `fireplay-accept` 登记本地承接；它不声称已在 Fireplay 抢单、指派或改变状态。重复承接同版本幂等，内容变化需审核后承接新版本。采用一张原图对应一个现有多语任务的结构，`--image` 从 1 开始。多张图片逐张下载建包。
 
 下载默认上限 30 MiB、5000 万像素，仅支持静态 PNG/JPEG/WebP。每次连接及重定向都验证公网地址并固定已验证 IP，保持 TLS 证书检查，不携带 Cookie 或身份头。支持带签名的公开素材直链，拒绝内网、登录页面和动画。保存真实字节的 SHA256、尺寸、格式及需求内容版本；有上游 hash/bytes/width/height 时逐项核对。下载重试保留既有原图，复用前验证其未被修改。

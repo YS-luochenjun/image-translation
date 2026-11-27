@@ -57,3 +57,11 @@ python bin/it.py stage-summary work/fireplay-production/CODE/stage-events.jsonl
 ```
 
 事件字段为 `stage`、`started_at`、`finished_at` 和 `outcome`。阶段可用 `intake`、`download`、`background`、`lettering`、`composite`、`provider_wait`、`visual_review`、`rework`、`upload` 或 `readback`。时间写带时区的真实时间戳。费用用实际回执的 `cost.amount`、`cost.unit` 和证据路径 `evidence`，可附 `member` 便于定位。
+
+`python bin/it.py publication-timing [PROJECT]` 只读本地发布流水。Base64 路线按发起登记到收到回执计算，样本可以包含业务失败，不是实际上传成功耗时。预签路线分开计算预签调用、每件 PUT 和完成计时的整批 PUT 跨度。整批跨度用最早开始和最晚结束，不相加并行成员。带哈希的回执会校验，未确认结果单列，不计作成功。历史未采集的阶段不估算，不将这些数据当作需求端到端时长。
+
+## 存储盘点
+
+`python bin/it.py storage-preview --limit 20` 扫描 `work/fireplay-production`、`runs` 和 `state/fireplay`，按 SHA256 汇总重复图片和字体，并显示重复组中位于已确认结案需求目录的副本数。报告供清理前核引用使用。实际释放空间受文件系统写时复制、硬链接和仍被引用的产物影响。保留需求回执、审核证据和历史交付关系后，再按授权处理具体文件。
+
+`python bin/it.py legacy-font-compact LEGACY_PROJECT` 只预览旧版可处理的同哈希字体。明确执行时追加 `--receipt NEW_AUDIT.jsonl`，回执须新建在旧项目之外。仅处理主控已核验交付、没有活动或待处理标记、且发布流水无未决写入的需求。用 macOS 写时复制保留每个字体路径和独立文件，只共享相同数据块。不同字节、有硬链接、无法克隆或无法通过元数据校验的文件不替换。不删除旧项目或改动发布流水，结果以回执记录的文件数及磁盘可用空间变化为准。重复运行会找到相同的逻辑副本，不应把预览字节数当作还能释放的磁盘空间。

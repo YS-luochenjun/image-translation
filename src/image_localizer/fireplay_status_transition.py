@@ -48,6 +48,35 @@ def _bound_materials(row, expected):
             expected <= {item.get('id') for item in materials if isinstance(item, dict)})
 
 
+def _verified_delivery(delivery_state, production, requirement_id, code, content_version):
+    state = read_json(delivery_state)
+    _require(state.get('fireplay_finish_allowed') is not False, 'Delivery state still describes partial fulfillment')
+    additional = state.get('supplemental_delivery_states', [])
+    _require(isinstance(additional, list) and all(isinstance(name, str) and name for name in additional),
+             'Supplemental delivery states must name JSON files in the requirement directory')
+    paths = [delivery_state.resolve()] + [(production / name).resolve() for name in additional]
+    _require(len(set(paths)) == len(paths) and all(path.parent == production for path in paths),
+             'Delivery states must be distinct files beside the publication journal')
+    material_ids, members = set(), set()
+    evidence = {}
+    for path in paths:
+        _require(read_json(path).get('content_version') == content_version,
+                 'Delivery state must cover the currently accepted requirement content version')
+        report = next_delivery(path)
+        _require(report['requirement_id'] == requirement_id and report['code'] == code and
+                 report['complete'] and not report['publication_unknown'],
+                 'All members need verified delivery receipts or exception readback. Check delivery-next.')
+        verified_ids = set(report['verified_material_ids'])
+        identities = {(item['source_id'], item['language'], item['member_id']) for item in report['actions']}
+        _require(len(identities) == report['verified_members'] and not members.intersection(identities) and
+                 not material_ids.intersection(verified_ids), 'Delivery states overlap')
+        members.update(identities)
+        material_ids.update(verified_ids)
+        for name, count in report.get('evidence_counts', {}).items():
+            evidence[name] = evidence.get(name, 0) + count
+    return len(members), material_ids, evidence
+
+
 def status_transition(root: Path, code: str, action: str, snapshot: dict, *,
                       prepare: bool = False, reconcile: bool = False,
                       delivery_state: Path | None = None, now: datetime | None = None) -> dict:
@@ -131,21 +160,16 @@ def status_transition(root: Path, code: str, action: str, snapshot: dict, *,
             production = (root / 'work/fireplay-production' / code).resolve()
             _require(delivery_state.resolve().parent == production,
                      'Finish needs the delivery state beside this requirement’s publication journal')
-            _require(read_json(delivery_state).get('content_version') == record['content_version'],
-                     'Delivery state must cover the currently accepted requirement content version')
             delivery_row, _ = _observe(snapshot, 'delivery', code, requirement_id, now)
             _require(delivery_row.get('updatedAt') == row['updatedAt'] and delivery_row.get('status') == before,
                      'Delivery view changed before status write')
-            report = next_delivery(delivery_state)
-            _require(report['requirement_id'] == requirement_id and report['code'] == code and
-                     report['complete'] and not report['publication_unknown'],
-                     'All members need verified delivery receipts or exception readback. Check delivery-next.')
-            verified_materials = set(report['verified_material_ids'])
+            verified_count, verified_materials, evidence = _verified_delivery(
+                delivery_state, production, requirement_id, code, record['content_version'])
             _require(_bound_materials(delivery_row, verified_materials),
                      'Fresh Fireplay binding does not include every verified material')
-            result['verified_members'] = report['verified_members']
+            result['verified_members'] = verified_count
             result['verified_material_ids'] = sorted(verified_materials)
-            result['evidence_counts'] = report.get('evidence_counts', {})
+            result['evidence_counts'] = evidence
         if not prepare:
             return {**result, 'state': 'eligible'}
         operation = {**result, 'state': 'reconcile_required', 'operation_id': str(uuid4()),

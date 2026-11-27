@@ -6,6 +6,7 @@ from .fireplay import payload
 
 EMPTY_DESIGNER_WARNING = '未识别到 DID，设计师为空'
 FILENAME_ATTRIBUTION_WARNING = '文件名归属信息无法解析，已按未标注处理'
+EXCLUDED_DESIGNERS = frozenset({'c74b62d9', 'b2fbcgab'})
 
 
 def _items(value):
@@ -16,12 +17,12 @@ def _rows(value):
     return [item for item in _items(value) if isinstance(item, dict)]
 
 
-def _has_warnings(result, designers, *, allow_filename_attribution=False):
+def _has_warnings(result, designers, *, allow_import_attribution=False):
     warnings = result.get('warnings')
     if not warnings:
         return False
-    allowed = (EMPTY_DESIGNER_WARNING,) if designers == [] else ()
-    if allow_filename_attribution:
+    allowed = (EMPTY_DESIGNER_WARNING,) if designers == [] or allow_import_attribution else ()
+    if allow_import_attribution:
         allowed += (FILENAME_ATTRIBUTION_WARNING,)
     return not isinstance(warnings, list) or any(warning not in allowed for warning in warnings)
 
@@ -41,7 +42,7 @@ def receipt_coverage(base: Path, requirement, operations, frozen, records, respo
     departments = requirement.get('shared_dept_ids')
     if (not isinstance(designers, list) or not isinstance(departments, list) or
             not departments or not all(isinstance(value, str) and value for value in designers + departments) or
-            {'c74b62d9', 'b2fbcgab'}.intersection(designers)):
+            EXCLUDED_DESIGNERS.intersection(designers)):
         return {}
 
     by_file = {((base / upload['path']).resolve(), upload['sha256']): key for key, upload in frozen.items()}
@@ -114,9 +115,11 @@ def receipt_coverage(base: Path, requirement, operations, frozen, records, respo
                      sorted(_import_urls(item)) == sorted(upload['url'] for upload in uploads) and
                      item.get('type') == requirement['asset_type'] and
                      item.get('shared_dept_id') in departments and
-                     not _has_warnings(response, designers) and
-                     not _has_warnings(item, designers, allow_filename_attribution=True))
-            if clean and FILENAME_ATTRIBUTION_WARNING in _items(item.get('warnings')):
+                     not _has_warnings(response, designers, allow_import_attribution=True) and
+                     not _has_warnings(item, designers, allow_import_attribution=True))
+            warnings = _items(response.get('warnings')) + _items(item.get('warnings'))
+            if clean and (FILENAME_ATTRIBUTION_WARNING in warnings or
+                          (designers and EMPTY_DESIGNER_WARNING in warnings)):
                 pending_import_attribution.add(material_id)
             for key in known_keys:
                 if key in coverage:
@@ -130,7 +133,11 @@ def receipt_coverage(base: Path, requirement, operations, frozen, records, respo
         if clean and materials[material_id] is not None and (material_id not in attributed or attributed[material_id] is not None):
             item = materials[material_id]
             attribution = attributed.get(material_id, {})
-            observed_designers = attribution.get('designer_ids', item.get('designers'))
+            observed_designers = item.get('designers')
+            if isinstance(observed_designers, list):
+                observed_designers = [value.get('id') if isinstance(value, dict) else value
+                                      for value in observed_designers]
+            observed_designers = attribution.get('designer_ids', observed_designers)
             creation_type = attribution.get('creation_type', item.get('creation_type'))
             ownership_ok = (creation_type == 'derivative' and isinstance(observed_designers, list) and
                             all(isinstance(value, str) for value in observed_designers) and

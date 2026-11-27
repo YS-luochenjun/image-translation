@@ -324,6 +324,26 @@ class IntakeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.register(spec(decision=decision))
 
+    def test_refresh_resolves_only_the_registered_resource_without_changing_version(self):
+        source_id = 'resource-123'
+        decision = {'sources': [{'url': URL, 'resource_id': source_id, 'source_quote': URL}]}
+        original = spec(decision=decision, material_receipt={'items': [{'resourceId': source_id, 'url': URL}]})
+        self.register(original)
+        accepted = fireplay.accept(CODE, self.root)
+        refreshed_url = 'https://images.example.test/new-link.png'
+        refreshed = {'url': refreshed_url,
+                     'receipt': {'items': [{'resourceId': 'wrong-id', 'url': refreshed_url},
+                                           {'resourceId': source_id, 'url': URL}]}}
+        with self.assertRaisesRegex(ValueError, 'registered resource'):
+            fireplay.refresh_source(CODE, 1, refreshed, self.root)
+        refreshed['receipt']['items'][0]['resourceId'] = source_id
+        result = fireplay.refresh_source(CODE, 1, refreshed, self.root)
+        self.assertEqual(result['content_version'], accepted['content_version'])
+        record = self.register(original)
+        self.assertEqual(record['sources'][0]['url'], URL)
+        self.assertEqual(record['source_links']['1']['url'], refreshed_url)
+        self.assertEqual(record['state'], 'accepted')
+
     def test_image_extension_only_and_no_automatic_attachment_guessing(self):
         for url in ('https://example.test/clip.mp4', 'https://example.test/object/123'):
             value = row(description='Translate ' + url)

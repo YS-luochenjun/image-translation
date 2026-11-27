@@ -57,7 +57,7 @@ checks每项{checked:布尔,notes:具体依据}，九项必须齐全：amounts_n
 {
   "requirement":{
     "id":"实际UUID","code":"实际需求编号","asset_type":"image",
-    "designer_ids":["当前有来源设计师ID"],"shared_dept_ids":["有效共享部门ID"]
+    "shared_dept_ids":["有效共享部门ID"]
   },
   "size_spec":"sizes.json",
   "publication_unknown":[],
@@ -73,7 +73,9 @@ size_spec、member输出/审核、fresh下载路径相对state；审核内部sou
 
 同一需求包含多组图时，在 `members` 中为同组成员填写相同的 `group_id`。程序按组和语种核对素材 ID。组内张数以实际成员清单为准，大按钮保持单张入库。
 
-`delivery-next` 从 `publication-journal.jsonl` 自动比对官方 R2 资源、按组入库结果、共享及归属和 exact UUID 的绑定结果。`evidence_counts.official_receipts` 是由回执核齐的成员数。允许设计师留空时，可接受「未识别到 DID，设计师为空」。遇到「文件名归属信息无法解析，已按未标注处理」时，批量补登二创。后续官方成功回执必须覆盖对应素材 ID，归属须符合需求，上传资源、入库和绑定也须匹配。满足这些条件即可用回执核齐该素材。全部成员核齐后由执行会话按[优化版运行手册](optimization-pilot.md)自行写回完成并确认。
+`delivery-next` 从同目录 `intake.json` 的需求摘要读取 `assigneeIds`，按需求 UUID 和编号确认对应记录，排除罗晨钧和邹彬后输出去重的 `designer_ids`。排除后无人时输出 `[]`。缺少 `intake.json` 的旧本地工作包沿用状态文件中的名单。
+
+`delivery-next` 从 `publication-journal.jsonl` 核对 R2 资源、按组入库结果、共享、归属和对应需求的绑定结果。应有设计师却收到「未识别到 DID，设计师为空」时，对相关素材返回 `attribute`。遇到「文件名归属信息无法解析，已按未标注处理」时也返回 `attribute`，可在同一批补登记设计师归属和二创。后续官方成功回执必须覆盖对应素材 ID。上传、入库、归属和绑定齐全才计入 `evidence_counts.official_receipts`。全部成员核齐后由执行会话按[优化版运行手册](optimization-pilot.md)自行写回完成并确认。
 
 有未解决的回执警告、资源变更、数量不符、历史流水字段不全或结果不明时，只用原操作 ID 对账受影响的素材，必要时单独补 `publication.fresh_verification`。旧记录仍可使用该字段，包含 `requirement_id`、`source_id`、`language`、`member_id`、`material_id`、`resource_id`、`designer_ids`、`shared_dept_ids`、`creation_type=derivative`、`sha256`、实际下载的 `downloaded_path` 和带时区的 `observed_at`。下载回执限 30 分钟内，下载路径须指回下载文件。已成功上传的成员沿用原资源。
 
@@ -81,4 +83,27 @@ size_spec、member输出/审核、fresh下载路径相对state；审核内部sou
 
 delivery-gate重新评估当前state，输出旧发布器可消费的requirement_id/passed/reviewed_by/evidence/outputs(path,sha256)。将此JSON通过文件工具保存到对应需求目录，并把相对gate路径交给现有发布请求gate_file；未知写、未审/过期或未达标项不入gate。部分合格可以发布，但requirement_complete仍false。每次旧发布器仍核实际SHA、原operation_id、当前tool_catalog与原journal，不重放未知写。
 
-发布器仍使用本地接入权限快照和真实官方合同。命令输出包含素材 ID、业务结果和警告等简要字段，可直接继续下一步。原始响应留在发布流水关联的回执文件。按当前用户规则排除罗晨钧和邹彬，其他设计师仅在身份可确认时填写，也可留空。
+发布器仍使用本地接入权限快照和真实官方合同。归属更新自动从需求摘要填入完整的设计师 ID，手动提供的名单须与计算结果一致。没有剩余执行人时，单独补二创可省略 `designer_ids`。命令输出包含素材 ID、业务结果和警告，原始响应留在发布流水关联的回执文件。
+
+## 批量预签名直传
+
+用 `delivery-gate` 准备本批已审成员，查阅并保存当前 `material_r2_presign_upload` 官方工具合同。执行 `node scripts/fireplay-mcp-publication.mjs --requirement CODE --batch-gate gate.json --operation-id BATCH_UUID`，按当前 gate 的待上传清单生成最多 200 个独立成员操作。如果只提交指定成员，可以用 `--request REQUEST.json` 和以下模板明确选择。
+
+```json
+{
+  "tool": "material_r2_presign_upload",
+  "schema_version": "当前官方合同版本",
+  "gate_file": "gate.json",
+  "batch_uploads": [
+    {
+      "operation_id": "11111111-1111-4111-8111-111111111111",
+      "output_path": "outputs/member-1.png",
+      "output_sha256": "当前成员的 SHA256"
+    }
+  ]
+}
+```
+
+按原发布器入口调用 `node scripts/fireplay-mcp-publication.mjs --requirement CODE --request REQUEST.json --operation-id BATCH_UUID`。批次 UUID 与各成员操作 UUID 分开。发布器从实际文件提取 MIME、后缀和大小，一次请求预签名，按返回的文件名连接成员，以最多 6 路同时 PUT。正式回执保存每张的实际传输结果、资源 ID、公开地址和已审 SHA256。入库的 `upload_operation_ids` 使用成功成员的操作 UUID。
+
+有已发起的未知 PUT 时，执行 `python bin/it.py fireplay-reconcile-upload CODE MEMBER_OPERATION_UUID`，读取并核对原公开对象的大小和 SHA256，相符后为原操作登记核验回执。结果仍未知的成员沿原 ID 保留。`delivery-next` 报告 `isolate_unknown_uploads` 可用时，可将它带入对应独立成员的发布请求。现有 Base64 路线按官方 15 MiB 上限继续使用。

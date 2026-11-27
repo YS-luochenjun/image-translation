@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "scope": "Original bytes copied locally; no image re-encoding. Snapshots are historical evidence, not fresh platform resource verification.",
+  "scope": "Images retain their original bytes. The historical JSON snapshot is hashed using its checked-in LF bytes.",
   "files": [
     {
       "path": "batch-snapshot.json",
-      "sha256": "db277237da65cc9f50773258968a17f64231aca42ba36372d101f218d36ff529",
-      "bytes": 13864
+      "sha256": "6192b3087fad779e01a08236dfd0b16739921260d819d73fd54c887d26fcd44d",
+      "bytes": 13546
     },
     {
       "path": "evidence/023-source-7-es-final.jpg",

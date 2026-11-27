@@ -14,7 +14,7 @@
 
 用户进一步明确授权已交办图片需求使用付费内容和工具完成制作，包括可用的 KIE 或 GPT ImageGen 图片编辑能力；按实际工具合同及费用执行并记录，不再因项目内缺少逐单付费授权而停止。宿主或服务的实际审批、权限和付款限制仍须遵守。
 
-用户明确规定邹彬（b2fbcgab）和罗晨钧（c74b62d9）不是设计师，不能填写为设计师。设计师字段可以留空，不以查找候选或提供空值证明作为交付门槛；如填写其他设计师，必须真实可确认。共享、二创和需求绑定仍按实际情况核验。
+素材设计师取自当前 Fireplay 需求的执行人 `assigneeIds`。排除罗晨钧（`c74b62d9`）和邹彬（`b2fbcgab`），其余执行人去重后全部列为该需求各素材的设计师。排除后无人时，设计师字段留空。原执行会话在交付时用现有需求回执确定名单，入库结果不匹配时按素材 ID 批量补登记归属。共享、二创和需求绑定仍按实际情况核验。
 
 用户明确要求已实际完成的需求不再跟踪；按需求编号日期或可信需求日期，以 America/Los_Angeles 当地日期计算，超过三天的需求不再跟踪或重新接入。保留历史账本。平台显示完成但已知交付不足，不视为实际完成；日期无法确定时不得猜测。
 
@@ -26,6 +26,8 @@
 
 ## 执行顺序
 
+2026-11-26 用户明确要求常规图片翻译停止反复精修。按[审核收敛规则](knowledge/methods/delivery-balanced-review.md#常规批次的审核收敛)执行，本规则优先于历史案例及其他审核指令中的精细比较要求。底图、字层及成图各阶段完成时审核一次；按组集中完成首轮成图审核、简明记录并立即评分和运行门禁。≥80且全部底线通过即结束制作，直接上传；已有同哈希审核可复用。启动返工前必须能指出具体未通过的底线及其实际影响，正常展示效果良好的视觉差异直接接受并记minor。没有明确阻断依据时停止寻找问题、停止生成候选和调整排版，推进上传与结案。修复后仅复审受影响成员及阶段。
+
 默认交付口径按用户2026-11-06指示为“大致相同、画面流畅、基本一致”，先读[交付评分与取舍](knowledge/methods/delivery-balanced-review.md)。允许自然补全与局部差异，达80分及底线即提交，不追完美；未达标且有可行改进路线时继续针对性修正，不设固定返工次数；同一方法无改善时换路线，确无可行路线才记录阻塞。历史固定37批次续作另读[统一执行控制](work/fireplay-production/unified-control.md)，其原会话/归档/专门授权约束不推广为未来新需求默认。MCP负责查询和发布绑定，以来源×语言×成员矩阵、官方业务成功回执和面板读回认定交付。
 
 制作、尺寸适配及提交前必须读 [原图图组与尺寸规划](knowledge/methods/source-set-and-size-planning.md)。用户明确要求按实际创意与版式识别所供图组，每套按真实待翻成员交付，套数和每套张数由看图及来源证据确定，可以是5、7、8、10张等。多套分别制作、入库和核验。独立原图需要派生版式且未指定规格时，才使用默认1长、3方、3竖。尺寸按明确需求→原图或同类已交付规格→默认选择。缺少已确定成员只能报partial；用 `material-size-plan` / `material-size-validate` 核实来源×去重语言×成员×尺寸矩阵、真实像素和字节限制。
@@ -34,7 +36,7 @@
 2. 运行 `python bin/it.py doctor`，区分依赖存在、宿主可看图、外部服务真实验证。新分阶段任务用`init-job SOURCE --targets zh-CN,ja --output runs/ID`，对每个languages/LANGUAGE运行packet；基础任务仍可用`init/packet`。实际打开规范化源图与局部。规范化PNG哈希与原始文件哈希分开，坐标用规范化画布。
 3. 使用 [解析](agent/prompts/analyze.md) 和 [翻译](agent/prompts/translate.md) 提示词，逐区记录原文/译文/保留理由、保护对象、样式与疑点；实际复核 confidence<0.9 的文字后才填 recognition_verified。不可辨内容不猜补，unresolved 未解决不标完成。
 4. 按 [内容路由](knowledge/methods/content-routing.md)、[文字构图](knowledge/methods/typography-composition.md) 和 [修复提示词](agent/prompts/repair.md) 选择方法。摄影图去字或出现暗带/糊化时必须读[清晰背景与遮罩退化检查](knowledge/methods/photographic-background-repair.md)，背景单独通过后再排字。均匀底色才用 solid；也可局部源像素重建、矢量容器重建或宿主真正编辑。增强路线需保留各阶段输出和真实观察，先审无字背景再制作透明字层，再合成。任务region_map精确覆盖每个翻译区和实际row/textasset；不能改数字标点蒙混文本核对。manifest的保留区并入共享保护。prepare-job冻结输入后停在背景待审，实际填当前背景审核后才render-job。基础 CLI 走 `validate`、`render [--clean-background PATH]`；参数以实际合同为准。
-5. 使用 [审核提示词](agent/prompts/review.md) 和 [差异驱动自检](knowledge/methods/visual-fidelity-self-review.md) 看全图缩略、100%及必要放大局部。制作前从源图选出3～5项关键视觉要求；交付前逐项记录源图与候选的实际差异，主动找最弱区域，只对影响正常展示或触及质量底线的实质缺陷返工。正常展示不显眼、仅放大或刻意对照才察觉且不触及底线的轻微光晕、非核心边缘接痕，记为minor，不为此换模型、重跑或追加复审。基础路线运行 `review-packet RUN`，真实填写当前版本审核后 `quality RUN`。visual_targets与style_comparisons绑定源图观察、失败判据、当前证据和目标实际观察；只有style=true而无具体比较不能放行。使用compare/benchmark生成辅助证据，已知缺陷标签不是自动检测结果。独立身份和计算门禁不能替代足以否决候选的视觉标准；返工需重新绑定实际文件哈希并复审，透明层或 quality 文件存在不能自动证明五阶段审核成立。
+5. 使用 [审核提示词](agent/prompts/review.md) 和 [差异驱动自检](knowledge/methods/visual-fidelity-self-review.md) 看全图缩略、100%及必要放大局部。制作前从源图选出3～5项关键视觉要求；交付前简明确认关键特征、语义和正常展示效果。只对已有明确阻断依据的实质缺陷返工。正常展示协调、基本一致且底线通过时直接接受轻微差异并记minor。基础路线运行 `review-packet RUN`，真实填写当前版本审核后 `quality RUN`。visual_targets与style_comparisons绑定源图观察、失败判据、当前证据和目标实际观察；只有style=true而无具体比较不能放行。compare/benchmark仅在需定位具体阻断问题时按需使用，已知缺陷标签不是自动检测结果。独立身份和计算门禁不能替代真实视觉审核；返工需重新绑定实际文件哈希并复审，透明层或 quality 文件存在不能自动证明五阶段审核成立。
 
 ## 不变量
 

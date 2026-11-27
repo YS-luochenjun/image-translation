@@ -132,6 +132,45 @@ def _source(record: dict, index: int) -> dict:
     return matches[0]
 
 
+def transfer_public_bytes(url, consume, *, max_bytes=MAX_BYTES):
+    started = time.monotonic()
+    try:
+        for hop in range(MAX_REDIRECTS + 1):
+            addresses = _public_addresses(url)
+            require(time.monotonic() - started < TOTAL_TIMEOUT, 'Image download timed out')
+            with _open_url(url, addresses) as response:
+                status = response.status if hasattr(response, 'status') else response.code
+                if status in REDIRECTS:
+                    require(hop < MAX_REDIRECTS, 'Image download exceeded redirect limit')
+                    location = response.headers.get('Location')
+                    require(bool(location), 'Image redirect lacks a destination')
+                    url = parse.urljoin(url, location)
+                    continue
+                require(status == 200, 'Image server returned an unsuccessful HTTP status')
+                length = response.headers.get('Content-Length')
+                if length is not None:
+                    require(length.isascii() and length.isdecimal(), 'Invalid image Content-Length')
+                    require(int(length) <= max_bytes, 'Source exceeds byte limit')
+                require(response.headers.get('Content-Encoding', 'identity').lower() == 'identity',
+                        'Encoded image responses are unsupported')
+                size = 0
+                while True:
+                    require(time.monotonic() - started < TOTAL_TIMEOUT, 'Image download timed out')
+                    chunk = response.read(min(64 * 1024, max_bytes - size + 1))
+                    if not chunk:
+                        break
+                    size += len(chunk)
+                    require(size <= max_bytes, 'Source exceeds byte limit')
+                    consume(chunk)
+                if length is not None:
+                    require(size == int(length), 'Image Content-Length mismatch')
+                return size
+    except ContractError:
+        raise
+    except (OSError, ValueError, error.URLError, http.client.HTTPException):
+        raise ContractError('Image download failed; verify public source availability') from None
+
+
 def download_source(code: str, index: int, root: Path) -> dict:
     """Download one accepted source and bind verified bytes to its content version."""
     root = root.resolve()
@@ -158,38 +197,8 @@ def download_source(code: str, index: int, root: Path) -> dict:
     try:
         with tempfile.NamedTemporaryFile(prefix=f'.source-{index}-', suffix='.tmp', dir=folder, delete=False) as stream:
             temp_path = Path(stream.name)
-            url = source['url']
-            started = time.monotonic()
-            for hop in range(MAX_REDIRECTS + 1):
-                addresses = _public_addresses(url)
-                require(time.monotonic() - started < TOTAL_TIMEOUT, 'Image download timed out')
-                with _open_url(url, addresses) as response:
-                    status = response.status if hasattr(response, 'status') else response.code
-                    if status in REDIRECTS:
-                        require(hop < MAX_REDIRECTS, 'Image download exceeded redirect limit')
-                        location = response.headers.get('Location')
-                        require(bool(location), 'Image redirect lacks a destination')
-                        url = parse.urljoin(url, location)
-                        continue
-                    require(status == 200, 'Image server returned an unsuccessful HTTP status')
-                    length = response.headers.get('Content-Length')
-                    if length is not None:
-                        require(length.isascii() and length.isdecimal(), 'Invalid image Content-Length')
-                        require(int(length) <= MAX_BYTES, 'Source exceeds 30 MiB byte limit')
-                    require(response.headers.get('Content-Encoding', 'identity').lower() == 'identity',
-                            'Encoded image responses are unsupported')
-                    size = 0
-                    while True:
-                        require(time.monotonic() - started < TOTAL_TIMEOUT, 'Image download timed out')
-                        chunk = response.read(min(64 * 1024, MAX_BYTES - size + 1))
-                        if not chunk:
-                            break
-                        size += len(chunk)
-                        require(size <= MAX_BYTES, 'Source exceeds 30 MiB byte limit')
-                        stream.write(chunk)
-                    if length is not None:
-                        require(size == int(length), 'Image Content-Length mismatch')
-                    break
+            url = record.get('source_links', {}).get(str(index), {}).get('url', source['url'])
+            transfer_public_bytes(url, stream.write, max_bytes=MAX_BYTES)
         actual = _inspect(temp_path)
         _matches(actual, source)
         destination = folder / f"source-{index}-{actual['sha256']}.{FORMATS[actual['format']]}"
@@ -199,7 +208,8 @@ def download_source(code: str, index: int, root: Path) -> dict:
             os.link(temp_path, destination)
         except FileExistsError:
             require(_inspect(destination) == actual, 'Existing source file has changed')
-        entry = {**actual, 'local_path': str(destination), 'content_version': record['content_version']}
+        entry = {**actual, **fireplay._source_identity(source), 'local_path': str(destination),
+                 'content_version': record['content_version']}
         fireplay.record_download(code, index, entry, root)
         return entry
     except ContractError:

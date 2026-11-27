@@ -47,7 +47,7 @@ class FireplayIntegrationTests(unittest.TestCase):
 
     def test_receipt_to_verified_original_and_pending_multilingual_job(self):
         with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
+            root = Path(temporary).resolve()
             row = {'id': '4237002a-f29b-4dc5-b1a1-778f76a41994', 'code': CODE,
                    'updatedAt': '2026-11-03T01:00:00Z', 'status': 'pending', 'priority': 'P0',
                    'assetType': 'image', 'title': 'Translate image',

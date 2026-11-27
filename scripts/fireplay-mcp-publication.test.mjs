@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
-import { publish, validateSchema } from './fireplay-mcp-publication.mjs';
+import { publish, requestFromGate, validateSchema } from './fireplay-mcp-publication.mjs';
 
 import { publicationDefinitions as definitions } from './fireplay-offline-test-contracts.mjs';
 import { tmpdir } from 'node:os';
@@ -36,8 +36,118 @@ async function fixture(t) {
   const upload={tool:'material_r2_upload_from_bytes',schema_version:definitions[0].schema_version,gate_file:'gate.json',output_sha256:hash,arguments:{content_type:'image/png',ext:'png',file_name:'image.png'}};
   return {root,folder,calls,transport,upload};
 }
-const run=(f,request,operationId=randomUUID())=>publish({root:f.root,code,request,operationId,transport:f.transport});
+const run=(f,request,operationId=randomUUID())=>publish({root:f.root,code,request,operationId,transport:f.transport,put:f.put});
 const importRequest=(uploadId)=>({tool:'material_upload_from_url',schema_version:definitions[1].schema_version,gate_file:'gate.json',upload_operation_ids:[uploadId],arguments:{confirmed:true,items:[{url:publicUrl,resource_id:resourceId,already_in_r2:true,type:'image',source:'MCP',name:`${code}-source01-fr`,shared_dept_id:'researched-group'}]}});
+
+test('batch presign pairs reordered items by filename, sends simultaneous PUTs and isolates a timeout', {timeout:3000}, async t => {
+  const fixtureData = await fixture(t);
+  const other = Buffer.concat([bytes, Buffer.from([4])]);
+  const otherHash = createHash('sha256').update(other).digest('hex');
+  const gatePath = join(fixtureData.folder, 'gate.json');
+  const gate = JSON.parse(await readFile(gatePath, 'utf8'));
+  gate.outputs.push({path:'other.png', sha256:otherHash});
+  await writeFile(gatePath, JSON.stringify(gate));
+  await writeFile(join(fixtureData.folder, 'other.png'), other);
+  const presign = definitions.at(-1);
+  const secondResource = randomUUID();
+  const firstId = randomUUID(), secondId = randomUUID(), batchId = randomUUID();
+  const request = {tool:presign.name, schema_version:presign.schema_version, gate_file:'gate.json', batch_uploads:[
+    {operation_id:firstId, output_sha256:hash}, {operation_id:secondId, output_sha256:otherHash},
+  ]};
+  const original = fixtureData.transport.call;
+  let presignCalls = 0;
+  fixtureData.transport.call = async (name, args) => {
+    if (name !== 'tool_write' || args.tool !== presign.name) return original(name, args);
+    presignCalls++;
+    return {structuredContent:{items:args.arguments.items.map((item, index) => ({
+      ...item, resourceId:index ? secondResource : resourceId,
+      publicUrl:index ? `https://example.invalid/materials/${secondResource}.png` : publicUrl,
+      putUrl:`https://testing.r2.cloudflarestorage.com/${index}?signature=secret`,
+      upload_headers:{'Content-Type':item.content_type},
+    })).reverse()}};
+  };
+  const awaiting = new Promise(resolve => {
+    fixtureData.releasePuts = resolve;
+  });
+  let started = 0;
+  fixtureData.put = async (target, data) => {
+    if (++started === 2) fixtureData.releasePuts();
+    await awaiting;
+    if (target.resourceId === secondResource) {
+      assert.deepEqual(data, other);
+      throw new Error('timeout at a signed URL');
+    }
+    assert.deepEqual(data, bytes);
+    return 200;
+  };
+  const completed = await run(fixtureData, request, batchId);
+  assert.deepEqual(completed.results.map(result => result.status), ['uploaded','unknown']);
+  assert.equal(presignCalls, 1);
+  const accepted = await readFile(join(fixtureData.folder, `publication-${firstId}.json`), 'utf8');
+  const journal = await readFile(join(fixtureData.folder, 'publication-journal.jsonl'), 'utf8');
+  assert.ok(!`${journal}${accepted}`.includes('secret'));
+  const entries = journal.trim().split('\n').map(JSON.parse);
+  const [firstIntent, secondIntent] = entries;
+  assert.equal(firstIntent.at, secondIntent.at);
+  assert.equal(firstIntent.state, 'unknown');
+  assert.equal(secondIntent.state, 'unknown');
+  const failed = entries.findLast(entry => entry.operation_id === secondId);
+  const saved = JSON.parse(accepted);
+  assert.deepEqual(failed.presign_timing, saved.presign_timing);
+  assert.ok(Date.parse(failed.put_transfer_started_at) <= Date.parse(failed.put_finished_at));
+  assert.ok(Date.parse(saved.response.transfer.started_at) <= Date.parse(saved.response.transfer.finished_at));
+  assert.equal(failed.put_target.resourceId, secondResource);
+  assert.equal(failed.state, 'unknown');
+  await run(fixtureData,{...importRequest(firstId),isolate_unknown_uploads:true});
+  await assert.rejects(run(fixtureData,{...fixtureData.upload,isolate_unknown_uploads:true}),/frozen resource/);
+  await assert.rejects(run(fixtureData,{...request,isolate_unknown_uploads:true},batchId),/replay forbidden/);
+});
+
+test('outer presign rejection does not send bytes even when data contains a valid target', async t => {
+  const fixtureData = await fixture(t);
+  const presign = definitions.at(-1);
+  const original = fixtureData.transport.call;
+  fixtureData.transport.call = async (name, args) => name === 'tool_write'
+    ? {structuredContent:{success:false, data:{items:[{
+      ...args.arguments.items[0], resourceId, publicUrl,
+      putUrl:'https://testing.r2.cloudflarestorage.com/test?signature=secret',
+    }]}}}
+    : original(name,args);
+  fixtureData.put = async () => assert.fail('Rejected presign cannot receive PUT');
+  const result = await run(fixtureData, {tool:presign.name, schema_version:presign.schema_version, gate_file:'gate.json',
+    batch_uploads:[{operation_id:randomUUID(), output_sha256:hash}]});
+  assert.equal(result.results[0].status, 'not_uploaded');
+});
+
+test('missing or mismatched presign response never sends bytes or authorizes import', async t => {
+  const fixtureData = await fixture(t);
+  const presign = definitions.at(-1);
+  const memberId = randomUUID();
+  const original = fixtureData.transport.call;
+  fixtureData.transport.call = async (name, args) => name === 'tool_write'
+    ? {structuredContent:{items:[{...args.arguments.items[0], file_name:'another.png', resourceId, publicUrl}]}}
+    : original(name,args);
+  fixtureData.put = async () => assert.fail('Mismatched response cannot receive PUT');
+  const result = await run(fixtureData,{tool:presign.name,schema_version:presign.schema_version,gate_file:'gate.json',
+    batch_uploads:[{operation_id:memberId,output_sha256:hash}]});
+  assert.equal(result.results[0].status,'not_uploaded');
+  await assert.rejects(run(fixtureData,importRequest(memberId)),/lacks verified binary PUT/);
+});
+
+test('batch flag builds an upload request only for gate upload candidates', async t => {
+  const fixtureData = await fixture(t);
+  const gatePath = join(fixtureData.folder, 'gate.json');
+  const gate = JSON.parse(await readFile(gatePath, 'utf8'));
+  gate.upload_candidates = [...gate.outputs];
+  gate.outputs.push({path:'import-only.png', sha256:'a'.repeat(64)});
+  gate.isolate_unknown_uploads = true;
+  await writeFile(gatePath, JSON.stringify(gate));
+  const request = await requestFromGate({root:fixtureData.root, code, gateFile:'gate.json'});
+  assert.equal(request.tool, 'material_r2_presign_upload');
+  assert.equal(request.isolate_unknown_uploads, true);
+  assert.equal(request.batch_uploads.length, 1);
+  assert.equal(request.batch_uploads[0].output_sha256, hash);
+});
 
 test('reviewed image -> own import -> own bind; journals contain no base64',async t=>{
   const f=await fixture(t); const uploadId=randomUUID();
@@ -407,10 +517,36 @@ test('unknown import cannot be resubmitted with a new operation ID',async t=>{
   assert.equal(f.calls.length,0);
 });
 
-test('excluded designer identity cannot be attributed',async t=>{
+test('attribution sends every distinct eligible intake assignee and rejects mismatches',async t=>{
   const f=await fixture(t); const uploadId=randomUUID();
   await run(f,f.upload,uploadId); await run(f,importRequest(uploadId));
-  await assert.rejects(run(f,{tool:'material_attribution_update',schema_version:definitions[2].schema_version,designer_members:[{feishuUserId:'valid-user',username:'罗晨钧'}],arguments:{material_ids:[materialId],designer_ids:['valid-user'],creation_type:'derivative',confirmed:false}}),/excluding/);
+  const path=join(f.folder,'intake.json');
+  const intake=JSON.parse(await readFile(path,'utf8'));
+  intake.summary.assigneeIds=['valid-user','c74b62d9','second-user','b2fbcgab','valid-user'];
+  await writeFile(path,JSON.stringify(intake));
+  const request={tool:'material_attribution_update',schema_version:definitions[2].schema_version,
+    arguments:{material_ids:[materialId],creation_type:'derivative',confirmed:true}};
+  for (const designer_ids of [[],['valid-user'],['valid-user','c74b62d9'],['valid-user','b2fbcgab'],
+    ['valid-user','outsider'],['valid-user','valid-user']]) {
+    await assert.rejects(run(f,{...request,arguments:{...request.arguments,designer_ids}}),/every current assignee/);
+  }
+  const result=await run(f,request);
+  assert.deepEqual(f.calls.at(-1).args.arguments.designer_ids,['valid-user','second-user']);
+  const receipt=JSON.parse(await readFile(result.receiptPath,'utf8'));
+  assert.deepEqual(receipt.attribution.designer_ids,['valid-user','second-user']);
+});
+
+test('attribution omits designer IDs when no eligible intake assignee remains',async t=>{
+  const f=await fixture(t); const uploadId=randomUUID();
+  await run(f,f.upload,uploadId); await run(f,importRequest(uploadId));
+  const path=join(f.folder,'intake.json');
+  const intake=JSON.parse(await readFile(path,'utf8'));
+  intake.summary.assigneeIds=['c74b62d9','b2fbcgab'];
+  await writeFile(path,JSON.stringify(intake));
+  await run(f,{tool:'material_attribution_update',schema_version:definitions[2].schema_version,
+    arguments:{material_ids:[materialId],designer_ids:[],creation_type:'derivative',confirmed:true}});
+  assert.deepEqual(f.calls.at(-1).args.arguments,
+    {material_ids:[materialId],creation_type:'derivative',confirmed:true});
 });
 
 test('concurrent calls cannot race the per-demand journal',async t=>{

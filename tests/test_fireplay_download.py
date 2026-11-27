@@ -36,7 +36,7 @@ class DownloadTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         self.record = {'state': 'accepted', 'content_version': 'v1', 'targets': ['ja', 'fr'],
                        'sources': [{'index': 1, 'url': 'https://images.example/source?signature=secret'}],
                        'downloads': {}}
@@ -206,6 +206,17 @@ class DownloadTests(unittest.TestCase):
             self.run_download()
         self.assertEqual(path.read_bytes(), stream.getvalue())
         self.network.assert_not_called()
+
+    def test_recorded_source_refresh_reuses_verified_existing_bytes(self):
+        self.record['sources'][0]['resource_id'] = 'original-resource'
+        new_link = 'https://images.example/renewed?signature=updated'
+        self.record['source_links'] = {'1': {'url': new_link}}
+        first = self.run_download()
+        self.assertEqual(first['resource_id'], 'original-resource')
+        self.assertEqual(self.network.call_args.args[0], new_link)
+        self.record['source_links']['1']['url'] = 'https://images.example/renewed-again'
+        self.assertEqual(self.run_download(), first)
+        self.assertEqual(self.network.call_count, 1)
 
     def test_prior_file_survives_receipt_failure_and_retry(self):
         self.save.side_effect = ValueError('receipt failure')

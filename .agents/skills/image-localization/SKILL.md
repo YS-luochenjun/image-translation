@@ -9,7 +9,9 @@ description: 在本项目按图片翻译需求自动接入长方竖图和大按�
 
 需求面板批次按[会话分工与调度](../../../agent/workflows/fireplay-autonomous.md#会话分工与调度)核对负责人并登记派发。原执行会话用 `delivery-next` 核齐官方上传、入库及绑定回执后，必须亲自写回「已完成」，一次面板读回确认状态和素材，保存 `status-finish.json` 的 `confirmed` 回执后才能报告结案。续办的旧需求也按此规则执行。缺件或写回受阻时，记录实际缺口和下一步。具体步骤见[运行手册](../../../docs/optimization-pilot.md#fireplay-从开工到完成)。
 
-所有制图与审核先应用[交付评分](../../../knowledge/methods/delivery-balanced-review.md)：默认画面流畅、基本一致，允许局部差异和补全；正常展示不显眼且不触及硬项的轻微修图痕迹记minor，不触发返工。≥80且底线通过即交付；未达标且有可行路线才继续局部返工，确有阻塞时只挂起关联成员。按[图组与尺寸规划](../../../knowledge/methods/source-set-and-size-planning.md)识别真实来源组，按实际成员逐套翻译和提交。独立原图需要派生版式且缺明确规格时默认七张，大按钮走自身规格。
+素材设计师采用当前需求执行人，排除罗晨钧和邹彬后，其余人员全部填写。没有剩余人员时留空。原执行会话沿用当前接入回执中的执行人 ID，入库归属不匹配时批量补登记。
+
+所有制图与审核先应用[交付评分与审核收敛](../../../knowledge/methods/delivery-balanced-review.md)：默认画面流畅、基本一致，允许局部差异和补全。各阶段审一次，成图按组集中审核并立即评分和运行门禁；≥80且底线通过即上传，同哈希观察直接复用。正常展示不显眼且不触及硬项的轻微修图痕迹记minor；只有具体底线缺陷才返工，修后仅复审受影响成员。按[图组与尺寸规划](../../../knowledge/methods/source-set-and-size-planning.md)识别真实来源组，按实际成员逐套翻译和提交。独立原图需要派生版式且缺明确规格时默认七张，大按钮走自身规格。
 
 按需查阅 [知识目录](../../../knowledge/README.md) 与 [索引](../../../knowledge/index.json)：通用阶段读 [分层流程](../../../knowledge/methods/layered-localization.md)，选技术路线读 [内容路由](../../../knowledge/methods/content-routing.md)，文字视觉设计读 [文字构图](../../../knowledge/methods/typography-composition.md)。仅在当前图条件相符时读取相关案例，并核查状态、证据和最新反馈。
 

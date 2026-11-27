@@ -19,7 +19,7 @@ class JobTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         font = next((Path(path) for path in available_fonts() if Path(path).name.lower() in ('arial.ttf', 'dejavusans.ttf')), None)
         if font is None:
             self.skipTest('A real Latin TTF is required')

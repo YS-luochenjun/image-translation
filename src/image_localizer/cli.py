@@ -130,6 +130,20 @@ def main(argv: list[str] | None = None) -> int:
     fireplay_register = commands.add_parser('fireplay-register', help='Register exact image requirement summary and brief receipts')
     fireplay_register.add_argument('code')
     fireplay_register.add_argument('--snapshot', type=Path, required=True)
+    fireplay_refresh = commands.add_parser('fireplay-refresh-source', help='Record a new URL for the same Fireplay source ID')
+    fireplay_refresh.add_argument('code')
+    fireplay_refresh.add_argument('receipt', type=Path)
+    fireplay_refresh.add_argument('--image', type=int, default=1)
+    fireplay_reconcile = commands.add_parser('fireplay-reconcile-upload', help='Verify the original R2 object for an uncertain PUT')
+    fireplay_reconcile.add_argument('code')
+    fireplay_reconcile.add_argument('operation_id')
+    storage_preview = commands.add_parser('storage-preview', help='Inventory exact duplicate images and fonts')
+    storage_preview.add_argument('--limit', type=int, default=20)
+    legacy_fonts = commands.add_parser('legacy-font-compact', help='Preview or clone identical legacy font snapshots')
+    legacy_fonts.add_argument('project', type=Path)
+    legacy_fonts.add_argument('--receipt', type=Path, help='Execute compaction and create this new audit file')
+    timing = commands.add_parser('publication-timing', help='Summarize observed upload timings from local journals')
+    timing.add_argument('project', type=Path, nargs='?', default=Path(__file__).resolve().parents[2])
     transition = commands.add_parser('fireplay-transition', help='Prepare or reconcile one Fireplay status change')
     transition.add_argument('code')
     transition.add_argument('action', choices=('start', 'finish'))
@@ -181,6 +195,11 @@ def main(argv: list[str] | None = None) -> int:
                 result = fireplay.register(args.code, read_json(args.snapshot), root)
             elif args.command == 'fireplay-accept':
                 result = fireplay.accept(args.code, root)
+            elif args.command == 'fireplay-refresh-source':
+                result = fireplay.refresh_source(args.code, args.image, read_json(args.receipt), root)
+            elif args.command == 'fireplay-reconcile-upload':
+                from .fireplay_upload_reconcile import reconcile_upload
+                result = reconcile_upload(args.code, args.operation_id, root)
             elif args.command == 'fireplay-status':
                 result = fireplay.status(args.code, root)
             elif args.command == 'fireplay-transition':
@@ -193,6 +212,15 @@ def main(argv: list[str] | None = None) -> int:
                 result = (download_source(args.code, args.image, root)
                           if args.command == 'fireplay-download'
                           else initialize_source_job(args.code, args.image, args.output, root))
+        elif args.command == 'storage-preview':
+            from .storage_preview import preview_storage
+            result = preview_storage(Path(__file__).resolve().parents[2], args.limit)
+        elif args.command == 'legacy-font-compact':
+            from .legacy_storage import compact_legacy_fonts
+            result = compact_legacy_fonts(args.project, args.receipt)
+        elif args.command == 'publication-timing':
+            from .publication_timing import publication_timing
+            result = publication_timing(args.project)
         elif args.command in ('material-size-plan', 'material-size-validate'):
             from .material_sizes import plan_sizes, validate_sizes
             result = (plan_sizes if args.command == 'material-size-plan' else validate_sizes)(args.spec)

@@ -125,6 +125,8 @@ class ProgramOptimizationTests(unittest.TestCase):
         snapshot = self.snapshot('in_progress', materials=[{'id': 'verified-material'}])
         report = {'requirement_id': self.requirement_id, 'code': self.code, 'complete': False,
                   'verified_material_ids': ['verified-material'], 'verified_members': 7, 'publication_unknown': [],
+                  'actions': [{'source_id': 'source', 'language': 'ja', 'member_id': f'member-{number}'}
+                              for number in range(1, 8)],
                   'evidence_counts': {'official_receipts': 7}}
         with patch('image_localizer.fireplay_status_transition.next_delivery', return_value=report):
             with self.assertRaisesRegex(ValueError, 'All members'):

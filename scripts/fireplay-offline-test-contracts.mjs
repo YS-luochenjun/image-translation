@@ -34,4 +34,7 @@ export const publicationDefinitions=[
  definition('material_upload_from_url',object({confirmed:boolean,items:list(importItem)},['confirmed','items']),'write','material_upload_from_url'),
  definition('material_attribution_update',object({material_ids:list(uuid),designer_ids:list(string),creation_type:{enum:['derivative']},confirmed:boolean},['material_ids'])),
  definition('requirement_bind_materials',object({confirmed:boolean,items:list(object({requirement_id:uuid,material_ids:list(uuid)},['requirement_id','material_ids']))},['confirmed','items']),'write','requirement_bind_materials'),
+ definition('material_r2_presign_upload',object({items:{...list(object({
+   file_name:string,content_type:string,ext:string,file_size:{type:'integer',exclusiveMinimum:0},
+ },['file_name','content_type','ext','file_size'])),maxItems:200}},['items'])),
 ];

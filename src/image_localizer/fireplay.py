@@ -158,9 +158,9 @@ def request_folder(code: str, root: Path) -> Path:
 
 
 @contextmanager
-def _lock(folder):
+def _lock(folder, name='.lock'):
     folder.mkdir(parents=True, exist_ok=True)
-    path = folder / '.lock'
+    path = folder / name
     try:
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     except FileExistsError as error:
@@ -219,6 +219,35 @@ def _http(url):
     return parsed.scheme in ('http', 'https') and bool(parsed.hostname) and not parsed.username and not parsed.password
 
 
+SOURCE_URL_FIELDS = ('url', 'file_url', 'fileUrl', 'public_url', 'publicUrl', 'r2Url', 'r2_url')
+SOURCE_ID_FIELDS = {'resource_id': ('resource_id', 'resourceId'),
+                    'attachment_id': ('attachment_id', 'attachmentId')}
+
+
+def _source_identity(source):
+    return {field: source[field] for field in SOURCE_ID_FIELDS if field in source}
+
+
+def _source_binding(evidence, source):
+    identity = _source_identity(source)
+    if not identity:
+        return False
+    pending = [(evidence, False)]
+    while pending:
+        current, attachment = pending.pop()
+        if isinstance(current, list):
+            pending.extend((item, attachment) for item in current)
+        elif isinstance(current, dict):
+            if (any(current.get(field) == source['url'] for field in SOURCE_URL_FIELDS)
+                    and all(value in [current.get(alias) for alias in SOURCE_ID_FIELDS[field]
+                                      + (('id',) if attachment and field == 'attachment_id' else ())]
+                            for field, value in identity.items())):
+                return True
+            pending.extend((value, key == 'attachments') for key, value in current.items()
+                           if isinstance(value, (list, dict)))
+    return False
+
+
 def _locale(value):
     if not isinstance(value, str):
         return None
@@ -237,8 +266,10 @@ def _locale(value):
 def _content(brief, decision, material_receipt):
     text = '\n'.join(str(brief.get(key) or '') for key in ('description', 'refText'))
     evidence = text + '\n' + json.dumps(brief, ensure_ascii=False)
+    source_evidence = [brief]
     if material_receipt is not None:
-        evidence += json.dumps(payload(material_receipt), ensure_ascii=False)
+        source_evidence.append(payload(material_receipt))
+        evidence += json.dumps(source_evidence[-1], ensure_ascii=False)
     blockers = []
     quote = decision.get('source_quote')
     justified = isinstance(quote, str) and bool(quote.strip()) and quote in evidence
@@ -261,6 +292,10 @@ def _content(brief, decision, material_receipt):
             source_quote = source.get('source_quote') or quote
             _require(isinstance(source_quote, str) and source_quote and source_quote in evidence
                      and source['url'] in evidence, 'Source needs actual brief/material receipt evidence')
+            if identity := _source_identity(source):
+                _require(all(isinstance(value, str) and value.strip() for value in identity.values())
+                         and _source_binding(source_evidence, source),
+                         'Source ID and URL must match one official resource or attachment row')
             sources.append({**source, 'index': len(sources) + 1})
     else:
         for url in re.findall(r'https?://[^\s<>"\)\]]+', text):
@@ -268,9 +303,15 @@ def _content(brief, decision, material_receipt):
             if _http(url) and re.search(r'\.(png|jpe?g|webp|gif|bmp|tiff?)(?:$|[?#])', url, re.I):
                 sources.append({'index': len(sources) + 1, 'url': url, 'source_quote': url})
     unique = []
+    used_sources = set()
     for source in sources:
-        if source['url'] not in {item['url'] for item in unique}:
-            unique.append({**source, 'index': len(unique) + 1})
+        identity = _source_identity(source)
+        source_key = ('resource_id', identity['resource_id']) if 'resource_id' in identity else (
+            ('attachment_id', identity['attachment_id']) if 'attachment_id' in identity else ('url', source['url']))
+        if source_key in used_sources:
+            continue
+        used_sources.add(source_key)
+        unique.append({**source, 'index': len(unique) + 1})
     sources = unique
     if not sources:
         blockers.append('image_sources_unresolved')
@@ -334,8 +375,13 @@ def register(code: str, spec: dict, root: Path) -> dict:
         saved_version = folder / 'versions' / (version + '.json')
         if same:
             record['downloads'] = previous.get('downloads', {})
+            if previous.get('source_links'):
+                record['source_links'] = previous['source_links']
         elif saved_version.exists():
-            record['downloads'] = json.loads(saved_version.read_text(encoding='utf-8')).get('downloads', {})
+            saved = json.loads(saved_version.read_text(encoding='utf-8'))
+            record['downloads'] = saved.get('downloads', {})
+            if saved.get('source_links'):
+                record['source_links'] = saved['source_links']
         if not record['blockers']:
             if version in record['accepted_versions']:
                 record['state'] = 'accepted'
@@ -388,3 +434,24 @@ def record_download(code: str, index: int, entry: dict, root: Path) -> dict:
         record['downloads'][str(index)] = entry
         _save(folder, record)
         return record
+
+
+def refresh_source(code: str, index: int, receipt: dict, root: Path) -> dict:
+    """Refresh a known source URL using the same registered resource or attachment."""
+    _require(type(index) is int and index > 0 and isinstance(receipt, dict) and _http(receipt.get('url')),
+             'Source refresh requires a positive image index and an actual HTTP(S) URL')
+    evidence = payload(receipt.get('receipt'))
+    folder = request_folder(code, root)
+    with _lock(folder):
+        record = load_record(code, root)
+        _require(record['state'] == 'accepted', 'Accept the current content version before refreshing a source')
+        source = next((item for item in record['sources'] if item['index'] == index), None)
+        _require(source is not None and _source_identity(source), 'Source refresh requires a registered resource or attachment ID')
+        _require(_source_binding(evidence, {**source, 'url': receipt['url']}),
+                 'Refreshed URL must belong to the registered resource or attachment')
+        snapshot = folder / 'snapshots' / ('source-refresh-' + _hash(receipt) + '.json')
+        _write(snapshot, receipt, immutable=True)
+        record.setdefault('source_links', {})[str(index)] = {'url': receipt['url'], 'receipt': snapshot.name}
+        _save(folder, record)
+    return {'code': code, 'source_index': index, 'content_version': record['content_version'],
+            'status': 'source_link_refreshed', 'receipt': str(snapshot)}

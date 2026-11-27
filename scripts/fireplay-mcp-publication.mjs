@@ -1,16 +1,23 @@
 #!/usr/bin/env node
 /** Restricted image publication caller. Importing this module never connects. */
 import { spawn } from 'node:child_process';
-import { createHash } from 'node:crypto';
-import { readFile, open, realpath, stat, lstat } from 'node:fs/promises';
+import { createHash, randomUUID } from 'node:crypto';
+import { readFile, open, realpath, stat, lstat, link, unlink } from 'node:fs/promises';
 import { dirname, join, relative, resolve, isAbsolute } from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
 import { homedir, platform } from 'node:os';
+import { matchUploadTargets, putImage } from './fireplay-r2-transfer.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const HASH = /^[0-9a-f]{64}$/;
-const TOOLS = new Set(['material_r2_upload_from_bytes', 'material_upload_from_url', 'material_append_images', 'material_attribution_update', 'requirement_bind_materials']);
+const PRESIGN_TOOL = 'material_r2_presign_upload';
+const UPLOAD_TOOLS = new Set(['material_r2_upload_from_bytes', PRESIGN_TOOL]);
+const TOOLS = new Set([...UPLOAD_TOOLS, 'material_upload_from_url', 'material_append_images', 'material_attribution_update', 'requirement_bind_materials']);
+const MAX_BYTES_UPLOAD = 15 * 1024 * 1024;
+const MAX_PRESIGNED_IMAGE_BYTES = 50 * 1024 * 1024;
+const PUT_CONCURRENCY = 6;
+const EXCLUDED_DESIGNERS = new Set(['c74b62d9', 'b2fbcgab']);
 const fail = message => { throw new Error(message); };
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const json = async path => JSON.parse(await readFile(path, 'utf8'));
@@ -71,9 +78,13 @@ function collect(value, key) {
   return Object.entries(value).flatMap(([name, child]) => [ ...(name === key ? [child] : []), ...collect(child, key) ]);
 }
 
-async function appendJournal(path, entry) {
+async function appendJournal(path, ...entries) {
   const handle = await open(path, 'a');
-  try { await handle.writeFile(`${JSON.stringify({ ...entry, at: new Date().toISOString() })}\n`); await handle.sync(); }
+  try {
+    const at = new Date().toISOString();
+    await handle.writeFile(entries.map(entry => `${JSON.stringify({ ...entry, at })}\n`).join(''));
+    await handle.sync();
+  }
   finally { await handle.close(); }
 }
 
@@ -88,7 +99,8 @@ async function loadJournal(path) {
     if (sha256(bytes) !== entry.receipt_sha256) fail('Publication receipt hash mismatch');
     const receipt = JSON.parse(bytes);
     if (receipt.operation_id !== entry.operation_id || receipt.requirement_id !== entry.requirement_id ||
-        receipt.tool !== entry.tool || receipt.state !== 'received') fail('Publication receipt identity mismatch');
+        receipt.tool !== entry.tool || receipt.state !== 'received' ||
+        JSON.stringify(receipt.outputs) !== JSON.stringify(entry.outputs)) fail('Publication receipt identity mismatch');
     return {...entry,response:receipt.response};
   }));
 }
@@ -143,14 +155,20 @@ function hasUploadResource(entry) {
 function provenUploads(entries, operationIds, requirementId) {
   if (!Array.isArray(operationIds) || !operationIds.length ||
       operationIds.length !== new Set(operationIds).size) fail('Upload operation IDs must be unique');
-  const uploads = recordsFor(entries, 'material_r2_upload_from_bytes')
-    .filter(entry => entry.requirement_id === requirementId && operationIds.includes(entry.operation_id));
+  const uploads = entries.filter(entry => entry.state === 'received' && !entry.response?.isError &&
+    UPLOAD_TOOLS.has(entry.tool) && entry.requirement_id === requirementId && operationIds.includes(entry.operation_id));
   if (uploads.length !== operationIds.length) fail('Upload provenance not found');
   return uploads.map(entry => {
     const [output] = entry.outputs || [];
     if (entry.outputs?.length !== 1 || !HASH.test(output.sha256)) fail('Missing reviewed upload binding');
-    return { ...uploadResource(decodeResult(entry.response)), output };
+    const result = decodeResult(entry.response);
+    if (entry.tool === PRESIGN_TOOL && !successfulPut(result, output)) fail('Presign receipt lacks verified binary PUT');
+    return { ...uploadResource(result), output };
   });
+}
+
+function successfulPut(result, output) {
+  return [200, 201, 204].includes(result?.transfer?.http_status) && result.transfer.sha256 === output.sha256;
 }
 
 function imageKind(bytes) {
@@ -221,31 +239,63 @@ async function publicationContract(root, folder, tool) {
   return {definition, evidence:{path:relative(root, path),sha256:sha256(bytes)}};
 }
 
+async function readReviewedImage(folder, output, maxBytes=MAX_PRESIGNED_IMAGE_BYTES) {
+  const path = await realpath(output.path);
+  if (!inside(folder, path)) fail('Reviewed output outside requirement folder');
+  const info = await stat(path);
+  if (!info.isFile() || info.size > maxBytes) fail(`Expected one reviewed image up to ${maxBytes / 1024 / 1024} MiB`);
+  const bytes = await readFile(path);
+  if (bytes.length > maxBytes || sha256(bytes) !== output.sha256) fail('Reviewed output changed or exceeds upload limit');
+  return { output:outputBinding({...output, path}), bytes, ...imageKind(bytes) };
+}
+
+function selectUploadOutput(outputs, selector, folder, entries, requirementId) {
+  const selected = outputs.filter(item => item.sha256 === selector.output_sha256 &&
+    (selector.output_path === undefined || item.path === resolve(folder, selector.output_path)));
+  if (selected.length !== 1) fail('output_sha256 must identify one reviewed output');
+  const [output] = selected;
+  const prior = entries.filter(entry => entry.state === 'received' && !entry.response?.isError &&
+    UPLOAD_TOOLS.has(entry.tool) && entry.requirement_id === requirementId && hasUploadResource(entry));
+  if (prior.some(entry => entry.outputs?.some(old => overlapsOutput(old, output)))) {
+    fail('Member already uploaded; reconcile the frozen resource');
+  }
+  return output;
+}
+
+function overlapsOutput(left, right) {
+  return left.path === right.path || left.sha256 === right.sha256 || matchesMember(left, right);
+}
+
 async function prepareArguments({ request, intake, folder, entries }) {
   const args = structuredClone(request.arguments || {});
   if ('feishu_user_id' in args) fail('Caller identity must come from JWT');
+  if (request.tool === PRESIGN_TOOL) {
+    const {batch_uploads: selectors} = request;
+    if (Object.keys(args).length || !Array.isArray(selectors) || !selectors.length || selectors.length > 200) {
+      fail('Presign batch needs 1–200 batch_uploads and derives the MCP arguments');
+    }
+    const outputs = await reviewedOutputs(folder, request, intake.summary.id);
+    const members = [];
+    for (const selector of selectors) {
+      if (!selector || Object.keys(selector).some(key => !['operation_id','output_sha256','output_path'].includes(key)) ||
+          !UUID.test(selector.operation_id) || !HASH.test(selector.output_sha256) ||
+          (selector.output_path !== undefined && typeof selector.output_path !== 'string')) fail('Invalid batch upload selector');
+      const output = selectUploadOutput(outputs, selector, folder, entries, intake.summary.id);
+      if (members.some(member => member.id === selector.operation_id || overlapsOutput(member.output, output))) fail('Duplicate batch member or operation ID');
+      const image = await readReviewedImage(folder, output);
+      members.push({id:selector.operation_id, output:image.output, item:{
+        file_name:`${selector.operation_id}.${image.ext}`, content_type:image.mime, ext:image.ext, file_size:image.bytes.length,
+      }});
+    }
+    return { args:{items:members.map(member => member.item)}, outputs:members.map(member => member.output), members };
+  }
   if (request.tool === 'material_r2_upload_from_bytes') {
     if ('file_base64' in args) fail('Do not supply base64; caller reads reviewed output');
     const outputs = await reviewedOutputs(folder, request, intake.summary.id);
-    const selected = outputs.filter(item => item.sha256 === request.output_sha256 &&
-      (request.output_path === undefined || item.path === resolve(folder, request.output_path)));
-    if (selected.length !== 1) fail('output_sha256 must identify one reviewed output');
-    const [output] = selected;
-    const prior = recordsFor(entries, request.tool).filter(entry =>
-      entry.requirement_id === intake.summary.id && hasUploadResource(entry));
-    if (prior.some(entry => entry.outputs?.some(old =>
-      matchesMember(old, output) || old.sha256 === output.sha256 || old.path === output.path))) {
-      fail('Member already uploaded; reconcile the frozen resource');
-    }
-    const path = await realpath(output.path);
-    if (!inside(folder, path)) fail('Reviewed output outside requirement folder');
-    if ((await stat(path)).size > 50 * 1024 * 1024) fail('Upload exceeds 50MiB');
-    const bytes = await readFile(path);
-    if (sha256(bytes) !== output.sha256) fail('Reviewed output changed');
-    const kind = imageKind(bytes);
-    if (bytes.length > 50 * 1024 * 1024) fail('Upload exceeds 50MiB');
-    if (args.content_type !== kind.mime || ![kind.ext, ...(kind.ext === 'jpg' ? ['jpeg'] : [])].includes(args.ext)) fail('MIME/ext do not match image bytes');
-    return { args: { ...args, file_base64:bytes.toString('base64') }, outputs:[outputBinding({...output, path})] };
+    const selected = selectUploadOutput(outputs, request, folder, entries, intake.summary.id);
+    const image = await readReviewedImage(folder, selected, MAX_BYTES_UPLOAD);
+    if (args.content_type !== image.mime || ![image.ext, ...(image.ext === 'jpg' ? ['jpeg'] : [])].includes(args.ext)) fail('MIME/ext do not match image bytes');
+    return { args: { ...args, file_base64:image.bytes.toString('base64') }, outputs:[image.output] };
   }
   if (request.tool === 'material_upload_from_url') {
     if (args.confirmed !== true) fail('Import requires explicit confirmed:true; false is skipped');
@@ -292,12 +342,17 @@ async function prepareArguments({ request, intake, folder, entries }) {
     if (typeof args.confirmed !== 'boolean') fail('Attribution must explicitly choose preview or write');
     if (args.creation_type && args.creation_type !== 'derivative') fail('Only derivative attribution allowed');
     if (!args.material_ids?.length || args.material_ids.some(id => !materialIds.has(id))) fail('Attribution IDs must belong to recorded same-demand imports');
-    if (args.designer_ids?.some(id => !intake.summary.assigneeIds?.includes(id))) fail('Designer ID is not a current intake assignee');
-    if (args.designer_ids) {
-      if (!Array.isArray(request.designer_members)) fail('Attribution requires verified designer_members with feishuUserId/username');
-      const selected = request.designer_members.filter(member => !['罗晨钧','邹彬'].includes(member.username));
-      if (selected.length !== args.designer_ids.length || selected.some(member => !member.username?.trim() || !args.designer_ids.includes(member.feishuUserId)) || args.designer_ids.some(id => !selected.some(member => member.feishuUserId === id))) fail('Attribution must retain exactly verified designers excluding 罗晨钧 and 邹彬');
+    const assignees = intake.summary.assigneeIds;
+    if (!Array.isArray(assignees) || assignees.some(id => typeof id !== 'string' || !id.trim())) {
+      fail('Attribution requires the current intake assigneeIds');
     }
+    const designers = [...new Set(assignees.filter(id => !EXCLUDED_DESIGNERS.has(id)))];
+    if (Object.hasOwn(args, 'designer_ids') && (!Array.isArray(args.designer_ids) ||
+        args.designer_ids.length !== designers.length || designers.some(id => !args.designer_ids.includes(id)))) {
+      fail('Attribution must include every current assignee except 罗晨钧 and 邹彬');
+    }
+    if (designers.length) args.designer_ids = designers;
+    else delete args.designer_ids;
   } else if (request.tool === 'requirement_bind_materials') {
     if (args.confirmed !== true || !Array.isArray(args.items) || args.items.length !== 1) fail('Bind requires exactly one confirmed requirement');
     const item = args.items[0];
@@ -336,13 +391,106 @@ function registeredOutputs(entry) {
   return (collect(response, 'material_id').length || response?.success === true) ? entry.outputs || [] : [];
 }
 
-/** Execute at most one business call; transport is injected for offline tests. */
-export async function publish({ root=ROOT, code, operationId, request, transport }) {
+async function saveReceived(folder, journalPath, entry, response) {
+  const path = join(folder,`publication-${entry.operation_id}.json`);
+  const temporary = join(folder, `.${entry.operation_id}.${randomUUID()}.tmp`);
+  const receipt = await open(temporary, 'wx', 0o600);
+  try {
+    const received = {...entry, state:'received', response};
+    const bytes = JSON.stringify(received, null, 2);
+    try {
+      await receipt.writeFile(bytes);
+      await receipt.sync();
+    } finally {
+      await receipt.close();
+    }
+    await link(temporary, path);
+    await appendJournal(journalPath,{...entry,state:'received',receipt_sha256:sha256(bytes)});
+  } finally {
+    await unlink(temporary);
+  }
+}
+
+async function executeUploadBatch({folder, journalPath, entry, parameters, prepared, definition, transport, put}) {
+  const memberEntries = prepared.members.map(member => ({
+    ...entry, operation_id:member.id, batch_id:entry.operation_id, outputs:[member.output],
+  }));
+  await appendJournal(journalPath, ...memberEntries);
+  const presignStartedAt = new Date().toISOString();
+  let raw;
+  try {
+    raw = await transport.call(definition.invoke_via, parameters);
+  } catch (error) {
+    const presign_timing = {started_at:presignStartedAt, finished_at:new Date().toISOString()};
+    await appendJournal(journalPath, ...memberEntries.map(memberEntry => ({...memberEntry,presign_timing})));
+    throw error;
+  }
+  const presignTiming = {started_at:presignStartedAt, finished_at:new Date().toISOString()};
+  const result = raw?.isError ? null : decodeResult(raw);
+  const payload = result?.success === false || result?.error ? null : result?.items ? result : result?.data;
+  const targets = matchUploadTargets(payload, prepared.args.items, UUID);
+  const results = new Array(prepared.members.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < prepared.members.length) {
+      const index = next++;
+      const member = prepared.members[index];
+      const memberEntry = {...memberEntries[index], presign_timing:presignTiming};
+      const target = targets[index];
+      let bytes;
+      let reason = raw?.isError ? 'presign_connector_error' : 'no_verified_presign_item';
+      if (target) {
+        try {
+          const image = await readReviewedImage(folder, member.output);
+          if (image.bytes.length === member.item.file_size) bytes = image.bytes;
+        } catch {
+          reason = 'reviewed_file_unavailable_or_changed';
+        }
+      }
+      if (!bytes) {
+        await saveReceived(folder, journalPath, memberEntry, {success:false, reason});
+        results[index] = {operation_id:member.id, status:'not_uploaded', reason};
+        continue;
+      }
+      const resource = {resourceId:target.resourceId, publicUrl:target.publicUrl};
+      const attempted = {...memberEntry, put_target:resource, put_started_at:new Date().toISOString(), put_bytes:bytes.length};
+      await appendJournal(journalPath, attempted);
+      const startedAt = new Date().toISOString();
+      const putEntry = {...attempted, put_transfer_started_at:startedAt};
+      let httpStatus;
+      try {
+        httpStatus = await put(target, bytes);
+      } catch {
+        await appendJournal(journalPath, {...putEntry, put_finished_at:new Date().toISOString()});
+        results[index] = {operation_id:member.id, status:'unknown', reason:'put_result_unconfirmed'};
+        continue;
+      }
+      const finishedAt = new Date().toISOString();
+      if (![200, 201, 204].includes(httpStatus)) {
+        await appendJournal(journalPath, {...putEntry, put_finished_at:finishedAt, put_http_status:httpStatus});
+        results[index] = {operation_id:member.id, status:'unknown', http_status:httpStatus};
+        continue;
+      }
+      await saveReceived(folder, journalPath, putEntry, {...resource, transfer:{
+        http_status:httpStatus, method:'PUT', sha256:member.output.sha256, bytes:bytes.length,
+        started_at:startedAt, finished_at:finishedAt,
+      }});
+      results[index] = {operation_id:member.id, status:'uploaded', ...resource, http_status:httpStatus};
+    }
+  };
+  const settled = await Promise.allSettled(Array.from({length:Math.min(PUT_CONCURRENCY, prepared.members.length)}, worker));
+  if (settled.some(result => result.status === 'rejected')) fail('Batch receipt write failed; inspect the member journal');
+  return {operationId:entry.operation_id, results};
+}
+
+export async function publish({ root=ROOT, code, operationId, request, transport, put=putImage }) {
   if (!/^[A-Z]+-\d{8}-\d+$/.test(code || '') || !UUID.test(operationId || '')) fail('Exact requirement code and operation UUID required');
   if (!request || typeof request !== 'object' || Array.isArray(request)) fail('Request must be an object');
-  const envelopeFields = new Set(['tool','schema_version','arguments','gate_file','output_sha256','output_path','upload_operation_ids','designer_members','reupload_authorization_file','isolate_unknown_uploads']);
+  const envelopeFields = new Set(['tool','schema_version','arguments','gate_file','output_sha256','output_path','upload_operation_ids','designer_members','reupload_authorization_file','isolate_unknown_uploads','batch_uploads']);
   for (const key of Object.keys(request)) if (!envelopeFields.has(key)) fail(`Unknown request control: ${key}`);
   if (!TOOLS.has(request.tool)) fail('Tool forbidden');
+  if (request.tool === PRESIGN_TOOL && (request.reupload_authorization_file || request.output_sha256 || request.upload_operation_ids)) fail('Batch upload requires its own member selectors');
+  if ('batch_uploads' in request && request.tool !== PRESIGN_TOOL) fail('batch_uploads requires the presign tool');
   if ('output_path' in request && (typeof request.output_path !== 'string' || request.tool !== 'material_r2_upload_from_bytes')) fail('output_path must identify an image upload');
   if ('isolate_unknown_uploads' in request && typeof request.isolate_unknown_uploads !== 'boolean') fail('isolate_unknown_uploads must be boolean');
   if (request.isolate_unknown_uploads && request.reupload_authorization_file) fail('Choose isolation or explicit reupload authorization');
@@ -360,8 +508,10 @@ export async function publish({ root=ROOT, code, operationId, request, transport
   const journalPath = join(folder,'publication-journal.jsonl');
   try {
     const entries = await loadJournal(journalPath);
-    if (entries.some(entry => entry.operation_id === operationId)) fail('Operation ID already recorded; replay forbidden');
-    const unresolved = entries.filter(entry => entry.state === 'unknown').filter(entry => !entries.some(other => other.operation_id === entry.operation_id && other.state === 'received'));
+    const usedIds = new Set(entries.flatMap(entry => [entry.operation_id, entry.batch_id]));
+    if (usedIds.has(operationId)) fail('Operation ID already recorded; replay forbidden');
+    const current = new Map(entries.map(entry => [entry.operation_id, entry]));
+    const unresolved = [...current.values()].filter(entry => entry.state === 'unknown');
     let reuploadAuthorization;
     if (request.reupload_authorization_file) {
       const authorizationPath = await realpath(resolve(folder, request.reupload_authorization_file));
@@ -377,13 +527,16 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     if (unresolved.length && request.isolate_unknown_uploads) {
       isolatedOutputs = unresolved.map(entry => {
         const [output] = entry.outputs || [];
-        if (entry.tool !== 'material_r2_upload_from_bytes' || entry.requirement_id !== intake.summary.id || entry.outputs?.length !== 1 ||
+        if (!UPLOAD_TOOLS.has(entry.tool) || entry.requirement_id !== intake.summary.id || entry.outputs?.length !== 1 ||
             typeof output?.path !== 'string' || !isAbsolute(output.path) || !inside(folder, output.path) ||
             !HASH.test(output.sha256)) fail('Only attributable unknown R2 uploads can be isolated');
         return output;
       });
     }
     const prepared = await prepareArguments({request,intake,folder,entries});
+    if (prepared.members?.some(member => member.id === operationId || usedIds.has(member.id))) {
+      fail('Batch member operation ID already recorded or equals batch ID; replay forbidden');
+    }
     if (isolatedOutputs.length) {
       let selected = prepared.outputs;
       if (request.tool === 'requirement_bind_materials' || request.tool === 'material_attribution_update') {
@@ -395,8 +548,7 @@ export async function publish({ root=ROOT, code, operationId, request, transport
           return originating.flatMap(entry => entry.outputs);
         });
       }
-      if (!selected.length || selected.some(output => isolatedOutputs.some(unknown =>
-        unknown.path === output.path || unknown.sha256 === output.sha256 || matchesMember(unknown, output)))) {
+      if (!selected.length || selected.some(output => isolatedOutputs.some(unknown => overlapsOutput(unknown, output)))) {
         fail('Operation overlaps an unresolved upload; original write cannot be replayed');
       }
     }
@@ -405,10 +557,16 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     validateSchema(prepared.args,definition.inputSchema);
     const live = decodeResult(await transport.call('tool_catalog',{tool:request.tool}));
     if (live.name !== request.tool || live.operation_class !== 'write' || live.schema_version !== definition.schema_version || live.invoke_via !== definition.invoke_via || JSON.stringify(live.inputSchema) !== JSON.stringify(definition.inputSchema)) fail('Live contract drift; refresh and review before write');
+    const baseEntry = {operation_id:operationId,requirement_id:intake.summary.id,code,tool:request.tool,schema_version:definition.schema_version,contract,request_sha256:sha256(JSON.stringify(request)),outputs:prepared.outputs,state:'unknown'};
+    if (request.isolate_unknown_uploads) baseEntry.isolated_unknown_upload_ids = unresolved.map(item => item.operation_id);
+    const parameters = definition.invoke_via === 'tool_write' ? {tool:request.tool,schema_version:definition.schema_version,arguments:prepared.args} : prepared.args;
+    if (request.tool === PRESIGN_TOOL) {
+      return await executeUploadBatch({folder,journalPath,entry:baseEntry,parameters,prepared,definition,transport,put});
+    }
     const receiptPath = join(folder,`publication-${operationId}.json`);
     const receipt = await open(receiptPath,'wx');
     try {
-      const entry = {operation_id:operationId,requirement_id:intake.summary.id,code,tool:request.tool,schema_version:definition.schema_version,contract,request_sha256:sha256(JSON.stringify(request)),outputs:prepared.outputs,state:'unknown'};
+      const entry = baseEntry;
       if (prepared.outputGroups) entry.output_groups = prepared.outputGroups;
       if (request.tool === 'material_attribution_update' && prepared.args.confirmed === true) {
         const {material_ids, designer_ids, creation_type} = prepared.args;
@@ -416,7 +574,6 @@ export async function publish({ root=ROOT, code, operationId, request, transport
       }
       if (request.tool === 'requirement_bind_materials') entry.binding_material_ids = prepared.args.items[0].material_ids;
       if (reuploadAuthorization) entry.reupload_authorization = reuploadAuthorization;
-      if (request.isolate_unknown_uploads) entry.isolated_unknown_upload_ids = unresolved.map(item => item.operation_id);
       if (request.tool === 'material_upload_from_url') {
         entry.request_file = `publication-request-${operationId}.json`;
         const original = await open(join(folder, entry.request_file), 'wx');
@@ -424,7 +581,6 @@ export async function publish({ root=ROOT, code, operationId, request, transport
         finally { await original.close(); }
       }
       await appendJournal(journalPath,entry);
-      const parameters = definition.invoke_via === 'tool_write' ? {tool:request.tool,schema_version:definition.schema_version,arguments:prepared.args} : prepared.args;
       const response = await transport.call(definition.invoke_via,parameters);
       const received = {...entry,state:'received',response};
       const receiptBytes = JSON.stringify(received,null,2);
@@ -435,7 +591,7 @@ export async function publish({ root=ROOT, code, operationId, request, transport
     } finally { await receipt.close(); }
   } finally {
     await lock.close();
-    const {unlink} = await import('node:fs/promises'); await unlink(join(folder,'publication.lock'));
+    await unlink(join(folder,'publication.lock'));
   }
 }
 
@@ -485,11 +641,40 @@ export async function connectProxy(root=ROOT) {
   } catch(error){close();throw error;}
 }
 
+export async function requestFromGate({root=ROOT, code, gateFile}) {
+  if (!/^[A-Z]+-\d{8}-\d+$/.test(code || '')) fail('Expected an exact requirement code');
+  const folder = await realpath(join(root, 'work', 'fireplay-production', code));
+  const gatePath = await realpath(resolve(folder, gateFile));
+  if (!inside(folder, gatePath)) fail('Gate outside requirement folder');
+  const gate = await json(gatePath);
+  if (gate.passed !== true || !Array.isArray(gate.upload_candidates) || !gate.upload_candidates.length) {
+    fail('Generate a current delivery gate with eligible upload candidates');
+  }
+  const {definition} = await publicationContract(root, folder, PRESIGN_TOOL);
+  return {
+    tool:PRESIGN_TOOL,
+    schema_version:definition.schema_version,
+    gate_file:gatePath,
+    isolate_unknown_uploads:gate.isolate_unknown_uploads === true,
+    batch_uploads:gate.upload_candidates.slice(0, 200).map(output => ({
+      operation_id:randomUUID(), output_sha256:output.sha256, output_path:output.path,
+    })),
+  };
+}
+
 async function main() {
-  const values={};
-  for(let index=2;index<process.argv.length;index+=2){const key=process.argv[index];if(!['--requirement','--request','--operation-id'].includes(key)||!process.argv[index+1]||key in values)fail('Expected --requirement CODE --request FILE --operation-id UUID');values[key]=process.argv[index+1];}
-  if(Object.keys(values).length!==3)fail('All three CLI options required');
-  const request=await json(resolve(values['--request']));
+  const values = {};
+  const usage = 'Expected --requirement CODE --operation-id UUID and either --request FILE or --batch-gate FILE';
+  for (let index=2; index<process.argv.length; index+=2) {
+    const key = process.argv[index];
+    if (!['--requirement','--request','--batch-gate','--operation-id'].includes(key) ||
+        !process.argv[index+1] || key in values) fail(usage);
+    values[key] = process.argv[index+1];
+  }
+  if (!values['--requirement'] || !values['--operation-id'] ||
+      Boolean(values['--request']) === Boolean(values['--batch-gate'])) fail(usage);
+  const request = values['--request'] ? await json(resolve(values['--request']))
+    : await requestFromGate({code:values['--requirement'], gateFile:values['--batch-gate']});
   const transport=await connectProxy();
   try { console.log(JSON.stringify(await publish({code:values['--requirement'],operationId:values['--operation-id'],request,transport}))); }
   finally {transport.close();}
